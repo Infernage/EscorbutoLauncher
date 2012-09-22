@@ -55,6 +55,11 @@ public class Unworker extends SwingWorker<Integer, Integer>{
             if (exec.exists()){//Si existe el acceso directo, lo borramos
                 exec.delete();
             }
+            File runner = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger");
+            if (runner.exists()){
+                borrarFichero(runner);
+                runner.delete();
+            }
         } else if (Vista.OS.equals("linux")){
             File mine = new File(System.getProperty("user.home") + "/.minecraft");
             if (mine.exists() && mine.isDirectory()){
@@ -74,6 +79,11 @@ public class Unworker extends SwingWorker<Integer, Integer>{
             File exec = new File(System.getProperty("user.home") + "/Desktop/RunMinecraft.sh");
             if (exec.exists()){//Si existe el acceso directo, lo borramos
                 exec.delete();
+            }
+            File runner = new File(System.getProperty("user.home") + "/Data/Logger");
+            if (runner.exists()){
+                borrarFichero(runner);
+                runner.delete();
             }
         }
         eti.setText("Minecraft desinstalado con éxito!");

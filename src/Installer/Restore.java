@@ -80,6 +80,11 @@ public class Restore extends SwingWorker<Integer, Integer>{
             File mine = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
             if (mine.exists() && mine.isDirectory()){
                 borrarFichero(mine);//Borramos el Minecraft instalado
+                File runner = new File(System.getProperty("user.name") + "\\AppData\\Roaming\\Data\\Logger");
+                if (runner.exists()){
+                    borrarFichero(runner);
+                    runner.delete();
+                }
                 eti.setText("Minecraft desinstalado con éxito.");
                 pro.setValue(50);
                 Thread.sleep(2000);
@@ -89,6 +94,9 @@ public class Restore extends SwingWorker<Integer, Integer>{
             if (temp == 1){
                 mine.mkdirs();
                 copyDirectory(rest, mine);//Instalamos la restauración
+                File runner = new File(mine.getAbsolutePath() + "\\RUN.jar");
+                File dest = new File(System.getProperty("user.name") + "\\AppData\\Roaming\\Data\\Logger");
+                dest.mkdirs();
             } else if (temp == 2){
                 //Instalamos la restauración
                 ZipFile dat = new ZipFile(newRest);
@@ -111,7 +119,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 pw.println();
                 pw.print("@echo off");
                 pw.println();
-                pw.print("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
+                pw.print("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\RUN.jar");
                 pw.close();
             }
         } else if (Vista.OS.equals("linux")){
