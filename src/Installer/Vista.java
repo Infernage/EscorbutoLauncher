@@ -22,15 +22,12 @@ public class Vista extends javax.swing.JFrame {
     private Worker work;//Installer
     private Unworker unwork;//Uninstaller
     private Restore restau;//Restorer
-    public static String OS = System.getProperty("os.name");//Operative system
+    public static String OS = Login.Mainclass.OS;//Operative system
     /**
      * Creates new form Vista
      */
     public Vista() {
         System.out.println("Executing with " + OS);
-        StringTokenizer token = new StringTokenizer(OS, " ");
-        OS = token.nextToken().toLowerCase();
-        token = null;
         initComponents();
         jButton4.setVisible(false);
         jProgressBar1.setVisible(false);

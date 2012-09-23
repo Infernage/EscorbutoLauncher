@@ -62,13 +62,12 @@ public class Worker extends SwingWorker <String, Integer>{
                     File copia = new File (System.getProperty("user.home") + "\\Desktop\\Copia Minecraft\\" + str.toString() + "\\" + sts.toString());
                     File zip = new File(copia.getAbsolutePath() + "\\data.dat");
                     if (copia.exists()){
-                        System.out.println("[ERROR] This copy is already done!");
+                        System.err.println("[ERROR] This copy is already done!");
                         int j = JOptionPane.showConfirmDialog(null, "Ya existe una copia hecha, ¿desea borrarla?");
                         if (j == 0){
                             borrarFichero(copia);
                             copia.mkdirs();
                             try {
-                                //copyDirectory(copiaDel, copia);
                                 ZipFile data = new ZipFile(zip);
                                 ZipParameters par = new ZipParameters();
                                 par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
@@ -87,7 +86,6 @@ public class Worker extends SwingWorker <String, Integer>{
                         copia.mkdirs();
                         try {
                             eti.setText("Realizando copia de seguridad...");
-                            //copyDirectory(copiaDel, copia);
                             ZipFile data = new ZipFile(zip);
                             ZipParameters par = new ZipParameters();
                             par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
@@ -174,6 +172,21 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
             }
+            File temporal = new File(user + "\\.minecraft\\Temporal.jar");
+            File temp = new File(user + "\\Data\\Logger\\Temporal.jar");
+            if (!temp.exists() && temporal.exists()){
+                copy(temporal, temp);
+                temporal.delete();
+            } else if (temp.exists() && !temporal.exists()){
+                System.out.println("File already copied!");
+            } else if (temp.exists() && temporal.exists()){
+                System.out.println("File already copied but not deleted!\nDeleting...");
+                temporal.delete();
+            } else{
+                JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
+                System.err.println("[ERROR] Temporal not found!\n");
+                exito = false;
+            }
         } else if (Vista.OS.equals("linux")){
             String user = System.getProperty("user.home");
             File fichsrc = new File("inst/inst.dat");
@@ -200,13 +213,12 @@ public class Worker extends SwingWorker <String, Integer>{
                     File copia = new File (System.getProperty("user.home") + "/Desktop/Copia Minecraft/" + str.toString() + "/" + sts.toString());
                     File zip = new File(copia.getAbsolutePath() + "/data.dat");
                     if (copia.exists()){
-                        System.out.println("[ERROR] This copy is already done!");
+                        System.err.println("[ERROR] This copy is already done!");
                         int j = JOptionPane.showConfirmDialog(null, "Ya existe una copia hecha, ¿desea borrarla?");
                         if (j == 0){
                             borrarFichero(copia);
                             copia.mkdirs();
                             try {
-                                //copyDirectory(copiaDel, copia);
                                 ZipFile data = new ZipFile(zip);
                                 ZipParameters par = new ZipParameters();
                                 par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
@@ -311,6 +323,21 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
             }
+            File temporal = new File(user + "/.minecraft/Temporal.jar");
+            File temp = new File(user + "/Data/Logger/Temporal.jar");
+            if (!temp.exists() && temporal.exists()){
+                copy(temporal, temp);
+                temporal.delete();
+            } else if (temp.exists() && !temporal.exists()){
+                System.out.println("File already copied!");
+            } else if (temp.exists() && temporal.exists()){
+                System.out.println("File already copied but not deleted!\nDeleting...");
+                temporal.delete();
+            } else{
+                JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
+                System.err.println("[ERROR] Temporal not found!\n");
+                exito = false;
+            }
         }
         if (exito){
             res = "Done!";
@@ -328,17 +355,29 @@ public class Worker extends SwingWorker <String, Integer>{
     protected void done() {
         fr.setVisible(true);
         if (exito && !this.isCancelled() && Vista.OS.equals("windows")){
-            eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
-            bot.setVisible(true);
-            bot.setEnabled(true);
-            prog.setValue(100);
-            bot1.setVisible(false);
+            try{
+                eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
+                Thread.sleep(3000);
+                bot.setVisible(true);
+                bot.setEnabled(true);
+                prog.setValue(100);
+                bot1.setVisible(false);
+                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar");
+            } catch (Exception ex){
+                System.err.println(ex.getMessage());
+            }
         } else if(exito && !this.isCancelled() && Vista.OS.equals("linux")){
-            eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "/.minecraft");
-            bot.setVisible(true);
-            bot.setEnabled(true);
-            prog.setValue(100);
-            bot1.setVisible(false);
+            try{
+                eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "/.minecraft");
+                Thread.sleep(3000);
+                bot.setVisible(true);
+                bot.setEnabled(true);
+                prog.setValue(100);
+                bot1.setVisible(false);
+                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "/Data/Logger/Temporal.jar");
+            } catch (Exception ex){
+                System.err.println(ex.getMessage());
+            }
         } else if (!exito){
             eti.setText("Minecraft no ha podido ser instalado.");
         } else if (this.isCancelled()){
@@ -367,5 +406,19 @@ public class Worker extends SwingWorker <String, Integer>{
             System.out.println("Deleting old data: " + ficheros[x].getName());
             ficheros[x].delete();
         }
+    }    
+    //Copiar fichero de un sitio a otro
+    private void copy(File src, File dst) throws IOException { 
+        InputStream in = new FileInputStream(src); 
+        OutputStream out = new FileOutputStream(dst); 
+        eti.setText("Extrayendo en " + dst.getAbsolutePath());
+         
+        byte[] buf = new byte[4096]; 
+        int len; 
+        while ((len = in.read(buf)) > 0) { 
+            out.write(buf, 0, len); 
+        } 
+        in.close(); 
+        out.close(); 
     }
 }

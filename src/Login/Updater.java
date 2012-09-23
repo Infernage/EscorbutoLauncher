@@ -192,7 +192,7 @@ public class Updater extends Thread{
         } else if (Mainclass.OS.equals("linux")){
             command = "java -jar " + path + "/Install.jar";
         }
-        Installer exe = new Installer(command);
+        Executer exe = new Executer(command);
         exe.start();
         Mainclass.hilos.put("Installer", exe);
     }

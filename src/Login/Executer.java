@@ -13,9 +13,9 @@ import javax.swing.JOptionPane;
  *
  * @author Reed
  */
-public class Installer extends Thread{
+public class Executer extends Thread{
     private String com;
-    public Installer (String command){
+    public Executer (String command){
         com = command;
     }
     @Override
