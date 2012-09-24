@@ -27,6 +27,7 @@ public class Vista extends javax.swing.JFrame {
      * Creates new form Vista
      */
     public Vista(String fich, String pss, String boo) {
+        Mainclass.init.exit();
         initComponents();
         fichero = new File(fich);
         error = new File (fich.replaceFirst("data.cfg", "LogEr.txt"));

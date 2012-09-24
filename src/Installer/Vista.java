@@ -27,6 +27,7 @@ public class Vista extends javax.swing.JFrame {
      * Creates new form Vista
      */
     public Vista() {
+        Login.Mainclass.init.exit();
         System.out.println("Executing with " + OS);
         initComponents();
         jButton4.setVisible(false);

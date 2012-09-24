@@ -36,6 +36,7 @@ public class Vista2 extends javax.swing.JFrame {
      * Creates new form Vista2
      */
     public Vista2(String P) {
+        Mainclass.init.exit();
         pass = P;
         //Asignamos el fondo al Panel
         setContentPane(new Background());

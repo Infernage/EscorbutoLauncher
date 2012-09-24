@@ -63,8 +63,7 @@ public class Updater extends Thread{
                 path = System.getProperty("user.home") + "/Desktop";
             }
             // Abrimos el archivo
-            name = getFileName(url);
-            name = name.replace("%20", " ");
+            name = "Update.zip";
             if (Mainclass.OS.equals("windows")){
                 file = new RandomAccessFile(path + "\\" + name, "rw");
             } else if (Mainclass.OS.equals("linux")){
@@ -92,7 +91,8 @@ public class Updater extends Thread{
             stream.close();
             file.close();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            JOptionPane.showMessageDialog(null, "[ERROR] Download crashed!");
+            System.err.println(e);
         }
     }
     //Método de descompresión
@@ -188,11 +188,12 @@ public class Updater extends Thread{
             //Por último ejecutamos el nuevo instalador
         String command = null;
         if (Mainclass.OS.equals("windows")){
-            command = "java -jar " + path + "\\Install.jar";
+            command = "java -jar " + System.getProperty("user.dir") + "\\Temporal.jar";
         } else if (Mainclass.OS.equals("linux")){
-            command = "java -jar " + path + "/Install.jar";
+            command = "java -jar " + System.getProperty("user.dir") + "/Temporal.jar";
         }
         Executer exe = new Executer(command);
+        exe.setDaemon(true);
         exe.start();
         Mainclass.hilos.put("Installer", exe);
     }
@@ -202,6 +203,6 @@ public class Updater extends Thread{
         descargar();//Descargamos los archivos necesarios
         descomprimir();//Los descomprimimos
         JOptionPane.showMessageDialog(null, "Instalado en " + path);
-        //exec();//Ejecutamos el main
+        exec();//Ejecutamos el main
     }
 }

@@ -22,15 +22,25 @@ public class Mainclass {
     public final static String version = "V3.1.1";
     public static String OS = System.getProperty("os.name");
     public static Map<String, Thread> hilos;
+    public static Splash init;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        init = new Splash();
+        Thread t = new Thread(init);
+        t.start();
         hilos = new HashMap<String, Thread>();
+        hilos.put("Splash", t);
         StringTokenizer token = new StringTokenizer(OS, " ");
         OS = token.nextToken().toLowerCase();
         token = null;
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Mainclass.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (OS.equals("windows")){
             //Creamos las variables
             StringBuilder path = new StringBuilder(System.getProperty("user.home"));//Path del sistema
