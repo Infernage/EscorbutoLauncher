@@ -47,13 +47,22 @@ public class Mainclass {
             File mine = new File(path.toString() + "\\AppData\\Roaming\\.minecraft");
             if (mine.exists()){
                 File[] mines = mine.listFiles();
-                if (mines.length < 7){
+                File infer = new File(mine.getAbsolutePath() + "\\Infernage.hdn");
+                if ((mines.length < 7) || infer.exists()){
                     System.out.println("Ejecutando instalador...");
                     Installer.Vista.main(args);
+                    return;
                 }
             } else{
                 System.out.println("Ejecutando instalador...");
                 Installer.Vista.main(args);
+                return;
+            }
+            File dat = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data");
+            if (!dat.exists()){
+                System.out.println("Ejecutando instalador...");
+                Installer.Vista.main(args);
+                return;
             }
             path.append("\\AppData\\Roaming\\Data");//Agregamos los datos
             File runner = new File(path.toString() + "\\Logger\\RUN.jar");
@@ -143,10 +152,18 @@ public class Mainclass {
                 if (mines.length < 7){
                     System.out.println("Ejecutando instalador...");
                     Installer.Vista.main(args);
+                    return;
                 }
             } else{
                 System.out.println("Ejecutando instalador...");
                 Installer.Vista.main(args);
+                return;
+            }
+            File dat = new File(System.getProperty("user.home") + "/.Data");
+            if (!dat.exists()){
+                System.out.println("Ejecutando instalador...");
+                Installer.Vista.main(args);
+                return;
             }
            path.append("/Data");//Agregamos los datos
            File runner = new File(path.toString() + "/Logger/RUN.jar");

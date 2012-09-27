@@ -27,9 +27,9 @@ public class Vista extends javax.swing.JFrame {
      * Creates new form Vista
      */
     public Vista() {
-        Login.Mainclass.init.exit();
         System.out.println("Executing with " + OS);
         initComponents();
+        Login.Mainclass.init.exit();
         jButton4.setVisible(false);
         jProgressBar1.setVisible(false);
     }
@@ -241,6 +241,25 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Botón Finalizar
         System.out.println("Exiting");
+        if (OS.equals("windows")){
+            File run = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
+            if (run.exists() && work.isDone()){
+                try {
+                    Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar");
+                } catch (IOException ex) {
+                    System.err.println(ex);
+                }
+            }
+        } else if (OS.equals("linux")){
+            File run = new File(System.getProperty("user.home") + "/.minecraft/RUN.jar");
+            if (run.exists() && work.isDone()){
+                try{
+                    Process temporal = Runtime.getRuntime().exec("java - jar" + System.getProperty("user.home") + "/.Data/Logger/Temporal.jar");
+                } catch (IOException ex){
+                    System.err.println(ex);
+                }
+            }
+        }
         System.exit(0);
     }//GEN-LAST:event_jButton4ActionPerformed
 

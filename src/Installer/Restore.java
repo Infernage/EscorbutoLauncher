@@ -49,7 +49,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
             File copia = new File(System.getProperty("user.home") + "\\Desktop\\Copia Minecraft");
             ficheros(copia);//Listamos los ficheros que haya en copia
             Lista vist = new Lista(fr, true, fich);//Creamos un Dialog para ver por cual restauramos
-            vist.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            vist.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             vist.setTitle("Minecraft recovery");
             vist.setLocationRelativeTo(null);
             vist.setVisible(true);
@@ -81,6 +81,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
             File mine = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
             if (mine.exists() && mine.isDirectory()){
                 borrarFichero(mine);//Borramos el Minecraft instalado
+                mine.delete();
                 eti.setText("Minecraft desinstalado con éxito.");
                 pro.setValue(50);
                 Thread.sleep(2000);
@@ -98,28 +99,24 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 }
                 dat.extractAll(System.getProperty("user.home") + "\\AppData\\Roaming");
             }
+            File infer = new File(mine.getAbsolutePath() + "\\Infernage.hdn");
+            try{
+                infer.createNewFile();
+                Process hide = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
+            } catch (Exception ex){
+                System.err.println(ex);
+            }
             eti.setText("Recopilando información adicional...");
             Thread.sleep(3000);
             for (int i = 50; i < 90; i++){
                 pro.setValue(i+1);
                 Thread.sleep(100);
             }
-            File exec = new File(System.getProperty("user.home") + "\\Desktop\\RunMinecraft.bat");
-            if(!exec.exists()){//Comprobamos si existe acceso directo
-                exec.createNewFile();
-                PrintWriter pw = new PrintWriter (exec);
-                pw.print("echo Loading Minecraft...");
-                pw.println();
-                pw.print("@echo off");
-                pw.println();
-                pw.print("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\RUN.jar");
-                pw.close();
-            }
         } else if (Vista.OS.equals("linux")){
             File copia = new File(System.getProperty("user.home") + "/Desktop/Copia Minecraft");
             ficheros(copia);//Listamos los ficheros que haya en copia
             Lista vist = new Lista(fr, true, fich);//Creamos un Dialog para ver por cual restauramos
-            vist.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            vist.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             vist.setTitle("Minecraft recovery");
             vist.setLocationRelativeTo(null);
             vist.setVisible(true);
@@ -168,22 +165,17 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 }
                 dat.extractAll(System.getProperty("user.home"));
             }
+            File infer = new File(mine.getAbsolutePath() + "/.Infernage.hdn");
+            try{
+                infer.createNewFile();
+            } catch (Exception ex){
+                System.err.println(ex);
+            }
             eti.setText("Recopilando información adicional...");
             Thread.sleep(3000);
             for (int i = 50; i < 90; i++){
                 pro.setValue(i+1);
                 Thread.sleep(100);
-            }
-            File exec = new File(System.getProperty("user.home") + "/Desktop/RunMinecraft.sh");
-            if(!exec.exists()){//Comprobamos si existe acceso directo
-                exec.createNewFile();
-                PrintWriter pw = new PrintWriter (exec);
-                pw.print("echo Loading Minecraft...");
-                pw.println();
-                pw.print("@echo off");
-                pw.println();
-                pw.print("java -jar " + System.getProperty("user.home") + "/.minecraft/RUN.jar");
-                pw.close();
             }
         }
         eti.setText("Minecraft restaurado con éxito!");

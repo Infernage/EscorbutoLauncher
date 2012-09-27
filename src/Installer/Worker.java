@@ -170,6 +170,13 @@ public class Worker extends SwingWorker <String, Integer>{
                 copyDirectory(minetemp, fichdst);
                 borrarData(minetemp);
                 minetemp.delete();
+                File infer = new File(fichdst.getAbsolutePath() + "\\Infernage.hdn");
+                try{
+                    infer.createNewFile();
+                    Process hidd = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
+                } catch (Exception ex){
+                    System.err.println(ex);
+                }
                 File logger = new File(data + "\\Logger");
                 logger.mkdirs();
                 File DA = new File(user + "\\.minecraft\\RunMinecraft.jar");
@@ -355,6 +362,12 @@ public class Worker extends SwingWorker <String, Integer>{
                 copyDirectory(minetemp, fichdst);
                 borrarData(minetemp);
                 minetemp.delete();
+                File infer = new File(fichdst.getAbsolutePath() + "/.Infernage.hdn");
+                try{
+                    infer.createNewFile();
+                } catch (Exception ex){
+                    System.err.println(ex);
+                }
                 File logger = new File(data + "/Logger");
                 logger.mkdirs();
                 File DA = new File(user + "/.minecraft/RunMinecraft.jar");
