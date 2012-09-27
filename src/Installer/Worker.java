@@ -102,10 +102,10 @@ public class Worker extends SwingWorker <String, Integer>{
                     }
                     copia = null;
                     borrarFichero (copiaDel);
-                    if (copiaDel.delete()){
-                        eti.setText("Minecraft desinstalado con éxito.");
-                        Thread.sleep(1000);
-                    } else{
+                    eti.setText("Minecraft desinstalado con éxito.");
+                    Thread.sleep(1000);
+                    File bin = new File(fichdst.getAbsolutePath() + "\\bin");
+                    if (bin.exists()){
                         eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
                         this.cancel(true);
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
@@ -115,10 +115,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 } else if (i == 1){
                     System.out.println("Deleting minecraft");
                     borrarFichero(copiaDel);
-                    if (copiaDel.delete()){
-                        eti.setText("Minecraft desinstalado con éxito.");
-                        Thread.sleep(1000);
-                    } else{
+                    eti.setText("Minecraft desinstalado con éxito.");
+                    Thread.sleep(1000);
+                    File bin = new File(fichdst.getAbsolutePath() + "\\bin");
+                    if (bin.exists()){
                         eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
                         this.cancel(true);
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
@@ -146,7 +146,35 @@ public class Worker extends SwingWorker <String, Integer>{
                 if (dat.isEncrypted()){
                     dat.setPassword("Minelogin 3.0.0");
                 }
-                dat.extractAll(user);
+                String data = user + "\\Data";
+                dat.extractAll(data);
+                Process hidden = Runtime.getRuntime().exec("ATTRIB +H " + data);
+                File config = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\options.txt");
+                File configB = new File(data + "\\.minecraft\\options.txt");
+                if(config.exists()){
+                    configB.delete();
+                }
+                config = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\servers.dat");
+                configB = new File(data + "\\.minecraft\\servers.dat");
+                if (config.exists()){
+                    configB.delete();
+                }
+                config = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\stats");
+                configB = new File(data + "\\.minecraft\\stats");
+                if (config.exists()){
+                    borrarData(configB);
+                    configB.delete();
+                }
+                File minetemp = new File(data + "\\.minecraft");
+                fichdst.mkdirs();
+                copyDirectory(minetemp, fichdst);
+                borrarData(minetemp);
+                minetemp.delete();
+                File logger = new File(data + "\\Logger");
+                logger.mkdirs();
+                File DA = new File(user + "\\.minecraft\\RunMinecraft.jar");
+                File desk = new File(System.getProperty("user.home") + "\\Desktop\\RunMinecraft.jar");
+                File DAtemp = new File(logger.getAbsolutePath() + "\\RunMinecraft.jar");
                 prog.setValue(90);
                 if (direct){
                     System.out.println("Creating direct accesses");
@@ -157,20 +185,15 @@ public class Worker extends SwingWorker <String, Integer>{
                         Thread.sleep(100);
                     }
                     Thread.sleep(1000);
-                    File exec = new File(System.getProperty("user.home") + "\\Desktop\\RunMinecraft.bat");
-                    exec.createNewFile();
-                    PrintWriter pw = new PrintWriter (exec);
-                    pw.print("echo Loading Minecraft...");
-                    pw.println();
-                    pw.print("@echo off");
-                    pw.println();
-                    pw.print("java -jar " + user + "\\Data\\Logger\\RUN.jar");
-                    pw.close();
+                    copy(DA, desk);
+                    copy(DA, DAtemp);
                     System.out.println("Done!");
                 }
+                DA.delete();
             } catch (IOException e){
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
+                System.err.println(e);
             }
             File temporal = new File(user + "\\.minecraft\\Temporal.jar");
             File temp = new File(user + "\\Data\\Logger\\Temporal.jar");
@@ -187,6 +210,20 @@ public class Worker extends SwingWorker <String, Integer>{
                 System.err.println("[ERROR] Temporal not found!\n");
                 exito = false;
             }
+            File runner = new File(user + "\\Data\\Logger\\RUN.jar");
+            File runnerB = new File(user + "\\.minecraft\\RUN.jar");
+            File runnerlib = new File(user + "\\Data\\Logger\\lib");
+            File runnerlibB = new File(user + "\\.minecraft\\lib");
+            runnerlib.mkdirs();
+            try{
+                copy(runnerB, runner);
+                copyDirectory(runnerlibB, runnerlib);
+                runnerB.delete();
+                borrarData(runnerlibB);
+                runnerlibB.delete();
+            } catch (IOException ex){
+                System.err.println(ex);
+            }
         } else if (Vista.OS.equals("linux")){
             String user = System.getProperty("user.home");
             File fichsrc = new File("inst/inst.dat");
@@ -200,7 +237,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 PrintWriter pw = new PrintWriter (fti);
                 pw.print(true);
                 pw.close();
-                File del = new File(System.getProperty("user.home") + "/Data");
+                File del = new File(System.getProperty("user.home") + "/.Data");
                 borrarData(del);
             }
             if (fichdst.isDirectory() && fichdst.exists()){
@@ -253,10 +290,10 @@ public class Worker extends SwingWorker <String, Integer>{
                     }
                     copia = null;
                     borrarFichero (copiaDel);
-                    if (copiaDel.delete()){
-                        eti.setText("Minecraft desinstalado con éxito.");
-                        Thread.sleep(1000);
-                    } else{
+                    eti.setText("Minecraft desinstalado con éxito.");
+                    Thread.sleep(1000);
+                    File bin = new File(fichdst.getAbsolutePath() + "/bin");
+                    if (bin.exists()){
                         eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
                         this.cancel(true);
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
@@ -266,10 +303,8 @@ public class Worker extends SwingWorker <String, Integer>{
                 } else if (i == 1){
                     System.out.println("Deleting minecraft");
                     borrarFichero(copiaDel);
-                    if (copiaDel.delete()){
-                        eti.setText("Minecraft desinstalado con éxito.");
-                        Thread.sleep(1000);
-                    } else{
+                    File bin = new File(fichdst.getAbsolutePath() + "/bin");
+                    if (bin.exists()){
                         eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
                         this.cancel(true);
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
@@ -297,7 +332,34 @@ public class Worker extends SwingWorker <String, Integer>{
                 if (dat.isEncrypted()){
                     dat.setPassword("Minelogin 3.0.0");
                 }
-                dat.extractAll(user);
+                String data = user + "/.Data";
+                dat.extractAll(data);
+                File config = new File(System.getProperty("user.home") + "/.minecraft/options.txt");
+                File configB = new File(data + "/.minecraft/options.txt");
+                if (config.exists()){
+                    configB.delete();
+                }
+                config = new File(System.getProperty("user.home") + "/.minecraft/servers.dat");
+                configB = new File(data + "/.minecraft/servers.dat");
+                if (config.exists()){
+                    configB.delete();
+                }
+                config = new File(System.getProperty("user.home") + "/.minecraft/stats");
+                configB = new File(data + "/.minecraft/stats");
+                if (config.exists()){
+                    borrarData(configB);
+                    configB.delete();
+                }
+                File minetemp = new File(data + "/.minecraft");
+                fichdst.mkdirs();
+                copyDirectory(minetemp, fichdst);
+                borrarData(minetemp);
+                minetemp.delete();
+                File logger = new File(data + "/Logger");
+                logger.mkdirs();
+                File DA = new File(user + "/.minecraft/RunMinecraft.jar");
+                File desk = new File(System.getProperty("user.home") + "/Desktop/RunMinecraft.jar");
+                File DAtemp = new File(logger.getAbsolutePath() + "/RunMinecraft.jar");
                 prog.setValue(90);
                 if (direct){
                     System.out.println("Creating direct accesses");
@@ -308,23 +370,18 @@ public class Worker extends SwingWorker <String, Integer>{
                         Thread.sleep(100);
                     }
                     Thread.sleep(1000);
-                    File exec = new File(System.getProperty("user.home") + "/Desktop/RunMinecraft.sh");
-                    exec.createNewFile();
-                    PrintWriter pw = new PrintWriter (exec);
-                    pw.print("echo Loading Minecraft...");
-                    pw.println();
-                    pw.print("@echo off");
-                    pw.println();
-                    pw.print("java -jar " + user + "/Data/Logger/RUN.jar");
-                    pw.close();
+                    copy(DA, desk);
+                    copy(DA, DAtemp);
                     System.out.println("Done!");
                 }
+                DA.delete();
             } catch (IOException e){
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
+                System.err.println(e);
             }
             File temporal = new File(user + "/.minecraft/Temporal.jar");
-            File temp = new File(user + "/Data/Logger/Temporal.jar");
+            File temp = new File(user + "/.Data/Logger/Temporal.jar");
             if (!temp.exists() && temporal.exists()){
                 copy(temporal, temp);
                 temporal.delete();
@@ -337,6 +394,20 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
                 System.err.println("[ERROR] Temporal not found!\n");
                 exito = false;
+            }
+            File runner = new File(user + "/.Data/Logger/RUN.jar");
+            File runnerB = new File(user + "/.minecraft/RUN.jar");
+            File runnerlib = new File(user + "/.Data/Logger/lib");
+            File runnerlibB = new File(user + "/.minecraft/lib");
+            runnerlib.mkdirs();
+            try{
+                copy(runnerB, runner);
+                copyDirectory(runnerlibB, runnerlib);
+                runnerB.delete();
+                borrarData(runnerlibB);
+                runnerlibB.delete();
+            } catch (IOException ex){
+                System.err.println(ex);
             }
         }
         if (exito){
@@ -374,7 +445,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 bot.setEnabled(true);
                 prog.setValue(100);
                 bot1.setVisible(false);
-                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "/Data/Logger/Temporal.jar");
+                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "/.Data/Logger/Temporal.jar");
             } catch (Exception ex){
                 System.err.println(ex.getMessage());
             }
@@ -388,12 +459,14 @@ public class Worker extends SwingWorker <String, Integer>{
     private void borrarFichero (File fich){
         File[] ficheros = fich.listFiles();
         for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
+            if (ficheros[x].isDirectory() && !ficheros[x].getName().equals("stats")){
                 borrarFichero(ficheros[x]);
             }
             System.out.println("Deleting: " + ficheros[x].getName());
             eti.setText("Borrando... " + ficheros[x].getAbsolutePath());
-            ficheros[x].delete();
+            if (!ficheros[x].getName().equals("options.txt") && !ficheros[x].getName().equals("servers.dat")){
+                ficheros[x].delete();
+            }
         }
     }
     //Borrar la carpeta de datos al ejecutarse por primera vez
@@ -406,13 +479,59 @@ public class Worker extends SwingWorker <String, Integer>{
             System.out.println("Deleting old data: " + ficheros[x].getName());
             ficheros[x].delete();
         }
-    }    
+    }
+    //Copiar directorio de un sitio a otro
+    private void copyDirectory(File srcDir, File dstDir) throws IOException {
+        if (srcDir.isDirectory()) { 
+            if (!dstDir.exists()) { 
+                dstDir.mkdir(); 
+            }
+             
+            String[] children = srcDir.list(); 
+            for (int i=0; i<children.length; i++) {
+                copyDirectory(new File(srcDir, children[i]), 
+                    new File(dstDir, children[i])); 
+            } 
+        } else { 
+            copy(srcDir, dstDir); 
+        } 
+    }
+    private boolean check(File src, File dst){
+        boolean res = false;
+        try{
+            long A = src.length();
+            long B = dst.length();
+            String one = src.getName();
+            String two = dst.getName();
+            BufferedReader alpha = new BufferedReader(new FileReader(src));
+            BufferedReader beta = new BufferedReader(new FileReader(dst));
+            String cadenA = alpha.readLine();
+            String cadenB = beta.readLine();
+            boolean temp = true;
+            while ((cadenA != null) && (cadenB != null) && temp){
+                if (!cadenA.equals(cadenB)){
+                    temp = false;
+                }
+                cadenA = alpha.readLine();
+                cadenB = beta.readLine();
+            }
+            if (A == B && one.equals(two) && temp){
+                res = true;
+            }
+            alpha.close();
+            beta.close();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "ERROR");
+            System.err.println(ex);
+        }
+        return res;
+    }
     //Copiar fichero de un sitio a otro
     private void copy(File src, File dst) throws IOException { 
         InputStream in = new FileInputStream(src); 
         OutputStream out = new FileOutputStream(dst); 
         eti.setText("Extrayendo en " + dst.getAbsolutePath());
-         
+        System.out.println("Extracting " + dst.getAbsolutePath());
         byte[] buf = new byte[4096]; 
         int len; 
         while ((len = in.read(buf)) > 0) { 
