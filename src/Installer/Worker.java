@@ -192,9 +192,14 @@ public class Worker extends SwingWorker <String, Integer>{
                         Thread.sleep(100);
                     }
                     Thread.sleep(1000);
-                    copy(DA, desk);
-                    copy(DA, DAtemp);
+                    if (!desk.exists()){
+                        copy(DA, desk);
+                    }
+                    JOptionPane.showMessageDialog(null, "Copiados se supone");
                     System.out.println("Done!");
+                }
+                if (!DAtemp.exists()){
+                     copy(DA, DAtemp);
                 }
                 DA.delete();
             } catch (IOException e){
@@ -216,20 +221,6 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
                 System.err.println("[ERROR] Temporal not found!\n");
                 exito = false;
-            }
-            File runner = new File(user + "\\Data\\Logger\\RUN.jar");
-            File runnerB = new File(user + "\\.minecraft\\RUN.jar");
-            File runnerlib = new File(user + "\\Data\\Logger\\lib");
-            File runnerlibB = new File(user + "\\.minecraft\\lib");
-            runnerlib.mkdirs();
-            try{
-                copy(runnerB, runner);
-                copyDirectory(runnerlibB, runnerlib);
-                runnerB.delete();
-                borrarData(runnerlibB);
-                runnerlibB.delete();
-            } catch (IOException ex){
-                System.err.println(ex);
             }
         } else if (Vista.OS.equals("linux")){
             String user = System.getProperty("user.home");
@@ -383,9 +374,13 @@ public class Worker extends SwingWorker <String, Integer>{
                         Thread.sleep(100);
                     }
                     Thread.sleep(1000);
-                    copy(DA, desk);
-                    copy(DA, DAtemp);
+                    if (!desk.exists()){
+                        copy(DA, desk);
+                    }
                     System.out.println("Done!");
+                }
+                if (!DAtemp.exists()){
+                    copy(DA, DAtemp);
                 }
                 DA.delete();
             } catch (IOException e){
@@ -407,20 +402,6 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
                 System.err.println("[ERROR] Temporal not found!\n");
                 exito = false;
-            }
-            File runner = new File(user + "/.Data/Logger/RUN.jar");
-            File runnerB = new File(user + "/.minecraft/RUN.jar");
-            File runnerlib = new File(user + "/.Data/Logger/lib");
-            File runnerlibB = new File(user + "/.minecraft/lib");
-            runnerlib.mkdirs();
-            try{
-                copy(runnerB, runner);
-                copyDirectory(runnerlibB, runnerlib);
-                runnerB.delete();
-                borrarData(runnerlibB);
-                runnerlibB.delete();
-            } catch (IOException ex){
-                System.err.println(ex);
             }
         }
         if (exito){
@@ -538,6 +519,18 @@ public class Worker extends SwingWorker <String, Integer>{
             System.err.println(ex);
         }
         return res;
+    }
+    private void copyData(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src); 
+        OutputStream out = new FileOutputStream(dst); 
+        System.out.println("Extracting data " + dst.getAbsolutePath());
+        byte[] buf = new byte[4096]; 
+        int len; 
+        while ((len = in.read(buf)) > 0) { 
+            out.write(buf, 0, len); 
+        } 
+        in.close(); 
+        out.close(); 
     }
     //Copiar fichero de un sitio a otro
     private void copy(File src, File dst) throws IOException { 
