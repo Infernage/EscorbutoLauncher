@@ -195,7 +195,6 @@ public class Worker extends SwingWorker <String, Integer>{
                     if (!desk.exists()){
                         copy(DA, desk);
                     }
-                    JOptionPane.showMessageDialog(null, "Copiados se supone");
                     System.out.println("Done!");
                 }
                 if (!DAtemp.exists()){
@@ -422,24 +421,22 @@ public class Worker extends SwingWorker <String, Integer>{
         if (exito && !this.isCancelled() && Vista.OS.equals("windows")){
             try{
                 eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
-                Thread.sleep(3000);
+                Thread.sleep(500);
                 bot.setVisible(true);
                 bot.setEnabled(true);
                 prog.setValue(100);
                 bot1.setVisible(false);
-                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar");
             } catch (Exception ex){
                 System.err.println(ex.getMessage());
             }
         } else if(exito && !this.isCancelled() && Vista.OS.equals("linux")){
             try{
                 eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "/.minecraft");
-                Thread.sleep(3000);
+                Thread.sleep(500);
                 bot.setVisible(true);
                 bot.setEnabled(true);
                 prog.setValue(100);
                 bot1.setVisible(false);
-                Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "/.Data/Logger/Temporal.jar");
             } catch (Exception ex){
                 System.err.println(ex.getMessage());
             }

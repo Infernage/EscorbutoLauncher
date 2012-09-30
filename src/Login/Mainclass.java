@@ -48,7 +48,7 @@ public class Mainclass {
             if (mine.exists()){
                 File[] mines = mine.listFiles();
                 File infer = new File(mine.getAbsolutePath() + "\\Infernage.hdn");
-                if ((mines.length < 7) || infer.exists()){
+                if ((mines.length < 7) || !infer.exists()){
                     System.out.println("Ejecutando instalador...");
                     Installer.Vista.main(args);
                     return;
@@ -80,14 +80,6 @@ public class Mainclass {
                }
            } else if (runner.exists() && runnerlib.exists()){
                System.out.println("Already copied!");
-               if (!actual.getAbsolutePath().equals(runner.getAbsolutePath())){
-                   try {
-                       Process run = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\RUN.jar");
-                   } catch (IOException ex) {
-                       System.err.println(ex.getMessage());
-                   }
-                   System.exit(0);
-               }
            } else if (!runner.exists() && runnerlib.exists()){
                 try {
                     copy(actual, runner);
@@ -149,7 +141,8 @@ public class Mainclass {
            File mine = new File(path.toString() + "/.minecraft");
             if (mine.exists()){
                 File[] mines = mine.listFiles();
-                if (mines.length < 7){
+                File infer = new File(mine.getAbsolutePath() + "/.Infernage.hdn");
+                if ((mines.length < 7) || !infer.exists()){
                     System.out.println("Ejecutando instalador...");
                     Installer.Vista.main(args);
                     return;
@@ -181,14 +174,6 @@ public class Mainclass {
                }
            } else if (runner.exists() && runnerlib.exists()){
                System.out.println("Already copied!");
-               if (!actual.getAbsolutePath().equals(runner.getAbsolutePath())){
-                   try {
-                       Process run = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "/Data/Logger/RUN.jar");
-                   } catch (IOException ex) {
-                       System.err.println(ex.getMessage());
-                   }
-                   System.exit(0);
-               }
            } else if (!runner.exists() && runnerlib.exists()){
                 try {
                     copy(actual, runner);
