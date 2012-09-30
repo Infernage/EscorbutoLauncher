@@ -59,20 +59,40 @@ public class Cliente extends Thread{
         String link = links.get(i);//Link de la nueva versión
         boolean exit = false;
         try {
-            URL url = new URL(link);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            String lin;
-            while (((lin = in.readLine()) != null) && !exit){
-                if (lin.contains("2shared.com/download") && lin.contains(".zip")){
-                    StringTokenizer token = new StringTokenizer(lin, "\"");
-                    while (token.hasMoreTokens()){
-                        String te = token.nextToken();
-                        if (te.contains(".zip")){
-                            link = te;
-                            exit = true;
+            if (link.contains("2shared.com")){
+                URL url = new URL(link);
+                BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                String lin;
+                while (((lin = in.readLine()) != null) && !exit){
+                    if (lin.contains("2shared.com/download") && lin.contains(".zip")){
+                        StringTokenizer token = new StringTokenizer(lin, "\"");
+                        while (token.hasMoreTokens()){
+                            String te = token.nextToken();
+                            if (te.contains(".zip")){
+                                link = te;
+                                exit = true;
+                            }
                         }
                     }
                 }
+                in.close();
+            } else if (link.contains("sendspace.com")){
+                URL url = new URL(link);
+                BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                String lin;
+                while (((lin = in.readLine()) != null) && !exit){
+                    if (lin.contains("download_button") && lin.contains("sendspace.com") && lin.contains(".zip")){
+                        StringTokenizer token = new StringTokenizer(lin, "\"");
+                        while (token.hasMoreTokens()){
+                            String te = token.nextToken();
+                            if (te.contains(".zip") && te.contains("sendspace.com")){
+                                link = te;
+                                exit = true;
+                            }
+                        }
+                    }
+                }
+                in.close();
             }
         } catch (Exception ex) {
             state.setForeground(Color.red);
@@ -96,10 +116,10 @@ public class Cliente extends Thread{
             StringTokenizer toke = new StringTokenizer(lista.get(i), "<>\"");
             while (toke.hasMoreTokens()){
                 String temp = toke.nextToken();
-                if (temp.contains("2shared.com")){
+                if (temp.contains("2shared.com") || temp.contains("sendspace.com")){
                     links.add(temp);
                 }
-                if (temp.contains(".") && !temp.contains("2shared.com")){
+                if (temp.contains(".") && !temp.contains("2shared.com") && !temp.contains("sendspace.com")){
                     versiones.add(temp);
                 }
             }
@@ -140,7 +160,7 @@ public class Cliente extends Thread{
             try {//Leemos los datos que nos envía el servidor
                 String msg;
                 while((msg = input.readLine()) != null){ //Si es distinto de null, comprobamos el mensaje
-                    if (msg.contains("2shared.com")){
+                    if (msg.contains("2shared.com") || msg.contains("sendspace.com")){
                         lista.add(msg);
                     }
                 }

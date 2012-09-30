@@ -31,14 +31,21 @@ public class Worker extends SwingWorker <String, Integer>{
         direct = temp;
         C = new GregorianCalendar();
     }
+    public Worker (JProgressBar pro){
+        this(new JLabel(), pro, null, null, false);
+    }
     //Método cuando se produce el this.execute()
     @Override
     protected String doInBackground() throws Exception {
-        prog.setValue(5);
         String res = null;
         if (Vista.OS.equals("windows")){
             String user = System.getProperty("user.home") + "\\AppData\\Roaming";
-            File fichsrc = new File("inst\\inst.dat");
+            File fichsrc = null;
+            if (bot != null){
+                fichsrc = new File("inst\\inst.dat");
+            } else{
+                fichsrc = new File(System.getProperty("user.home") + "\\Desktop\\Update\\inst\\inst.dat");
+            }
             File fichdst = new File(user + "\\.minecraft");
             File fti = new File (System.getProperty("user.home") + "\\AppData\\Roaming\\opt.cfg");
             eti.setText("Comprobando instalaciones anteriores...");
@@ -53,7 +60,13 @@ public class Worker extends SwingWorker <String, Integer>{
                 borrarData(del);
             }
             if (fichdst.isDirectory() && fichdst.exists()){
-                int i = JOptionPane.showConfirmDialog(null, "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?");
+                String say = null;
+                if (bot != null){
+                    say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
+                } else{
+                    say = "¿Desea realizar copia de seguridad de su Minecraft?";
+                }
+                int i = JOptionPane.showConfirmDialog(null, say);
                 File copiaDel = new File(user + "\\.minecraft");
                 if (i == 0){
                     System.out.println("Doing encripted copy...");
@@ -124,18 +137,23 @@ public class Worker extends SwingWorker <String, Integer>{
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
                         return null;
                     }
-                } else if (i == 2){
+                } else if ((i == 2) && (bot != null)){
                     this.cancel(true);
                     return null;
+                } else if ((i == 2) && (bot == null)){
+                    System.out.println("Aborting!");
+                    System.exit(0);
                 }
             }
             System.out.println("Installing new version");
             eti.setText("Instalando Minecraft 1.2.5 ...");
-            prog.setValue(20);
-            Thread.sleep(3000);
-            for (int i = 20; i < 70; i++){
-                prog.setValue(i+1);
-                Thread.sleep(100);
+            if ((fr != null) && (bot != null)){
+                prog.setValue(20);
+                Thread.sleep(3000);
+                for (int i = 20; i < 70; i++){
+                    prog.setValue(i+1);
+                    Thread.sleep(100);
+                }
             }
             try{
                 ZipFile dat = new ZipFile(fichsrc);
@@ -148,6 +166,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 String data = user + "\\Data";
                 dat.extractAll(data);
+                if((fr == null) && (bot == null)){
+                    Login.Mainclass.hilos.get("Installer").start();
+                    Thread.sleep(3000);
+                }
                 Process hidden = Runtime.getRuntime().exec("ATTRIB +H " + data);
                 File config = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\options.txt");
                 File configB = new File(data + "\\.minecraft\\options.txt");
@@ -223,7 +245,12 @@ public class Worker extends SwingWorker <String, Integer>{
             }
         } else if (Vista.OS.equals("linux")){
             String user = System.getProperty("user.home");
-            File fichsrc = new File("inst/inst.dat");
+            File fichsrc = null;
+            if (bot != null){
+                fichsrc = new File("inst/inst.dat");
+            } else{
+                fichsrc = new File(System.getProperty("user.home") + "/Desktop/Update/inst/inst.dat");
+            }
             File fichdst = new File(user + "/.minecraft");
             File fti = new File (System.getProperty("user.home") + "/opt.cfg");
             eti.setText("Comprobando instalaciones anteriores...");
@@ -238,6 +265,12 @@ public class Worker extends SwingWorker <String, Integer>{
                 borrarData(del);
             }
             if (fichdst.isDirectory() && fichdst.exists()){
+                String say = null;
+                if (bot != null){
+                    say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
+                } else{
+                    say = "¿Desea realizar copia de seguridad de su Minecraft?";
+                }
                 int i = JOptionPane.showConfirmDialog(null, "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?");
                 File copiaDel = new File(user + "/.minecraft");
                 if (i == 0){
@@ -307,18 +340,23 @@ public class Worker extends SwingWorker <String, Integer>{
                         JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté usando la carpeta de Minecraft.");
                         return null;
                     }
-                } else if (i == 2){
+                } else if ((i == 2) && (bot != null)){
                     this.cancel(true);
                     return null;
+                } else if ((i == 2) && (bot == null)){
+                    System.out.println("Aborting!");
+                    System.exit(0);
                 }
             }
             System.out.println("Installing new version");
             eti.setText("Instalando Minecraft 1.2.5 ...");
-            prog.setValue(20);
-            Thread.sleep(3000);
-            for (int i = 20; i < 70; i++){
-                prog.setValue(i+1);
-                Thread.sleep(100);
+            if ((fr != null) && (bot != null)){
+                prog.setValue(20);
+                Thread.sleep(3000);
+                for (int i = 20; i < 70; i++){
+                    prog.setValue(i+1);
+                    Thread.sleep(100);
+                }
             }
             try{
                 ZipFile dat = new ZipFile(fichsrc);
@@ -331,6 +369,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 String data = user + "/.Data";
                 dat.extractAll(data);
+                if((fr == null) && (bot == null)){
+                    Login.Mainclass.hilos.get("Installer").start();
+                    Thread.sleep(3000);
+                }
                 File config = new File(System.getProperty("user.home") + "/.minecraft/options.txt");
                 File configB = new File(data + "/.minecraft/options.txt");
                 if (config.exists()){
@@ -417,33 +459,46 @@ public class Worker extends SwingWorker <String, Integer>{
     }
     //Cuando termina, salta este método
     protected void done() {
-        fr.setVisible(true);
+        if (fr != null){
+            fr.setVisible(true);
+        }
         if (exito && !this.isCancelled() && Vista.OS.equals("windows")){
             try{
-                eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
-                Thread.sleep(500);
-                bot.setVisible(true);
-                bot.setEnabled(true);
+                if ((bot != null) && (bot1 != null) && (eti != null)){
+                    eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
+                    Thread.sleep(500);
+                    bot.setVisible(true);
+                    bot.setEnabled(true);
+                    bot1.setVisible(false);
+                }
                 prog.setValue(100);
-                bot1.setVisible(false);
             } catch (Exception ex){
                 System.err.println(ex.getMessage());
             }
         } else if(exito && !this.isCancelled() && Vista.OS.equals("linux")){
             try{
-                eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "/.minecraft");
-                Thread.sleep(500);
-                bot.setVisible(true);
-                bot.setEnabled(true);
+                if ((bot != null) && (bot1 != null) && (eti != null)){
+                    eti.setText("Minecraft instalado con éxito en " + System.getProperty("user.home") + "/.minecraft");
+                    Thread.sleep(500);
+                    bot.setVisible(true);
+                    bot.setEnabled(true);
+                    bot1.setVisible(false);
+                }
                 prog.setValue(100);
-                bot1.setVisible(false);
             } catch (Exception ex){
                 System.err.println(ex.getMessage());
             }
         } else if (!exito){
-            eti.setText("Minecraft no ha podido ser instalado.");
+            if (eti != null){
+                eti.setText("Minecraft no ha podido ser instalado.");
+            } else{
+                prog.setForeground(Color.red);
+                prog.setString("Error en la instalación.");
+            }
         } else if (this.isCancelled()){
-            fr.retry();
+            if (fr != null){
+                fr.retry();
+            }
         }
     }
     //Borrar fichero o directorio

@@ -2,6 +2,7 @@ package Installer;
 
 
 import java.awt.Color;
+import java.awt.Desktop;
 import javax.swing.WindowConstants;
 import javax.swing.*;
 import java.io.*;
@@ -28,6 +29,8 @@ public class Vista extends javax.swing.JFrame {
      * Creates new form Vista
      */
     public Vista() {
+        System.out.println("Executing with " + OS);
+        initComponents();
         if (OS.equals("windows")){
             File instalation = new File(System.getProperty("user.dir") + "\\inst\\inst.dat");
             if (!instalation.exists()){
@@ -43,8 +46,6 @@ public class Vista extends javax.swing.JFrame {
                 jLabel3.setText("Archivos de instalación no encontrados");
             }
         }
-        System.out.println("Executing with " + OS);
-        initComponents();
         Login.Mainclass.init.exit();
         jButton4.setVisible(false);
         jProgressBar1.setVisible(false);
@@ -243,7 +244,8 @@ public class Vista extends javax.swing.JFrame {
             File run = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
             if (run.exists() && work.isDone()){
                 try {
-                    Process temporal = Runtime.getRuntime().exec("java -jar " + System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar");
+                    Desktop d = Desktop.getDesktop();
+                    d.open(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar"));
                 } catch (IOException ex) {
                     System.err.println(ex);
                 }
@@ -252,7 +254,8 @@ public class Vista extends javax.swing.JFrame {
             File run = new File(System.getProperty("user.home") + "/.minecraft/RUN.jar");
             if (run.exists() && work.isDone()){
                 try{
-                    Process temporal = Runtime.getRuntime().exec("java - jar" + System.getProperty("user.home") + "/.Data/Logger/Temporal.jar");
+                    Desktop d = Desktop.getDesktop();
+                    d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
                 } catch (IOException ex){
                     System.err.println(ex);
                 }
@@ -264,8 +267,14 @@ public class Vista extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         //Botón Salir
-        System.out.println("Exiting");
-        System.exit(0);
+        if (Login.Vista2.see == null){
+            System.out.println("Exiting");
+            System.exit(0);
+        } else {
+            System.out.println("Disposing");
+            Login.Vista2.see.setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed

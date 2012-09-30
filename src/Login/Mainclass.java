@@ -63,6 +63,13 @@ public class Mainclass {
                 System.out.println("Ejecutando instalador...");
                 Installer.Vista.main(args);
                 return;
+            } else{
+                File[] datas = dat.listFiles();
+                if (datas.length < 2){
+                    System.out.println("Ejecutando instalador...");
+                    Installer.Vista.main(args);
+                    return;
+                }
             }
             path.append("\\AppData\\Roaming\\Data");//Agregamos los datos
             File runner = new File(path.toString() + "\\Logger\\RUN.jar");

@@ -43,7 +43,7 @@ public class Ventanita extends javax.swing.JDialog {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setText("Guía rápida");
 
-        jLabel2.setText("Para cambiar el nombre, primero debemos introducir nuestro registro.");
+        jLabel2.setText("Para cambiar el nombre, primero hay que introducirlo en el registro.");
 
         jLabel3.setText("El nombre no se podrá volver a cambiar, a no ser de que se le ");
 
@@ -87,7 +87,7 @@ public class Ventanita extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(147, 147, 147)
                         .addComponent(jButton1)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

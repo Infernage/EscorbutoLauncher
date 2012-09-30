@@ -4,6 +4,7 @@ package Login;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import java.awt.Desktop;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -22,13 +23,14 @@ public class Updater extends Thread{
     private String link;
     private String path;
     private String name;
+    public Installer.Worker work;
     //Creamos el actualizador con el link de la nueva versión como parámetro
     public Updater (String host){
         link = host;
         if (Mainclass.OS.equals("windows")){
-            path = System.getProperty("user.home") + "\\Desktop\\Minecraft Update";
+            path = System.getProperty("user.home") + "\\Desktop\\Update";
         } else if (Mainclass.OS.equals("linux")){
-            path = System.getProperty("user.home") + "/Desktop/Minecraft Update";
+            path = System.getProperty("user.home") + "/Desktop/Update";
         }
     }
     private void borrarFiles (File fich){
@@ -185,24 +187,56 @@ public class Updater extends Thread{
     }
     //Método de ejecución de Main Instalador
     private void exec(){
-            //Por último ejecutamos el nuevo instalador
-        String command = null;
+            //Por último ejecutamos el nuevo login
+        Vista2.jProgressBar1.setVisible(true);
+        Vista2.jProgressBar1.setString("Aplicando actualización...");
+        Vista2.jProgressBar1.setMaximum(100);
+        Vista2.jProgressBar1.setMinimum(0);
+        Vista2.jProgressBar1.setValue(0);
+        work = new Installer.Worker(Vista2.jProgressBar1);
+        work.execute();
+        Executer exe = null;
         if (Mainclass.OS.equals("windows")){
-            command = "java -jar " + System.getProperty("user.dir") + "\\Temporal.jar";
+            File dst = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
+            exe = new Executer(dst);
         } else if (Mainclass.OS.equals("linux")){
-            command = "java -jar " + System.getProperty("user.dir") + "/Temporal.jar";
+            File dst = new File(System.getProperty("user.home") + "/.minecraft");
+            exe = new Executer(dst);
         }
-        Executer exe = new Executer(command);
         exe.setDaemon(true);
-        exe.start();
         Mainclass.hilos.put("Installer", exe);
+        while(!work.isDone() && !work.isCancelled()){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Updater.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        exe.out();
+        if (!work.isCancelled()){
+            this.temp();
+        }
+    }
+    public void temp(){
+        try {
+            System.out.println("Executing new process");
+            Desktop d = Desktop.getDesktop();
+            if (Mainclass.OS.equals("windows")){
+                d.open(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar"));
+            } else if (Mainclass.OS.equals("linux")){
+                d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
+            }
+        } catch (IOException ex) {
+            System.err.println(ex);
+        } finally{
+            System.exit(0);
+        }
     }
     //Método de ejecución
     @Override
     public void run(){
         descargar();//Descargamos los archivos necesarios
         descomprimir();//Los descomprimimos
-        JOptionPane.showMessageDialog(null, "Instalado en " + path);
         exec();//Ejecutamos el main
     }
 }

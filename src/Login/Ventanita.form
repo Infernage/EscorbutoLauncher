@@ -53,7 +53,7 @@
                       <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="17" max="32767" attributes="0"/>
+              <EmptySpace pref="27" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -89,7 +89,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Para cambiar el nombre, primero debemos introducir nuestro registro."/>
+        <Property name="text" type="java.lang.String" value="Para cambiar el nombre, primero hay que introducirlo en el registro."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
