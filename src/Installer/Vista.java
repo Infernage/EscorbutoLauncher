@@ -1,6 +1,7 @@
 package Installer;
 
 
+import java.awt.Color;
 import javax.swing.WindowConstants;
 import javax.swing.*;
 import java.io.*;
@@ -27,6 +28,21 @@ public class Vista extends javax.swing.JFrame {
      * Creates new form Vista
      */
     public Vista() {
+        if (OS.equals("windows")){
+            File instalation = new File(System.getProperty("user.dir") + "\\inst\\inst.dat");
+            if (!instalation.exists()){
+                jButton2.setEnabled(false);
+                jLabel3.setForeground(Color.red);
+                jLabel3.setText("Archivos de instalación no encontrados");
+            }
+        } else if (OS.equals("linux")){
+            File instalation = new File(System.getProperty("user.dir") + "/inst/inst.dat");
+            if (!instalation.exists()){
+                jButton2.setEnabled(false);
+                jLabel3.setForeground(Color.red);
+                jLabel3.setText("Archivos de instalación no encontrados");
+            }
+        }
         System.out.println("Executing with " + OS);
         initComponents();
         Login.Mainclass.init.exit();
@@ -105,12 +121,12 @@ public class Vista extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLayeredPane1 = new javax.swing.JLayeredPane();
         jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
+        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -130,15 +146,6 @@ public class Vista extends javax.swing.JFrame {
         });
         jButton1.setBounds(330, 80, 60, 23);
         jLayeredPane1.add(jButton1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jButton3.setText("ChangeLog Instalador");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jButton3.setBounds(230, 60, 160, 23);
-        jLayeredPane1.add(jButton3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton4.setText("Finalizar");
         jButton4.setEnabled(false);
@@ -180,6 +187,8 @@ public class Vista extends javax.swing.JFrame {
         jProgressBar1.setForeground(new java.awt.Color(0, 204, 0));
         jProgressBar1.setBounds(0, 30, 393, 25);
         jLayeredPane1.add(jProgressBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLabel3.setBounds(80, 4, 300, 20);
+        jLayeredPane1.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLabel2.setBounds(0, 10, 385, 22);
         jLayeredPane1.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -217,17 +226,6 @@ public class Vista extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        //Creación de la ventana de Changelog
-        System.out.println("Opening changelog");
-        Cambios c = new Cambios (this, true);
-        c.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        c.setTitle("Changelog");
-        c.setLocationRelativeTo(null);
-        c.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -323,13 +321,13 @@ public class Vista extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSeparator jSeparator1;
