@@ -22,6 +22,7 @@ import javax.swing.JTextArea;
 public class CHLG extends Thread{
     private JTextArea area;
     public CHLG (JTextArea ar){
+        super("ChangeLog");
         area = ar;
     }
     private void inicializar(){

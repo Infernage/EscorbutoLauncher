@@ -23,13 +23,46 @@ public class Mainclass {
     public static String OS = System.getProperty("os.name");
     public static Map<String, Thread> hilos;
     public static Splash init;
+    
+    public static void suspend(Vista2 see){
+        Iterator<String> it = hilos.keySet().iterator();
+        String temp;
+        while(it.hasNext()){
+            temp = it.next();
+            if (!temp.equals("Systray")){
+                Thread thread = hilos.get(temp);
+                try {
+                    if (thread.isAlive()){
+                        thread.wait();
+                    } else{
+                        System.out.println("Thread " + thread.getName() + " is not active!");
+                    }
+                } catch (InterruptedException ex) {
+                    System.err.println(ex);
+                }
+            }
+        }
+    }
+    public static void threads(){
+        System.out.println("Name  IsActive IsInterruped IsDaemon");
+        Iterator<String> it = hilos.keySet().iterator();
+        String temp;
+        while(it.hasNext()){
+            temp = it.next();
+            Thread thread = hilos.get(temp);
+            System.out.println(thread.getName() + "  " + thread.isAlive() + "  "
+                    + thread.isInterrupted() + "  " + thread.isDaemon());
+        }
+        System.out.println(Thread.currentThread().getName() + "  " + Thread.currentThread().isAlive()
+                 + "  " + Thread.currentThread().isInterrupted() + "  " + Thread.currentThread().isDaemon());
+    }
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
         init = new Splash();
-        Thread t = new Thread(init);
+        Thread t = new Thread(init, "Splash");
         t.start();
         hilos = new HashMap<String, Thread>();
         hilos.put("Splash", t);
@@ -65,7 +98,7 @@ public class Mainclass {
                 return;
             } else{
                 File[] datas = dat.listFiles();
-                if (datas.length < 2){
+                if (datas.length < 1){
                     System.out.println("Ejecutando instalador...");
                     Installer.Vista.main(args);
                     return;
@@ -164,6 +197,13 @@ public class Mainclass {
                 System.out.println("Ejecutando instalador...");
                 Installer.Vista.main(args);
                 return;
+            } else {
+                File[] datas = dat.listFiles();
+                if (datas.length < 1){
+                    System.out.println("Ejecutando instalador...");
+                    Installer.Vista.main(args);
+                    return;
+                }
             }
            path.append("/Data");//Agregamos los datos
            File runner = new File(path.toString() + "/Logger/RUN.jar");
@@ -236,6 +276,12 @@ public class Mainclass {
                //Abrimos Vista
                Vista.main(path.toString(), pss, fichero.getAbsolutePath());
            }
+        } else{
+            System.err.println("[ERROR]Found operative system not supported! Exiting system!");
+            JOptionPane.showMessageDialog(null, "Your operative system is not supported! Only are supported"
+                    + " Windows and Linux.\nOperative system in this computer: " + OS + "\nIf you are running one "
+                    + "of these operative systems, contact with me: Infernage");
+            System.exit(9);
         }
     }
     //Borrar fichero o directorio

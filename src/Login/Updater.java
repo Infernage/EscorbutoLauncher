@@ -26,6 +26,7 @@ public class Updater extends Thread{
     public Installer.Worker work;
     //Creamos el actualizador con el link de la nueva versión como parámetro
     public Updater (String host){
+        super("Updater");
         link = host;
         if (Mainclass.OS.equals("windows")){
             path = System.getProperty("user.home") + "\\Desktop\\Update";

@@ -300,7 +300,6 @@ public class Vista extends javax.swing.JFrame {
                     pw.close();
                 } catch (IOException ex) {
                 }
-            exito = false;
             System.exit(0);
         }
             this.dispose();
@@ -309,359 +308,77 @@ public class Vista extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        /*Botón para ejecutar el Minecraft normal
-         * Creamos la ventana de RAM para elegir con cuanta memoria ejecutar el Minecraft
+        /*Botón para indicar que se tiene cuenta de Minecraft Oficial
          */
-        RAM ram = new RAM(this, true);
-    ram.setLocationRelativeTo(null);
-    ram.setVisible(true);
-    int ind = ram.devolver() + 1;
-    ram.dispose();
-    Process minecraft;
-    //Indicamos el lugar del Minecraft
-    String user = null;
-    if (Mainclass.OS.equals("windows")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\minecraft.jar").toString();
-    } else if (Mainclass.OS.equals("linux")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar").toString();
-    }
-    if (ind > 0) {
-      try {
-          //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
-        PrintWriter pw = new PrintWriter(this.booleano);
-        pw.print("true");
-        pw.close();
-      }
-      catch (IOException e){
-      }
-      switch (ind) { //Ejecutamos Minecraft dependiendo de la opción elegida de RAM
-      case 1:
-        try { minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx512M -Xms512M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-        break;
-      case 2:
-        try {
-          minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 3:
-        try {
-          minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx2048M -Xms2048M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 4:
-        try {
-          minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx4096M -Xms4096M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()){
+        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás el registro y pasarás al login.\n¿Estás seguro de continuar?");
+        if (i == 0){
             try {
-              this.error.createNewFile();
-            }
-            catch (IOException exe) {
-            }
-          }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      }
-      //Creamos un Log en la carpeta de datos para controlar cuando se conecta cada usuario
-      File log = null;
-      if (Mainclass.OS.equals("windows")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
-      } else if (Mainclass.OS.equals("linux")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/Data/LogMC.cfg").toString());
-      }
-      if (!log.exists()) {
-            try {
-              log.createNewFile();
-            }
-            catch (IOException e)
-            {
-            }
-        }
-      //Indicamos la fecha (en día, mes, año) y la hora (en hora, minuto, segundo)
-      Calendar C = new GregorianCalendar();
-      StringBuilder str = new StringBuilder("Connected at ");
-      str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
-      str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
-      str.append(" with name of Minecraft Official User").append("\n");
-      try {
-          //Escribimos en el Log indicando que no sobreescriba lo anterior
-        PrintWriter pw = new PrintWriter(new FileWriter(log, true));
-        pw.println();
-        pw.print(str.toString());
-        pw.close();
-      }
-      catch (IOException e) {
-      }
-      try {
-          //Creamos el fichero de datos vacío
-        this.fichero.createNewFile();
-      }
-      catch (IOException e) {
-      }
-      System.exit(0);
-    } else if (ind == 0){
-        //Si no se ha elegido ninguna opción, se elige la opción por defecto de RAM
-      JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-            try {
-                minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-             if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
+                //Creamos el fichero de datos vacío
+                fichero.createNewFile();
+                //Creamos el fichero para saber que la cuenta es Oficial
+                File MinecraftUser = null;
+                if (Mainclass.OS.equals("windows")){
+                    MinecraftUser = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\MOS.bon");
+                } else if (Mainclass.OS.equals("linux")){
+                    MinecraftUser = new File(System.getProperty("user.home") + "/.Data/MOS.bon");
                 }
-                catch (IOException exe) {
-                }
+                MinecraftUser.createNewFile();
+                PrintWriter p = new PrintWriter(MinecraftUser);
+                p.print("said_/&/JT&^*$/&(/*Ç_said");
+                p.close();
+                //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
+                PrintWriter pw = new PrintWriter(this.booleano);
+                pw.print("true");
+                pw.close();
+                //Abrimos Vista2
+                Vista2 ven = new Vista2(pass);
+                ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                ven.pack();
+                ven.setLocationRelativeTo(null);
+                ven.setTitle(Mainclass.title + " " + Mainclass.version);
+                ven.setVisible(true);
+            } catch (IOException e){
+                System.err.println(e);
             }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(ex.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);            }
-    }
+            this.dispose();
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         //Lo mismo que el ActionPerformed anterior, pero con Mineshafter
-        RAM ram = new RAM(this, true);
-        ram.setLocationRelativeTo(null);
-        ram.setVisible(true);
-        int ind = ram.devolver() + 1;
-        ram.dispose();
-        Process minecraftshafter;
-        String user = null;
-        if (Mainclass.OS.equals("windows")){
-            user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\Mineshafter-proxy.jar").toString();
-        } else if (Mainclass.OS.equals("linux")){
-            user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/Mineshafter-proxy.jar").toString();
-        }
-        if (ind > 0) {
+        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás el registro y pasarás al login.\n¿Estás seguro de continuar?");
+        if (i == 0){
             try {
-            PrintWriter pw = new PrintWriter(this.booleano);
-            pw.print("true");
-            pw.close();
+                //Creamos el fichero de datos vacío
+                fichero.createNewFile();
+                //Creamos el fichero para saber que la cuenta es Oficial
+                File MineshafterUser = null;
+                if (Mainclass.OS.equals("windows")){
+                    MineshafterUser = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\MSOS.bon");
+                } else if (Mainclass.OS.equals("linux")){
+                    MineshafterUser = new File(System.getProperty("user.home") + "/.Data/MSOS.bon");
+                }
+                MineshafterUser.createNewFile();
+                PrintWriter p = new PrintWriter(MineshafterUser);
+                p.print("said_/HT&)$^)/%(¨¨Ç_said");
+                p.close();
+                //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
+                PrintWriter pw = new PrintWriter(this.booleano);
+                pw.print("true");
+                pw.close();
+                //Abrimos Vista2
+                Vista2 ven = new Vista2(pass);
+                ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                ven.pack();
+                ven.setLocationRelativeTo(null);
+                ven.setTitle(Mainclass.title + " " + Mainclass.version);
+                ven.setVisible(true);
             } catch (IOException e){
-                
+                System.err.println(e);
+            }
+            this.dispose();
         }
-      switch (ind) {
-      case 1:
-        try { minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx512M -Xms512M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 2:
-        try {
-          minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 3:
-        try {
-          minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx2048M -Xms2048M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 4:
-        try {
-          minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx4096M -Xms4096M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-          if (!this.error.exists()){
-            try {
-              this.error.createNewFile();
-            }
-            catch (IOException exe) {
-            }
-          }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      }
-      File log = null;
-      if (Mainclass.OS.equals("windows")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
-      } else if (Mainclass.OS.equals("linux")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/Data/LogMC.cfg").toString());
-      }
-      if (!log.exists()) {
-            try {
-              log.createNewFile();
-            }
-            catch (IOException e)
-            {
-            }
-        }
-      Calendar C = new GregorianCalendar();
-      StringBuilder str = new StringBuilder("Connected at ");
-      str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
-      str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
-      str.append(" with name of Mineshafter User").append("\n");
-      try {
-        PrintWriter pw = new PrintWriter(new FileWriter(log, true));
-        pw.println();
-        pw.print(str.toString());
-        pw.close();
-      }
-      catch (IOException e) {
-      }
-      try {
-        this.fichero.createNewFile();
-      }
-      catch (IOException e) {
-      }
-      System.exit(0);
-    } else if (ind == 0){
-      JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-            try {
-                minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-             if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(ex.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);            }
-    }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     /**

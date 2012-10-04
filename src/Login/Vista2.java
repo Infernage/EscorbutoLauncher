@@ -15,8 +15,10 @@ import java.util.GregorianCalendar;
 import javax.swing.*;
 import java.awt.event.*;
 import java.net.URL;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.net.ssl.HttpsURLConnection;
 
 /*
  * To change this template, choose Tools | Templates
@@ -32,6 +34,7 @@ public class Vista2 extends javax.swing.JFrame {
     private String pass;
     private File error;
     private String args;
+    private static Systray sys;
     public static Vista2 see;
     /**
      * Creates new form Vista2
@@ -42,13 +45,8 @@ public class Vista2 extends javax.swing.JFrame {
         setContentPane(new Background());
         initComponents();
         jProgressBar1.setVisible(false);
-        Mainclass.init.exit();
         inicializar();
         this.setLocationRelativeTo(null);
-        jButton3.setFocusPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton4.setFocusPainted(false);
-        jButton4.setContentAreaFilled(false);
         jButton7.setFocusPainted(false);
         jButton7.setContentAreaFilled(false);
         jButton8.setFocusPainted(false);
@@ -98,8 +96,8 @@ public class Vista2 extends javax.swing.JFrame {
             }
         } else if (Mainclass.OS.equals("linux")){
             datos = new File(System.getProperty("user.home"));
-            error = new File(System.getProperty("user.home") + "/Data/LogEr.txt");
-            File rem = new File (datos.getAbsolutePath() + "/Data/RMB.txt");
+            error = new File(System.getProperty("user.home") + "/.Data/LogEr.txt");
+            File rem = new File (datos.getAbsolutePath() + "/.Data/RMB.txt");
             //Controlamos las pestañas de recordar
             if (rem.exists()){
                 try{
@@ -107,7 +105,7 @@ public class Vista2 extends javax.swing.JFrame {
                     String temp = bf.readLine();
                     String temp2 = bf.readLine();
                     StringECP t = new StringECP(P);
-                    File te = new File (datos.getAbsolutePath() + "/Data/data.cfg");
+                    File te = new File (datos.getAbsolutePath() + "/.Data/data.cfg");
                     bf.close();
                     if (temp.equals("true")){
                         //Si se seleccionó en un principio la pestaña, se deja seleccionada y se recuerda el usuario
@@ -143,7 +141,7 @@ public class Vista2 extends javax.swing.JFrame {
         //Creamos el cliente del actualizador
         try{
             URL url = new URL("http://minechinchas.blogspot.com/2012/09/downloads.html");
-            Cliente client = new Cliente(jLabel1, jLabel5, jButton5, url, this, jButton4, jButton3);
+            Cliente client = new Cliente(jLabel1, jLabel5, jButton5, url, this);
             client.start();
             Mainclass.hilos.put("Cliente", client);
         } catch(Exception e){
@@ -153,6 +151,10 @@ public class Vista2 extends javax.swing.JFrame {
             jLabel5.setText(e.getMessage());
         }
         jTextArea1.getPreferredScrollableViewportSize().setSize(0, 0);
+        Mainclass.init.exit();
+    }
+    public void res(){
+        sys.salir();
     }
     public static void per (int size, int downloaded){
         size = size/1048576;
@@ -169,14 +171,22 @@ public class Vista2 extends javax.swing.JFrame {
         Mainclass.hilos.put("ChangeLog", text);
     }
     private void Play(){
+        see = this;
+        jButton5.setEnabled(false);
         //Método del botón ¡Jugar!
+        statusConn.setForeground(Color.white);
+        statusConn.setText("Connecting...");
         boolean open = false; boolean er = false; boolean remember = jCheckBox1.isSelected(); boolean rememberP = jCheckBox2.isSelected();
         //Comprobamos si el Recordar está activo y lo recordamos para un futuro
-    File rem = null;
+    File rem = null, MOS = null, MSOS = null;
     if (Mainclass.OS.equals("windows")){
         rem = new File(datos.getAbsolutePath() + "\\Data\\RMB.txt");
+        MOS = new File(datos.getAbsolutePath() + "\\Data\\MOS.bon");
+        MSOS = new File(datos.getAbsolutePath() + "\\Data\\MSOS.bon");
     } else if (Mainclass.OS.equals("linux")){
-        rem = new File(datos.getAbsolutePath() + "/Data/RMB.txt");
+        rem = new File(datos.getAbsolutePath() + "/.Data/RMB.txt");
+        MOS = new File(datos.getAbsolutePath() + "/.Data/MOS.bont");
+        MSOS = new File(datos.getAbsolutePath() + "/.Data/MSOS.bon");
     }
     if (!rem.exists()) {
             try {
@@ -186,21 +196,26 @@ public class Vista2 extends javax.swing.JFrame {
             {
             }
         }
-    try {
+      try{ 
         //Escribimos los booleanos de recordar
-      PrintWriter pw = new PrintWriter(rem);
-      pw.print(remember);
-      pw.println();
-      pw.print(rememberP);
-      pw.close();
+          PrintWriter pw = new PrintWriter(rem);
+          pw.print(remember);
+          pw.println();
+          pw.print(rememberP);
+          pw.close();
+      }catch (IOException ex){
+          System.err.println(ex);
+      }
+    if (!MOS.exists() && !MSOS.exists()){
+        try {
       //Leemos el fichero de datos
       BufferedReader bf = null;
       if (Mainclass.OS.equals("windows")){
           bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "\\Data\\data.cfg")));
       } else if (Mainclass.OS.equals("linux")){
-          bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "/Data/data.cfg")));
+          bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "/.Data/data.cfg")));
       }
-      String temp1 = null; String temp2 = null;
+      String temp1 = null, temp2 = null;
       //Creamos el desencriptador y comprobamos si el usuario y la contraseña coinciden
       StringECP crypt = new StringECP(this.pass);
       temp1 = crypt.decrypt(bf.readLine());
@@ -439,7 +454,7 @@ public class Vista2 extends javax.swing.JFrame {
       if (Mainclass.OS.equals("windows")){
           log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
       } else if (Mainclass.OS.equals("linux")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/Data/LogMC.cfg").toString());
+          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/.Data/LogMC.cfg").toString());
       }        
       if (!log.exists()) {
               try {
@@ -470,6 +485,88 @@ public class Vista2 extends javax.swing.JFrame {
         //Si el nombre y la contraseña son inválidos
       JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos");
     }
+    } else if (MOS.exists() && !MSOS.exists()){
+        String usuario = jTextField1.getText();
+        String contraseña = new String (jPasswordField1.getPassword());
+        //LogMine logeoMC = new LogMine(usuario, contraseña, statusConn);
+        //logeoMC.start();
+        //Mainclass.hilos.put("LogMine", logeoMC);
+        Vista2.playMC(usuario, contraseña);
+    } else if (!MOS.exists() && MSOS.exists()){
+        final String user = jTextField1.getText();
+        final String pass = new String(jPasswordField1.getPassword());
+        Thread thr = new Thread("LogShafter"){
+            public void run(){
+                Vista2.playMS(user, pass);
+            }
+        };
+        thr.start();
+        Mainclass.hilos.put("LogShafter", thr);
+    } else{
+        System.err.println("ERROR: Files parameters are more than one type!");
+        statusConn.setForeground(Color.red);
+        statusConn.setText("Demasiados argumentos de ficheros!");
+    }
+    }
+    public static void playMS (String user, String pass){
+        //Crear proceso del Mineshafter con parámetros
+    }
+    public static void playMC (String user, String pass){
+        File temporal = null;
+        if (Mainclass.OS.equals("windows")){
+            temporal = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\");
+        } else if (Mainclass.OS.equals("linux")){
+            temporal = new File(System.getProperty("user.home") + "/.Data/");
+        }
+        File temp = null;
+        try {
+            temp = File.createTempFile("Temporal", null, temporal);
+            PrintWriter pw = new PrintWriter(temp);
+            pw.println(user);
+            pw.println(pass);
+            pw.close();
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+        StringBuilder command = new StringBuilder();
+        if (Mainclass.OS.equals("windows")){
+            command.append("java -jar ").append(System.getProperty("user.home")).append("\\AppData\\Roaming\\"
+                    + ".minecraft\\minecraft.jar");
+        } else if (Mainclass.OS.equals("linux")){
+            command.append("java -jar ").append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar");
+        }
+        /*if (!temp.exists()){
+            try{
+                command.append(" ").append(user).append(" ").append(pass);
+                execMC(command.toString());
+            } catch (Exception ex){
+                System.err.println(ex);
+                System.exit(11);
+            }
+        } else{
+            try{
+                execMC(command.toString());
+            } catch (Exception ex){
+                
+            }
+        }*/
+        execMC(command.toString());
+    }
+    private static void execMC(String com){
+        see.setVisible(false);
+        Process minecraft;
+        try {
+            minecraft = Runtime.getRuntime().exec(com);
+            sys = new Systray(see);
+            sys.addProcess(minecraft);
+            sys.start();
+            minecraft.waitFor();
+        } catch (Exception ex) {
+            System.err.println(ex);
+            System.exit(11);
+        }
+        sys.salir();
+        see.setVisible(true);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -481,8 +578,6 @@ public class Vista2 extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel3 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -501,38 +596,12 @@ public class Vista2 extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jProgressBar1 = new javax.swing.JProgressBar();
         jButton6 = new javax.swing.JButton();
+        statusConn = new javax.swing.JLabel();
 
         jLabel3.setText("jLabel3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(829, 600));
-        setPreferredSize(new java.awt.Dimension(829, 600));
         setResizable(false);
-
-        jButton3.setBackground(new java.awt.Color(255, 255, 255));
-        jButton3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 0));
-        jButton3.setText("Tengo cuenta de Minecraft");
-        jButton3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(216, 216, 216), 3));
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jButton3.setEnabled(false);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        jButton4.setBackground(new java.awt.Color(255, 255, 255));
-        jButton4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(216, 216, 216));
-        jButton4.setText("Tengo Mineshafter");
-        jButton4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 0), 3));
-        jButton4.setEnabled(false);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
 
         jTextField1.setBackground(new java.awt.Color(174, 108, 17));
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -647,6 +716,8 @@ public class Vista2 extends javax.swing.JFrame {
             }
         });
 
+        statusConn.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -654,66 +725,73 @@ public class Vista2 extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGap(44, 44, 44)
-                                            .addComponent(jLabel4))
-                                        .addComponent(jLabel2))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jCheckBox2))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jCheckBox1))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(220, 220, 220)
-                                .addComponent(jButton6)))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(44, 44, 44)
+                                    .addComponent(jLabel4))
+                                .addComponent(jLabel2))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jCheckBox2))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+                                    .addComponent(statusConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jCheckBox1))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(300, 300, 300)
-                        .addComponent(jButton3)))
+                        .addGap(220, 220, 220)
+                        .addComponent(jButton6)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(90, 90, 90)
-                .addComponent(jButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel6)
                 .addGap(161, 161, 161))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(109, 109, 109)
-                .addComponent(jButton3)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(153, 153, 153)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
+                .addGap(119, 119, 119))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(216, 216, 216)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jButton4)
-                        .addGap(41, 41, 41)
+                        .addComponent(statusConn, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton6)
                         .addGap(182, 182, 182)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -727,29 +805,15 @@ public class Vista2 extends javax.swing.JFrame {
                             .addComponent(jLabel4))
                         .addGap(13, 13, 13)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton7)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton8)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(123, 123, 123))))
+                                .addComponent(jButton8)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -765,7 +829,7 @@ public class Vista2 extends javax.swing.JFrame {
             if (Mainclass.OS.equals("windows")){
                 bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "\\Data\\data.cfg")));
             } else if (Mainclass.OS.equals("linux")){
-                bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "/Data/data.cfg")));
+                bf = new BufferedReader(new FileReader(new File(datos.getAbsolutePath() + "/.Data/data.cfg")));
             }
             String str = bf.readLine();
             String str1 = bf.readLine();
@@ -835,313 +899,6 @@ public class Vista2 extends javax.swing.JFrame {
         Play();
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        //Igual que el Botón de Minecraft de Vista
-        RAM ram = new RAM(this, true);
-        ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    ram.setLocationRelativeTo(null);
-    ram.setVisible(true);
-    int ind = ram.devolver() + 1;
-    ram.dispose();
-    if (ind == 0){
-        ind = 2;
-        JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-    }
-    Process minecraft;
-    String user = null;
-    if (Mainclass.OS.equals("windows")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\minecraft.jar").toString();
-    } else if (Mainclass.OS.equals("linux")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar").toString();
-    }    
-    if (ind > 0) {
-      switch (ind) {
-      case 1:
-        try { minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx512M -Xms512M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 2:
-        try {minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 3:
-        try {minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx2048M -Xms2048M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 4:
-        try {minecraft = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx4096M -Xms4096M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()){
-            try {
-              this.error.createNewFile();
-            }
-            catch (IOException exe) {
-            }
-          }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      }
-      File log = null;
-      if (Mainclass.OS.equals("windows")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
-      } else if (Mainclass.OS.equals("linux")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/Data/LogMC.cfg").toString());
-      }      
-      if (!log.exists()) {
-            try {
-              log.createNewFile();
-            }
-            catch (IOException e)
-            {
-            }
-        }
-      Calendar C = new GregorianCalendar();
-      StringBuilder str = new StringBuilder("Connected at ");
-      str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
-      str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
-      str.append(" with name of Minecraft Official User").append("\n");
-      try {
-        PrintWriter pw = new PrintWriter(new FileWriter(log, true));
-        pw.println();
-        pw.print(str.toString());
-        pw.close();
-      }
-      catch (IOException e) {
-      }
-      System.exit(0);
-    }
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-        //Igual que el Botón de Mineshafter de Vista
-        RAM ram = new RAM(this, true);
-        ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    ram.setLocationRelativeTo(null);
-    ram.setVisible(true);
-    int ind = ram.devolver() + 1;
-    ram.dispose();
-    if (ind == 0){
-        ind = 2;
-        JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-    }
-    Process minecraftshafter;
-    String user = null;
-        if (Mainclass.OS.equals("windows")){
-            user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\Mineshafter-proxy.jar").toString();
-        } else if (Mainclass.OS.equals("linux")){
-            user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/Mineshafter-proxy.jar").toString();
-        }    
-        if (ind > 0) {
-      switch (ind) {
-      case 1:
-        try { minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx512M -Xms512M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 2:
-        try {minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 3:
-        try {minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx2048M -Xms2048M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      case 4:
-        try {minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx4096M -Xms4096M -jar ").append(user).toString());
-        } catch (IOException e) {
-          JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-          if (!this.error.exists()){
-            try {
-              this.error.createNewFile();
-            }
-            catch (IOException exe) {
-            }
-          }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(e.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-        }
-          break;
-      }
-      File log = null;
-      if (Mainclass.OS.equals("windows")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
-      } else if (Mainclass.OS.equals("linux")){
-          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/Data/LogMC.cfg").toString());
-      }
-      if (!log.exists()) {
-            try {
-              log.createNewFile();
-            }
-            catch (IOException e)
-            {
-            }
-        }
-      Calendar C = new GregorianCalendar();
-      StringBuilder str = new StringBuilder("Connected at ");
-      str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
-      str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
-      str.append(" with name of Mineshafter User").append("\n");
-      try {
-        PrintWriter pw = new PrintWriter(new FileWriter(log, true));
-        pw.println();
-        pw.print(str.toString());
-        pw.close();
-      }
-      catch (IOException e) {
-      }
-      System.exit(0);
-    } else if (ind == 0){
-      JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-            try {
-                minecraftshafter = Runtime.getRuntime().exec(new StringBuilder().append("java -Xmx1024M -Xms1024M -jar ").append(user).toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Mineshafter.");
-             if (!this.error.exists()) {
-                try {
-                  this.error.createNewFile();
-                }
-                catch (IOException exe) {
-                }
-            }
-          try {
-            PrintWriter pw = new PrintWriter(this.error);
-            pw.print(ex.getMessage());
-            pw.println();
-            pw.close();
-          }
-          catch (IOException exe) {
-          }
-          System.exit(0);
-            }
-    }
-    }//GEN-LAST:event_jButton4ActionPerformed
-
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         // TODO add your handling code here:
         //Escáner de Intro en el usuario
@@ -1151,6 +908,8 @@ public class Vista2 extends javax.swing.JFrame {
             String a = jTextField1.getText();
             if (a.equals("ADMINCLOSE")){
                 exit();
+            } else if (a.equals("threads")){
+                Mainclass.threads();
             }
         }
     }//GEN-LAST:event_jTextField1KeyPressed
@@ -1214,8 +973,6 @@ public class Vista2 extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
@@ -1233,5 +990,6 @@ public class Vista2 extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel statusConn;
     // End of variables declaration//GEN-END:variables
 }
