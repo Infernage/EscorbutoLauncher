@@ -14,7 +14,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.*;
 import java.awt.event.*;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.CodeSource;
+import java.security.PermissionCollection;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +38,10 @@ public class Vista2 extends javax.swing.JFrame {
     private String pass;
     private File error;
     private String args;
-    private static Systray sys;
+    private LogMine logeoMC;
+    //private static Systray sys;
     public static Vista2 see;
+    private boolean offline = false;
     /**
      * Creates new form Vista2
      */
@@ -153,9 +159,9 @@ public class Vista2 extends javax.swing.JFrame {
         jTextArea1.getPreferredScrollableViewportSize().setSize(0, 0);
         Mainclass.init.exit();
     }
-    public void res(){
+    /*public void res(){
         sys.salir();
-    }
+    }*/
     public static void per (int size, int downloaded){
         size = size/1048576;
         downloaded = downloaded/1048576;
@@ -169,6 +175,237 @@ public class Vista2 extends javax.swing.JFrame {
         CHLG text = new CHLG(jTextArea1);
         text.start();
         Mainclass.hilos.put("ChangeLog", text);
+    }
+    private void mineOff(){
+        //Si todo está correcto, se abre la ventana de elección de RAM
+      RAM ram = new RAM(this, true);
+      ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      ram.setLocationRelativeTo(null);
+      ram.setVisible(true);
+      int ind = ram.devolver() + 1;
+      ram.dispose();
+      //Si no se elige ninguna opción, se ejecuta la existente por defecto
+      if (ind == 0){
+          ind = 2;
+          JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
+      }
+      Process minecraft = null;
+    String user = null;
+    String cmd = "-cp \"%APPDATA%/.minecraft/bin/minecraft.jar;%APPDATA%/.minecraft/bin/lwjgl.jar;%APPDATA%/.minecraft/bin/lwjgl_util.jar;%APPDATA%/.minecraft/bin/jinput.jar\" -Djava.library.path=\"%APPDATA%/.minecraft/bin/natives\" net.minecraft.client.Minecraft ";
+    if (Mainclass.OS.equals("windows")){
+        user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\minecraft.jar").toString();
+    } else if (Mainclass.OS.equals("linux")){
+        user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar").toString();
+    }      if (ind > 0) { //Según el caso, elegimos una u otra opción
+        switch (ind) {
+        case 1:
+          try { 
+              //Leemos el fichero de comando y creamos el ejecutable
+              File bat = null;
+              if (Mainclass.OS.equals("windows")){
+                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
+              } else if (Mainclass.OS.equals("linux")){
+                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.sh");
+              }
+              if (!bat.exists()){
+                  bat.createNewFile();
+              }
+              //Escribimos el comando en el ejecutable
+              PrintWriter pw = new PrintWriter (bat);
+              pw.print("java -Xmx512m -Xms512m " + cmd + args);
+              pw.close();
+              if (!bat.canExecute()){
+                  bat.setExecutable(true);
+              }
+              bat.deleteOnExit();
+              //Lo ejecutamos con cmd
+              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
+          } catch (IOException e)
+          {
+            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
+            if (!error.exists()) {
+                  try {
+                    error.createNewFile();
+                  }
+                  catch (IOException exe) {
+                  }
+              }
+            try {
+              PrintWriter pw = new PrintWriter(error);
+              pw.print(e.getMessage());
+              pw.println();
+              pw.close();
+            }
+            catch (IOException exe) {
+            }
+            System.exit(0);
+          }
+            break;
+        case 2:
+          try {
+              File bat = null;
+              if (Mainclass.OS.equals("windows")){
+                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
+              } else if (Mainclass.OS.equals("linux")){
+                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.sh");
+              }
+              if (!bat.exists()){
+                  bat.createNewFile();
+              }
+              PrintWriter pw = new PrintWriter (bat);
+              pw.print("java -Xmx1024m -Xms1024m " + cmd + args);
+              pw.close();
+              if (!bat.canExecute()){
+                  bat.setExecutable(true);
+              }
+              bat.deleteOnExit();
+              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
+          } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
+            if (!error.exists()) {
+                  try {
+                    error.createNewFile();
+                  }
+                  catch (IOException exe) {
+                  }
+              }
+            try {
+              PrintWriter pw = new PrintWriter(error);
+              pw.print(e.getMessage());
+              pw.println();
+              pw.close();
+            }
+            catch (IOException exe) {
+            }
+            System.exit(0);
+          }
+            break;
+        case 3:
+          try {
+              File bat = null;
+              if (Mainclass.OS.equals("windows")){
+                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
+              } else if (Mainclass.OS.equals("linux")){
+                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.sh");
+              }
+              if (!bat.exists()){
+                  bat.createNewFile();
+              }
+              PrintWriter pw = new PrintWriter (bat);
+              pw.print("java -Xmx2048m -Xms2048m " + cmd + args);
+              pw.close();
+              if (!bat.canExecute()){
+                  bat.setExecutable(true);
+              }
+              bat.deleteOnExit();
+              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
+          } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
+            if (!error.exists()) {
+                  try {
+                    error.createNewFile();
+                  }
+                  catch (IOException exe) {
+                  }
+              }
+            try {
+              PrintWriter pw = new PrintWriter(error);
+              pw.print(e.getMessage());
+              pw.println();
+              pw.close();
+            }
+            catch (IOException exe) {
+            }
+            System.exit(0);
+          }
+            break;
+        case 4:
+          try {
+              File bat = null;
+              if (Mainclass.OS.equals("windows")){
+                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
+              } else if (Mainclass.OS.equals("linux")){
+                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.sh");
+              }
+              if (!bat.exists()){
+                  bat.createNewFile();
+              }
+              PrintWriter pw = new PrintWriter (bat);
+              pw.print("java -Xmx4096m -Xms4096m " + cmd + args);
+              pw.close();
+              if (!bat.canExecute()){
+                  bat.setExecutable(true);
+              }
+              bat.deleteOnExit();
+              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
+          } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
+            if (!error.exists()) {
+                  try {
+                    error.createNewFile();
+                  }
+                  catch (IOException exe) {
+                  }
+              }
+            try {
+              PrintWriter pw = new PrintWriter(error);
+              pw.print(e.getMessage());
+              pw.println();
+              pw.close();
+            }
+            catch (IOException exe) {
+            }
+            System.exit(0);
+          }
+            break;
+        }
+        //Creamos el fichero Log si no existía
+      File log = null;
+      if (Mainclass.OS.equals("windows")){
+          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
+      } else if (Mainclass.OS.equals("linux")){
+          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/.Data/LogMC.cfg").toString());
+      }        
+      if (!log.exists()) {
+              try {
+                log.createNewFile();
+              }
+              catch (IOException e)
+              {
+              }
+          }
+        //Obtenemos la fecha, la hora y el usuario
+        Calendar C = new GregorianCalendar();
+        StringBuilder str = new StringBuilder("Connected at ");
+        str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
+        str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
+        str.append(" with name of ").append(jTextField1.getText()).append("\n");
+        try {
+            //Escribimos en el Log indicándole que no sobreescriba lo anterior
+          PrintWriter pw = new PrintWriter(new FileWriter(log, true));
+          pw.println();
+          pw.print(str.toString());
+          pw.close();
+        }
+        catch (IOException e) {
+        }
+        System.exit(0);
+        /*see.setVisible(false);
+        try {
+            sys = new Systray(see, false);
+            sys.addProcess(minecraft);
+            sys.start();
+            Mainclass.hilos.put("Systray", sys);
+            minecraft.waitFor();
+        } catch (Exception ex) {
+            System.err.println(ex);
+            System.exit(11);
+        }
+        sys.salir();
+        statusConn.setText("");
+        jButton5.setEnabled(true);
+        see.setVisible(true);*/
+      }
     }
     private void Play(){
         see = this;
@@ -206,7 +443,12 @@ public class Vista2 extends javax.swing.JFrame {
       }catch (IOException ex){
           System.err.println(ex);
       }
-    if (!MOS.exists() && !MSOS.exists()){
+    if (!MOS.exists() && !MSOS.exists() || offline){
+        if (offline){
+            args = jTextField1.getText();
+            mineOff();
+            return;
+        }
         try {
       //Leemos el fichero de datos
       BufferedReader bf = null;
@@ -252,205 +494,64 @@ public class Vista2 extends javax.swing.JFrame {
     }
     if (open)
     {
-        //Si todo está correcto, se abre la ventana de elección de RAM
-      RAM ram = new RAM(this, true);
-      ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-      ram.setLocationRelativeTo(null);
-      ram.setVisible(true);
-      int ind = ram.devolver() + 1;
-      ram.dispose();
-      //Si no se elige ninguna opción, se ejecuta la existente por defecto
-      if (ind == 0){
-          ind = 2;
-          JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-      }
-      Process minecraft;
-    String user = null;
-    if (Mainclass.OS.equals("windows")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\.minecraft\\minecraft.jar").toString();
-    } else if (Mainclass.OS.equals("linux")){
-        user = new StringBuilder().append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar").toString();
-    }      if (ind > 0) { //Según el caso, elegimos una u otra opción
-        switch (ind) {
-        case 1:
-          try { 
-              //Leemos el fichero de comando y creamos el ejecutable
-              File bat = null;
-              BufferedReader bf = null;
-              if (Mainclass.OS.equals("windows")){
-                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\com.txt")));
-              } else if (Mainclass.OS.equals("linux")){
-                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "/.minecraft/bin/com.txt")));
-              }
-              String comand = bf.readLine();
-              bf.close();
-              if (!bat.exists()){
-                  bat.createNewFile();
-              }
-              //Escribimos el comando en el ejecutable
-              PrintWriter pw = new PrintWriter (bat);
-              pw.print("java -Xmx512m -Xms512m " + comand + args);
-              pw.close();
-              if (!bat.canExecute()){
-                  bat.setExecutable(true);
-              }
-              //Lo ejecutamos con cmd
-              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
-          } catch (IOException e)
-          {
-            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-            if (!error.exists()) {
-                  try {
-                    error.createNewFile();
-                  }
-                  catch (IOException exe) {
-                  }
-              }
-            try {
-              PrintWriter pw = new PrintWriter(error);
-              pw.print(e.getMessage());
-              pw.println();
-              pw.close();
+        mineOff();
+    } else if (!er) {
+        //Si el nombre y la contraseña son inválidos
+      JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos");
+    }
+    } else if (MOS.exists() && !MSOS.exists()){
+        String usuario = jTextField1.getText();
+        String contraseña = new String (jPasswordField1.getPassword());
+        if (logeoMC != null){
+            offline = logeoMC.offline;
+            if (offline){
+                Play();
+                return;
             }
-            catch (IOException exe) {
-            }
-            System.exit(0);
-          }
-            break;
-        case 2:
-          try {
-              File bat = null;
-              BufferedReader bf = null;
-              if (Mainclass.OS.equals("windows")){
-                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\com.txt")));
-              } else if (Mainclass.OS.equals("linux")){
-                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "/.minecraft/bin/com.txt")));
-              }
-              String comand = bf.readLine();
-              bf.close();
-              if (!bat.exists()){
-                  bat.createNewFile();
-              }
-              PrintWriter pw = new PrintWriter (bat);
-              pw.print("java -Xmx1024m -Xms1024m " + comand + args);
-              pw.close();
-              if (!bat.canExecute()){
-                  bat.setExecutable(true);
-              }
-              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
-          } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-            if (!error.exists()) {
-                  try {
-                    error.createNewFile();
-                  }
-                  catch (IOException exe) {
-                  }
-              }
-            try {
-              PrintWriter pw = new PrintWriter(error);
-              pw.print(e.getMessage());
-              pw.println();
-              pw.close();
-            }
-            catch (IOException exe) {
-            }
-            System.exit(0);
-          }
-            break;
-        case 3:
-          try {
-              File bat = null;
-              BufferedReader bf = null;
-              if (Mainclass.OS.equals("windows")){
-                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\com.txt")));
-              } else if (Mainclass.OS.equals("linux")){
-                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "/.minecraft/bin/com.txt")));
-              }
-              String comand = bf.readLine();
-              bf.close();
-              if (!bat.exists()){
-                  bat.createNewFile();
-              }
-              PrintWriter pw = new PrintWriter (bat);
-              pw.print("java -Xmx2048m -Xms2048m " + comand + args);
-              pw.close();
-              if (!bat.canExecute()){
-                  bat.setExecutable(true);
-              }
-              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
-          } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-            if (!error.exists()) {
-                  try {
-                    error.createNewFile();
-                  }
-                  catch (IOException exe) {
-                  }
-              }
-            try {
-              PrintWriter pw = new PrintWriter(error);
-              pw.print(e.getMessage());
-              pw.println();
-              pw.close();
-            }
-            catch (IOException exe) {
-            }
-            System.exit(0);
-          }
-            break;
-        case 4:
-          try {
-              File bat = null;
-              BufferedReader bf = null;
-              if (Mainclass.OS.equals("windows")){
-                  bat =  new File (System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\com.txt")));
-              } else if (Mainclass.OS.equals("linux")){
-                  bat =  new File (System.getProperty("user.home") + "/.minecraft/bin/start.bat");
-                  bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "/.minecraft/bin/com.txt")));
-              }
-              String comand = bf.readLine();
-              bf.close();
-              if (!bat.exists()){
-                  bat.createNewFile();
-              }
-              PrintWriter pw = new PrintWriter (bat);
-              pw.print("java -Xmx4096m -Xms4096m " + comand + args);
-              pw.close();
-              if (!bat.canExecute()){
-                  bat.setExecutable(true);
-              }
-              minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
-          } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error, no se ha podido ejecutar Minecraft.");
-            if (!error.exists()) {
-                  try {
-                    error.createNewFile();
-                  }
-                  catch (IOException exe) {
-                  }
-              }
-            try {
-              PrintWriter pw = new PrintWriter(error);
-              pw.print(e.getMessage());
-              pw.println();
-              pw.close();
-            }
-            catch (IOException exe) {
-            }
-            System.exit(0);
-          }
-            break;
         }
-        //Creamos el fichero Log si no existía
-      File log = null;
+        logeoMC = new LogMine(usuario, contraseña, statusConn, jButton5);
+        logeoMC.start();
+        Mainclass.hilos.put("LogMine", logeoMC);
+        File log = null;
+        if (Mainclass.OS.equals("windows")){
+          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
+        } else if (Mainclass.OS.equals("linux")){
+          log = new File(new StringBuilder().append(System.getProperty("user.home")).append("/.Data/LogMC.cfg").toString());
+        }        
+        if (!log.exists()) {
+              try {
+                log.createNewFile();
+              }
+              catch (IOException e)
+              {
+              }
+          }
+        //Obtenemos la fecha, la hora y el usuario
+        Calendar C = new GregorianCalendar();
+        StringBuilder str = new StringBuilder("Connected at ");
+        str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
+        str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
+        str.append(" with name of ").append(jTextField1.getText()).append("\n");
+        try {
+            //Escribimos en el Log indicándole que no sobreescriba lo anterior
+          PrintWriter pw = new PrintWriter(new FileWriter(log, true));
+          pw.println();
+          pw.print(str.toString());
+          pw.close();
+        }
+        catch (IOException e) {
+        }
+    } else if (!MOS.exists() && MSOS.exists()){
+        final String user = jTextField1.getText();
+        final String pass = new String(jPasswordField1.getPassword());
+        Thread thr = new Thread("LogShafter"){
+            public void run(){
+                Vista2.playMS(user, pass);
+            }
+        };
+        thr.start();
+        Mainclass.hilos.put("LogShafter", thr);
+        File log = null;
       if (Mainclass.OS.equals("windows")){
           log = new File(new StringBuilder().append(System.getProperty("user.home")).append("\\AppData\\Roaming\\Data\\LogMC.cfg").toString());
       } else if (Mainclass.OS.equals("linux")){
@@ -469,7 +570,7 @@ public class Vista2 extends javax.swing.JFrame {
         StringBuilder str = new StringBuilder("Connected at ");
         str.append(C.get(5)).append("/").append(C.get(2) + 1).append("/").append(C.get(1));
         str.append(" ").append(C.get(11)).append(":").append(C.get(12)).append(":").append(C.get(13));
-        str.append(" with name of ").append(this.jTextField1.getText()).append("\n");
+        str.append(" with name of ").append(jTextField1.getText()).append("\n");
         try {
             //Escribimos en el Log indicándole que no sobreescriba lo anterior
           PrintWriter pw = new PrintWriter(new FileWriter(log, true));
@@ -479,29 +580,6 @@ public class Vista2 extends javax.swing.JFrame {
         }
         catch (IOException e) {
         }
-        System.exit(0);
-      }
-    } else if (!er) {
-        //Si el nombre y la contraseña son inválidos
-      JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos");
-    }
-    } else if (MOS.exists() && !MSOS.exists()){
-        String usuario = jTextField1.getText();
-        String contraseña = new String (jPasswordField1.getPassword());
-        //LogMine logeoMC = new LogMine(usuario, contraseña, statusConn);
-        //logeoMC.start();
-        //Mainclass.hilos.put("LogMine", logeoMC);
-        Vista2.playMC(usuario, contraseña);
-    } else if (!MOS.exists() && MSOS.exists()){
-        final String user = jTextField1.getText();
-        final String pass = new String(jPasswordField1.getPassword());
-        Thread thr = new Thread("LogShafter"){
-            public void run(){
-                Vista2.playMS(user, pass);
-            }
-        };
-        thr.start();
-        Mainclass.hilos.put("LogShafter", thr);
     } else{
         System.err.println("ERROR: Files parameters are more than one type!");
         statusConn.setForeground(Color.red);
@@ -509,64 +587,98 @@ public class Vista2 extends javax.swing.JFrame {
     }
     }
     public static void playMS (String user, String pass){
-        //Crear proceso del Mineshafter con parámetros
-    }
-    public static void playMC (String user, String pass){
+        List <String> command = new ArrayList<String>();
+        command.add("java");
+        command.add("-jar");
         File temporal = null;
         if (Mainclass.OS.equals("windows")){
-            temporal = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\");
+            command.add(System.getProperty("user.home") + "\\AppData\\Roaming\\"
+                    + ".minecraft\\Mineshafter-proxy.jar");
+            try {
+                temporal = new File(System.getProperty("user.home")
+                        + "\\AppData\\Roaming\\Data\\sys.tpl");
+                temporal.createNewFile();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
         } else if (Mainclass.OS.equals("linux")){
-            temporal = new File(System.getProperty("user.home") + "/.Data/");
+            command.add(System.getProperty("user.home") + "/.minecraft/Mineshafter-proxy.jar");
+            try {
+                temporal = new File(System.getProperty("user.home")
+                        + "/.Data/sys.tpl");
+                temporal.createNewFile();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
         }
-        File temp = null;
         try {
-            temp = File.createTempFile("Temporal", null, temporal);
-            PrintWriter pw = new PrintWriter(temp);
+            PrintWriter pw = new PrintWriter(temporal);
             pw.println(user);
             pw.println(pass);
             pw.close();
-        } catch (IOException ex) {
+        } catch (FileNotFoundException ex) {
             System.err.println(ex);
         }
-        StringBuilder command = new StringBuilder();
-        if (Mainclass.OS.equals("windows")){
-            command.append("java -jar ").append(System.getProperty("user.home")).append("\\AppData\\Roaming\\"
-                    + ".minecraft\\minecraft.jar");
-        } else if (Mainclass.OS.equals("linux")){
-            command.append("java -jar ").append(System.getProperty("user.home")).append("/.minecraft/minecraft.jar");
-        }
-        /*if (!temp.exists()){
-            try{
-                command.append(" ").append(user).append(" ").append(pass);
-                execMC(command.toString());
-            } catch (Exception ex){
-                System.err.println(ex);
-                System.exit(11);
-            }
-        } else{
-            try{
-                execMC(command.toString());
-            } catch (Exception ex){
-                
-            }
-        }*/
-        execMC(command.toString());
+        temporal.deleteOnExit();
+        execMCS(command);
     }
-    private static void execMC(String com){
+    public static void playMC (String user, String pass){
+        List <String> command = new ArrayList<String>();
+        command.add("java");
+        command.add("-jar");
+        File temporal = null;
+        if (Mainclass.OS.equals("windows")){
+            command.add(System.getProperty("user.home") + "\\AppData\\Roaming\\"
+                    + ".minecraft\\minecraft.jar");
+            try {
+                temporal = new File(System.getProperty("user.home")
+                        + "\\AppData\\Roaming\\Data\\sys.tpl");
+                temporal.createNewFile();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        } else if (Mainclass.OS.equals("linux")){
+            command.add(System.getProperty("user.home") + "/.minecraft/minecraft.jar");
+            try {
+                temporal = new File(System.getProperty("user.home")
+                        + "/.Data/sys.tpl");
+                temporal.createNewFile();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        }
+        try {
+            PrintWriter pw = new PrintWriter(temporal);
+            pw.println(user);
+            pw.println(pass);
+            pw.close();
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex);
+        }
+        temporal.deleteOnExit();
+        execMCS(command);
+    }
+    private static void execMCS(List com){
         see.setVisible(false);
         Process minecraft;
+        //File minec = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
+        //URL[] urls = new URL[1];
         try {
-            minecraft = Runtime.getRuntime().exec(com);
-            sys = new Systray(see);
+            //urls[0] = new File(minec, "minecraft.jar").toURI().toURL();
+            //ClassLoader clase = new URLClassLoader(urls);
+            //Class claseMine = clase.loadClass("net.minecraft.MinecraftLauncher");
+            //claseMine.newInstance()
+            ProcessBuilder pb = new ProcessBuilder(com);
+            minecraft = pb.start();
+            /*sys = new Systray(see, true);
             sys.addProcess(minecraft);
             sys.start();
-            minecraft.waitFor();
+            Mainclass.hilos.put("Systray", sys);*/
         } catch (Exception ex) {
-            System.err.println(ex);
+            System.err.println(ex.getStackTrace());
             System.exit(11);
         }
-        sys.salir();
-        see.setVisible(true);
+        System.exit(0);
     }
     /**
      * This method is called from within the constructor to initialize the form.

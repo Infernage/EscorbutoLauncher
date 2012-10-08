@@ -36,7 +36,7 @@ package Login;
 /*     */   public int devolver() {
                 int i = jList1.getSelectedIndex();
                 if (exit){
-                    i = -2;
+                    i = -1;
                 }
 /*  23 */     return i;
 /*     */   }

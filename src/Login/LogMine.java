@@ -18,6 +18,7 @@ import java.security.cert.Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 
 /**
@@ -27,12 +28,15 @@ import javax.swing.JLabel;
 public class LogMine extends Thread{
     private String targetURL, urlParameters, userName, password;
     private JLabel label;
-    public LogMine(String user, String pass, JLabel lab){
+    private JButton play;
+    public boolean offline = false;
+    public LogMine(String user, String pass, JLabel lab, JButton but){
         super("LogMine");
         targetURL = "https://login.minecraft.net/";
         label = lab;
         userName = user;
         password = pass;
+        play = but;
     }
     private String logMine (String targetURL, String urlParameters){
         HttpsURLConnection connection = null;
@@ -89,6 +93,9 @@ public class LogMine extends Thread{
             if (res == null){
                 label.setForeground(Color.red);
                 label.setText("Can't connect to minecraft.net");
+                play.setText("Jugar offline");
+                play.setEnabled(true);
+                offline = true;
                 return;
             }
             if (!res.contains(":")){
