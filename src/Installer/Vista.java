@@ -56,7 +56,13 @@ public class Vista extends javax.swing.JFrame {
         jProgressBar1.setVisible(false);
         jButton1.setVisible(true);
         jButton1.setEnabled(true);
-        jButton2.setEnabled(true);
+        if (jButton2.isEnabled()){
+            jButton2.setEnabled(true);
+        } else{
+            jButton2.setEnabled(false);
+            jLabel3.setForeground(Color.red);
+            jLabel3.setText("Archivos de instalación no encontrados");
+        }
         jButton2.setVisible(true);
         jButton4.setVisible(false);
         jButton4.setEnabled(false);
@@ -68,6 +74,7 @@ public class Vista extends javax.swing.JFrame {
     }
     //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
     private void install(boolean direct){
+        jLabel3.setText("");
         jProgressBar1.setVisible(true);
         work = new Worker (jLabel2, jProgressBar1, jButton4, jButton1, direct);
         work.add(this);
@@ -82,6 +89,7 @@ public class Vista extends javax.swing.JFrame {
     }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
+        jLabel3.setText("");
         jProgressBar1.setVisible(true);
         unwork = new Unworker(jLabel2, jProgressBar1, jButton4, jButton1, this);
         unwork.execute();
@@ -96,6 +104,7 @@ public class Vista extends javax.swing.JFrame {
     
     //Botón restaurar que ejecuta el restaurador
     private void restauring(){
+        jLabel3.setText("");
         jProgressBar1.setVisible(true);
         restau = new Restore(this, jLabel2, jProgressBar1, jButton4, jButton1);
         restau.execute();
@@ -231,9 +240,12 @@ public class Vista extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         //Ejecutar instalación
-        boolean direct = jCheckBox1.isSelected();
-        System.out.println("Installing...");
-        install(direct);
+        int i = JOptionPane.showConfirmDialog(null, "¿Quiere instalar Minecraft en su ordenador?");
+        if (i == 0){
+            boolean direct = jCheckBox1.isSelected();
+            System.out.println("Installing...");
+            install(direct);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -280,8 +292,11 @@ public class Vista extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
         //Botón desinstalar
-        System.out.println("Uninstalling...");
-        uninstall();
+        int i = JOptionPane.showConfirmDialog(null, "¿Está seguro que desea desinstalar?");
+        if (i == 0){
+            System.out.println("Uninstalling...");
+            uninstall();
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed

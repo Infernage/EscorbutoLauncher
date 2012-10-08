@@ -48,6 +48,9 @@ public class Restore extends SwingWorker<Integer, Integer>{
         if (Vista.OS.equals("windows")){
             File copia = new File(System.getProperty("user.home") + "\\Desktop\\Copia Minecraft");
             ficheros(copia);//Listamos los ficheros que haya en copia
+            if (this.isCancelled()){
+                return 0;
+            }
             Lista vist = new Lista(fr, true, fich);//Creamos un Dialog para ver por cual restauramos
             vist.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             vist.setTitle("Minecraft recovery");
@@ -211,6 +214,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
             }
         } else{
             JOptionPane.showMessageDialog(null, "No existen copias realizadas.");
+            this.cancel(true);
         }
     }
     //Borrar fichero o directorio
