@@ -500,6 +500,7 @@ public class Vista2 extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos");
     }
     } else if (MOS.exists() && !MSOS.exists()){
+        see = this;
         String usuario = jTextField1.getText();
         String contraseña = new String (jPasswordField1.getPassword());
         if (logeoMC != null){
@@ -542,11 +543,22 @@ public class Vista2 extends javax.swing.JFrame {
         catch (IOException e) {
         }
     } else if (!MOS.exists() && MSOS.exists()){
+        RAM ram = new RAM(this, true);
+        ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        ram.setLocationRelativeTo(null);
+        ram.setVisible(true);
+        int ind = ram.devolver() + 1;
+        ram.dispose();
+        if (ind == 0){
+            ind = 2;
+            JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
+        }
+        final int opt = ind;
         final String user = jTextField1.getText();
         final String pass = new String(jPasswordField1.getPassword());
         Thread thr = new Thread("LogShafter"){
             public void run(){
-                Vista2.playMS(user, pass);
+                Vista2.playMS(user, pass, opt);
             }
         };
         thr.start();
@@ -586,9 +598,18 @@ public class Vista2 extends javax.swing.JFrame {
         statusConn.setText("Demasiados argumentos de ficheros!");
     }
     }
-    public static void playMS (String user, String pass){
+    public static void playMS (String user, String pass, int opt){
         List <String> command = new ArrayList<String>();
         command.add("java");
+        switch(opt){
+            case 1: command.add(" -Xmx512m -Xms512m ");
+                break;
+            case 2: command.add(" -Xmx1024m -Xms1024m ");
+                break;
+            case 3: command.add(" -Xmx2048m -Xms2048m ");
+                break;
+            case 4: command.add(" -Xmx4096m -Xms4096m ");
+        }
         command.add("-jar");
         File temporal = null;
         if (Mainclass.OS.equals("windows")){
@@ -622,9 +643,18 @@ public class Vista2 extends javax.swing.JFrame {
         temporal.deleteOnExit();
         execMCS(command);
     }
-    public static void playMC (String user, String pass){
+    public static void playMC (String user, String pass, int opt){
         List <String> command = new ArrayList<String>();
         command.add("java");
+        switch(opt){
+            case 1: command.add(" -Xmx512m -Xms512m ");
+                break;
+            case 2: command.add(" -Xmx1024m -Xms1024m ");
+                break;
+            case 3: command.add(" -Xmx2048m -Xms2048m ");
+                break;
+            case 4: command.add(" -Xmx4096m -Xms4096m ");
+        }
         command.add("-jar");
         File temporal = null;
         if (Mainclass.OS.equals("windows")){

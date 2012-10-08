@@ -19,7 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -110,8 +112,18 @@ public class LogMine extends Thread{
                 }
                 return;
             }
+            RAM ram = new RAM(Vista2.see, true);
+            ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            ram.setLocationRelativeTo(null);
+            ram.setVisible(true);
+            int ind = ram.devolver() + 1;
+            ram.dispose();
+            if (ind == 0){
+                ind = 2;
+                JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
+            }
             System.out.println("Initializing minecraft...");
-            Vista2.playMC(userName, password);
+            Vista2.playMC(userName, password, ind);
         } catch (UnsupportedEncodingException ex) {
             System.err.println(ex);
         }
