@@ -77,7 +77,7 @@ public class FAQ extends javax.swing.JDialog {
 
         jLabel10.setText("R: Contacta conmigo (Infernage) y te diré lo que tienes que hacer.");
 
-        jLabel11.setText("P: ¿Cuándo vais a actualizar el servidor a X versión?");
+        jLabel11.setText("P: ¿Cuándo vais a actualizar el servidor a X.Y.Z versión?");
 
         jLabel12.setText("R: El que me pregunte esto dentro del server, lo BANEO xD (Se actualizará cuando salgan las mods y tenga tiempo para actualizarlo)");
 
@@ -101,7 +101,7 @@ public class FAQ extends javax.swing.JDialog {
 
         jLabel15.setText("P: Tengo X error en el minecraft/login. ¿Qué hago?");
 
-        jLabel16.setText("R: Si has encontrado algún error, postéalo aquí:");
+        jLabel16.setText("R: Si has encontrado algún error, coméntalo aquí:");
 
         jButton3.setText("Click aquí");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -217,7 +217,7 @@ public class FAQ extends javax.swing.JDialog {
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:		
-            Desktop.getDesktop().browse(new URI("https://github.com/Infernage/MineLogin/issues/new"));
+            Desktop.getDesktop().browse(new URI("http://minechinchas.blogspot.com.es/2012/09/bugs-y-problemas.html"));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "No se ha encontrado la página Web");
         }

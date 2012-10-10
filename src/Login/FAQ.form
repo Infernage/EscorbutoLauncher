@@ -172,7 +172,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel11">
       <Properties>
-        <Property name="text" type="java.lang.String" value="P: &#xbf;Cu&#xe1;ndo vais a actualizar el servidor a X versi&#xf3;n?"/>
+        <Property name="text" type="java.lang.String" value="P: &#xbf;Cu&#xe1;ndo vais a actualizar el servidor a X.Y.Z versi&#xf3;n?"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel12">
@@ -213,7 +213,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel16">
       <Properties>
-        <Property name="text" type="java.lang.String" value="R: Si has encontrado alg&#xfa;n error, post&#xe9;alo aqu&#xed;:"/>
+        <Property name="text" type="java.lang.String" value="R: Si has encontrado alg&#xfa;n error, com&#xe9;ntalo aqu&#xed;:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jButton3">

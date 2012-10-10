@@ -156,33 +156,15 @@ public class Vista2 extends javax.swing.JFrame {
     private void mineOff(){
         statusConn.setText("");
         Process minecraft = null;
-        String temp = null;
-        if (Mainclass.OS.equals("windows")){
-            String m = System.getProperty("user.home") + "/AppData/Roaming/.minecraft/bin";
-            temp = "-cp \"" + m + "/minecraft.jar" + m + "/jinput.jar\" "
-                    + "-Djava.library.path=\"" + m + "/natives\" "
-                    + "net.minecraft.client.Minecraft ";
-        } else if (Mainclass.OS.equals("linux")){
-            String m = System.getProperty("user.home") + "/.minecraft/bin";
-            temp = "-cp \"" + m + "/minecraft.jar" + m + "/jinput.jar\" "
-                    + "-Djava.library.path=\"" + m + "/natives\" "
-                    + "net.minecraft.client.Minecraft ";
-        }
         final String cmd = "-cp \"%APPDATA%/.minecraft/bin/minecraft.jar;%APPDATA%/.minecraft/bin/lwjgl.jar;%APPDATA%/.minecraft/bin/lwjgl_util.jar;%APPDATA%/.minecraft/bin/jinput.jar\" -Djava.library.path=\"%APPDATA%/.minecraft/bin/natives\" net.minecraft.client.Minecraft ";
-        //final String cmd = temp;
-        JOptionPane.showMessageDialog(null, cmd);
         String comand = "java ";
         //Si todo está correcto, se abre la ventana de elección de RAM
         int tam = selectRAM();
         switch(tam){
             case 1:
                 try{
-                    comand = comand + "-Xmx512m -Xms512m " + cmd + args + "\nexit";
-                    if (Mainclass.OS.equals("windows")){
-                        minecraft = Runtime.getRuntime().exec("cmd /c start " + comand);
-                    } else if (Mainclass.OS.equals("linux")){
-                        minecraft = Runtime.getRuntime().exec("sh -c " + comand);
-                    }
+                    comand = comand + "-Xmx512m -Xms512m " + cmd + args;
+                    minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
                     ex.printStackTrace();
                     System.exit(1);
@@ -190,12 +172,8 @@ public class Vista2 extends javax.swing.JFrame {
                 break;
             case 2:
                 try{
-                    comand = comand + "-Xmx1024m -Xms1024m " + cmd + args + "\nexit";
-                    if (Mainclass.OS.equals("windows")){
-                        minecraft = Runtime.getRuntime().exec("cmd /c start " + comand);
-                    } else if (Mainclass.OS.equals("linux")){
-                        minecraft = Runtime.getRuntime().exec("sh -c " + comand);
-                    }
+                    comand = comand + "-Xmx1024m -Xms1024m " + cmd + args;
+                    minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
                     ex.printStackTrace();
                     System.exit(1);
@@ -203,12 +181,8 @@ public class Vista2 extends javax.swing.JFrame {
                 break;
             case 3:
                 try{
-                    comand = comand + "-Xmx2048m -Xms2048m " + cmd + args + "\nexit";
-                    if (Mainclass.OS.equals("windows")){
-                        minecraft = Runtime.getRuntime().exec("cmd /c start " + comand);
-                    } else if (Mainclass.OS.equals("linux")){
-                        minecraft = Runtime.getRuntime().exec("sh -c " + comand);
-                    }
+                    comand = comand + "-Xmx2048m -Xms2048m " + cmd + args;
+                    minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
                     ex.printStackTrace();
                     System.exit(1);
@@ -216,12 +190,8 @@ public class Vista2 extends javax.swing.JFrame {
                 break;
             case 4:
                 try{
-                    comand = comand + "-Xmx4096m -Xms4096m " + cmd + args + "\nexit";
-                    if (Mainclass.OS.equals("windows")){
-                        minecraft = Runtime.getRuntime().exec("cmd /c start " + comand);
-                    } else if (Mainclass.OS.equals("linux")){
-                        minecraft = Runtime.getRuntime().exec("sh -c " + comand);
-                    }
+                    comand = comand + "-Xmx4096m -Xms4096m " + cmd + args;
+                    minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
                     ex.printStackTrace();
                     System.exit(1);
@@ -230,7 +200,9 @@ public class Vista2 extends javax.swing.JFrame {
         }
         inputLog(jTextField1.getText());
         try {
-            minecraft.waitFor();
+            if (minecraft == null){
+                throw new Exception("[ERROR]Minecraft execution was incorrect!");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -288,7 +260,9 @@ public class Vista2 extends javax.swing.JFrame {
         jButton5.setEnabled(false);
         //Método del botón ¡Jugar!
         statusConn.setForeground(Color.white);
-        statusConn.setText("Connecting...");
+        if (!offline){
+            statusConn.setText("Connecting...");
+        }
         boolean open = false, remember = jCheckBox1.isSelected(), rememberP = jCheckBox2.isSelected();
         //Comprobamos si el Recordar está activo y lo recordamos para un futuro
         File rem = null, MOS = null, MSOS = null;
@@ -418,7 +392,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "\\AppData\\Roaming\\Data\\sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
             }
         } else if (Mainclass.OS.equals("linux")){
             command = command + System.getProperty("user.home") + "/.minecraft/Mineshafter-proxy.jar";
@@ -427,7 +401,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "/.Data/sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
             }
         }
         try {
@@ -436,9 +410,8 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            System.err.println(ex);
+            ex.printStackTrace();
         }
-        temporal.deleteOnExit();
         execMCS(command);
     }
     public static void playMC (String user, String pass, int opt){
@@ -463,7 +436,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "\\AppData\\Roaming\\Data\\sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
             }
         } else if (Mainclass.OS.equals("linux")){
             command = command + System.getProperty("user.home") + "/.minecraft/minecraft.jar";
@@ -472,7 +445,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "/.Data/sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
             }
         }
         try {
@@ -481,27 +454,18 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            System.err.println(ex);
+            ex.printStackTrace();
         }
-        temporal.deleteOnExit();
         execMCS(command);
     }
     private static void execMCS(String com){
         see.setVisible(false);
-        Process minecraft;
-        //File minec = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
-        //URL[] urls = new URL[1];
+        Process minecraft = null;
         try {
-            //urls[0] = new File(minec, "minecraft.jar").toURI().toURL();
-            //ClassLoader clase = new URLClassLoader(urls);
-            //Class claseMine = clase.loadClass("net.minecraft.MinecraftLauncher");
-            //claseMine.newInstance()
-            if (Mainclass.OS.equals("windows")){
-                minecraft = Runtime.getRuntime().exec("cmd /c start " + com);
-            } else if (Mainclass.OS.equals("linux")){
-                minecraft = Runtime.getRuntime().exec("sh -c " + com);
+            minecraft = Runtime.getRuntime().exec(com);
+            if (minecraft == null){
+                throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
-            Thread.sleep(5000);
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(11);
