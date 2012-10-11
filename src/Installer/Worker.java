@@ -54,10 +54,26 @@ public class Worker extends SwingWorker <String, Integer>{
                 System.out.println("Setting new Data");
                 fti.createNewFile();
                 PrintWriter pw = new PrintWriter (fti);
+                pw.println(true);
                 pw.print(true);
                 pw.close();
                 File del = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data");
                 borrarData(del);
+            } else{
+                System.out.println("Reading Data document");
+                BufferedReader bf = new BufferedReader(new FileReader(fti));
+                String A = bf.readLine();
+                String B = bf.readLine();
+                bf.close();
+                if ((A == null) || (B == null)){
+                    System.out.println("Setting new Data");
+                    PrintWriter pw = new PrintWriter(fti);
+                    pw.println(true);
+                    pw.print(true);
+                    pw.close();
+                    File del = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data");
+                    borrarData(del);
+                }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
                 String say = null;
@@ -263,6 +279,20 @@ public class Worker extends SwingWorker <String, Integer>{
                 pw.close();
                 File del = new File(System.getProperty("user.home") + "/.Data");
                 borrarData(del);
+            } else{
+                System.out.println("Reading Data document");
+                BufferedReader bf = new BufferedReader(new FileReader(fti));
+                String A = bf.readLine();
+                String B = bf.readLine();
+                bf.close();
+                if ((A == null) || (B == null)){
+                    PrintWriter pw = new PrintWriter(fti);
+                    pw.println(true);
+                    pw.print(true);
+                    pw.close();
+                    File del = new File(System.getProperty("user.home") + "/.Data");
+                    borrarData(del);
+                }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
                 String say = null;
@@ -271,7 +301,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 } else{
                     say = "¿Desea realizar copia de seguridad de su Minecraft?";
                 }
-                int i = JOptionPane.showConfirmDialog(null, "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?");
+                int i = JOptionPane.showConfirmDialog(null, say);
                 File copiaDel = new File(user + "/.minecraft");
                 if (i == 0){
                     System.out.println("Doing encripted copy...");

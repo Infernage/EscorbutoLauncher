@@ -14,19 +14,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.*;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 /**
  *
  * @author Reed
  */
 public class Updater extends Thread{
+    private boolean data;
     private String link;
     private String path;
     private String name;
     public Installer.Worker work;
     //Creamos el actualizador con el link de la nueva versión como parámetro
-    public Updater (String host){
+    public Updater (String host, boolean isData){
         super("Updater");
+        data = isData;
         link = host;
         if (Mainclass.OS.equals("windows")){
             path = System.getProperty("user.home") + "\\Desktop\\Update";
@@ -95,7 +96,7 @@ public class Updater extends Thread{
             file.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "[ERROR] Download crashed!");
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
     //Método de descompresión
@@ -189,6 +190,39 @@ public class Updater extends Thread{
     //Método de ejecución de Main Instalador
     private void exec(){
             //Por último ejecutamos el nuevo login
+        if (!data){
+            File old = null;
+            File oldlib = null;
+            File next = null;
+            File nextlib = null;
+            if (Mainclass.OS.equals("windows")){
+                old = new File(System.getProperty("user.home") + "\\Desktop\\Update\\RUN.jar");
+                oldlib = new File(System.getProperty("user.home") + "\\Desktop\\Update\\lib");
+                next = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
+                nextlib = new File(System.getProperty("user.home") +  "\\AppData\\Roaming\\.minecraft\\lib");
+            } else if (Mainclass.OS.equals("linux")){
+                old = new File(System.getProperty("user.home") + "/Desktop/Update/RUN.jar");
+                oldlib = new File(System.getProperty("user.home") + "/Desktop/Update/RUN.jar");
+                next = new File(System.getProperty("user.home") + "/.minecraft/RUN.jar");
+                nextlib = new File(System.getProperty("user.home") + "/.minecraft/lib");
+            }
+            if (next.exists()){
+                next.delete();
+            }
+            if (nextlib.exists()){
+                borrarFiles(nextlib);
+            }
+            try{
+                copy(old, next);
+                copyDirectory(oldlib, nextlib);
+                old.delete();
+                borrarFiles(oldlib);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            temp();
+            return;
+        }
         Vista2.jProgressBar1.setVisible(true);
         Vista2.jProgressBar1.setString("Aplicando actualización...");
         Vista2.jProgressBar1.setMaximum(100);
@@ -232,6 +266,33 @@ public class Updater extends Thread{
         } finally{
             System.exit(0);
         }
+    }
+    private void copy(File src, File dst) throws IOException { 
+        InputStream in = new FileInputStream(src); 
+        OutputStream out = new FileOutputStream(dst); 
+        System.out.println("Extracting " + dst.getAbsolutePath());
+        byte[] buf = new byte[4096]; 
+        int len; 
+        while ((len = in.read(buf)) > 0) { 
+            out.write(buf, 0, len); 
+        } 
+        in.close(); 
+        out.close(); 
+    }
+    private void copyDirectory(File srcDir, File dstDir) throws IOException {
+        if (srcDir.isDirectory()) { 
+            if (!dstDir.exists()) { 
+                dstDir.mkdir(); 
+            }
+             
+            String[] children = srcDir.list(); 
+            for (int i=0; i<children.length; i++) {
+                copyDirectory(new File(srcDir, children[i]), 
+                    new File(dstDir, children[i])); 
+            } 
+        } else { 
+            copy(srcDir, dstDir); 
+        } 
     }
     //Método de ejecución
     @Override
