@@ -203,6 +203,12 @@ public class Worker extends SwingWorker <String, Integer>{
                     borrarData(configB);
                     configB.delete();
                 }
+                config = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\saves");
+                configB = new File(data + "\\.minecraft\\saves");
+                if (config.exists()){
+                    borrarData(configB);
+                    configB.delete();
+                }
                 File minetemp = new File(data + "\\.minecraft");
                 fichdst.mkdirs();
                 copyDirectory(minetemp, fichdst);
@@ -419,6 +425,12 @@ public class Worker extends SwingWorker <String, Integer>{
                     borrarData(configB);
                     configB.delete();
                 }
+                config = new File(System.getProperty("user.home") + "/.minecraft/saves");
+                configB = new File(data + "/.minecraft/saves");
+                if (config.exists()){
+                    borrarData(configB);
+                    configB.delete();
+                }
                 File minetemp = new File(data + "/.minecraft");
                 fichdst.mkdirs();
                 copyDirectory(minetemp, fichdst);
@@ -535,7 +547,7 @@ public class Worker extends SwingWorker <String, Integer>{
     private void borrarFichero (File fich){
         File[] ficheros = fich.listFiles();
         for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory() && !ficheros[x].getName().equals("stats")){
+            if (ficheros[x].isDirectory() && !ficheros[x].getName().equals("stats") && !ficheros[x].getName().equals("saves")){
                 borrarFichero(ficheros[x]);
             }
             System.out.println("Deleting: " + ficheros[x].getName());

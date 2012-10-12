@@ -145,7 +145,7 @@ public class Vista2 extends javax.swing.JFrame {
     public static void per (int size, int downloaded){
         size = size/1048576;
         downloaded = downloaded/1048576;
-        String temp = downloaded + "bytes/" + size + "bytes";
+        String temp = downloaded + "MBytes/" + size + "MBytes";
         jProgressBar1.setString(temp);
     }
     private void inicializar(){

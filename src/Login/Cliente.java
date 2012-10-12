@@ -24,7 +24,7 @@ public class Cliente extends Thread{
     private JLabel info, state;//Etiquetas para indicar el estado de la actualizacion
     private JButton play;//Botón jugar
     private JFrame fr;//Ventana
-    private boolean isData;
+    private boolean isData, write = false;
     //Creamos el cliente
     public Cliente(JLabel A, JLabel B, JButton C, URL url, JFrame fra){
         super("Cliente");
@@ -63,7 +63,7 @@ public class Cliente extends Thread{
                 String lin;
                 while (((lin = in.readLine()) != null) && !exit){
                     if (lin.contains("2shared.com/download") && lin.contains(".zip")){
-                        StringTokenizer token = new StringTokenizer(lin, "\"");
+                        StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
                             if (te.contains(".zip")){
@@ -80,7 +80,7 @@ public class Cliente extends Thread{
                 String lin;
                 while (((lin = in.readLine()) != null) && !exit){
                     if (lin.contains("download_button") && lin.contains("sendspace.com") && lin.contains(".zip")){
-                        StringTokenizer token = new StringTokenizer(lin, "\"");
+                        StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
                             if (te.contains(".zip") && te.contains("sendspace.com")){
@@ -124,8 +124,6 @@ public class Cliente extends Thread{
             }
             if ((ver != null) && (lin != null)){
                 linksD.put(ver, lin);
-                ver = null;
-                lin = null;
             }
         }
         for (int i = 0; i < login.size(); i++){
@@ -141,8 +139,6 @@ public class Cliente extends Thread{
             }
             if ((ver != null) && (lin != null)){
                 links.put(ver, lin);
-                ver = null;
-                lin = null;
             }
         }
         Iterator<String> it = linksD.keySet().iterator();
@@ -189,14 +185,14 @@ public class Cliente extends Thread{
         }
         Vista2.jProgressBar1.setVisible(false);
         state.setText("");
-        salida = false;
         it = links.keySet().iterator();
-        while(it.hasNext() && !salida){
+        while(it.hasNext()){
+            salida = false;
             String version = it.next(), main = Mainclass.version;
             StringTokenizer token = new StringTokenizer(version, ".");
             main = main.substring(1);
             StringTokenizer actual = new StringTokenizer(main, ".");
-            while(token.hasMoreTokens() && !exit && !actualize){
+            while(token.hasMoreTokens() && !salida && !actualize){
                 int V = Integer.parseInt(token.nextToken());
                 int V2 = Integer.parseInt(actual.nextToken());
                 if (V > V2){
@@ -206,7 +202,7 @@ public class Cliente extends Thread{
                     fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                     actualizar(links.get(version));
                 } else if (V < V2){
-                    salir();
+                    salida = true;
                 }
             }
         }
@@ -230,21 +226,21 @@ public class Cliente extends Thread{
                 String msg;
                 while((msg = input.readLine()) != null){ //Si es distinto de null, comprobamos el mensaje
                     if(msg.contains("DataVersion")){
+                        write = true;
                         lista = new ArrayList<String>();
                     } else if (msg.contains("EndData")){
+                        write = false;
                         List<String> temp = lista;
                         mapa.put("Data", temp);
-                        lista.clear();
-                        lista = null;
                     } else if (msg.contains("LoginVersion")){
+                        write = true;
                         lista = new ArrayList<String>();
                     } else if (msg.contains("EndLogin")){
+                        write = false;
                         List<String> temp = lista;
                         mapa.put("Login", temp);
-                        lista.clear();
-                        lista = null;
                     }
-                    if (msg.contains("2shared.com") || msg.contains("sendspace.com")){
+                    if ((msg.contains("2shared.com") || msg.contains("sendspace.com")) && write){
                         lista.add(msg);
                     }
                 }

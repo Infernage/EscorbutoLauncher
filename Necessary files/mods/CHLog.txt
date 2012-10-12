@@ -5,36 +5,26 @@ c)Mods añadidas.
 d)Bugs.
 ___________________________________________
 
-b) Changelog. (Desde la versión MineLogin 3.1.1)
+b) Changelog. (Desde la versión MineLogin 4.0.1)
 
 ||Instalador||
--Añadido imagen de carga tanto al instalador como al login.
--Añadido nuevo acceso directo. Ya no es un bat, sino que es un .jar.
--Añadido soporte del login y viceversa.
--Añadidos ventanas de confirmación a la instalación y desinstalación
--Arreglados bugs que hacían que no instalase el Minecraft.
--Cambiado el sistema de instalación, desinstalación y restauración. Ahora todo está integrado en el mismo launcher.
--Cambiado el sistema de Changelog. Ya no habrá un Changelog para el instalador y otro para el login. Todo está integrado en el login.
--Optimizado el código.
+Nada
 
 ||Login||
--Añadido botón Instalador. Este botón abre el instalador para que podáis desinstalar, instalar o restaurar alguna versión de Minecraft. NOTA: El restaurador mantiene esta versión del Minelogin, por tanto todas las demás versiones de Minelogin no serán ejecutadas al restaurar, pero sí serán restauradas las versiones del Minecraft.
--Cambiado sistema de registro y de login para los usuarios de Minecraft oficial y Mineshafter. Ya no se abrirá la ventana para loggearse en sus respectivos sitios, todo ha sido integrado en el login. (Tranquilidad que las contraseñas no serán visibles para nadie más que vosotros xD)
--Cambiado host de actualización. Minus.com me ha jodido bastante deshabilitando la subida de los .rar y .zip, y como veo de que a más de uno se le hace pesado el que le pase los links cada 2x3 he cambiado un poco el sistema del actualizador poniéndole en vez de 1 host, 2. Por si detecto que alguno de los 2 imposibilita la subida de las actualizaciones, poder buscar otro y subirlo al host de reserva. También cambiaré en un futuro el actualizador para que tengáis que descargar menos :P
--Cambiado la barra de progreso del actualizador. Ahora muestra el tamaño de la descarga actual en MB y el % de la actualización implementada.
--Optimizado el código.
--Quitados los botones de usuarios de Minecraft oficial y Mineshafter.
+-Arreglado actualizador. Ahora no se corrompe la descarga desde 1 de los hosters.
+-Arreglado barra de progreso. Ahora muestra correctamente el progreso de descarga en MBytes.
+-Añadido soporte para partidas antiguas. Ahora la instalación no borra tus mapas.
 
 ||Minecraft||
--Cambiado minecraft.jar por mi. NOTA: El login no funcionará correctamente con otro minecraft.jar, así que sugiero que hagas una copia de seguridad del archivo, sobretodo cuando vayas a restaurar.
+Nada
 ___________________________________________
 
-b)Mods eliminadas (Desde la versión MineLogin 3.1.1)
+b)Mods eliminadas (Desde la versión MineLogin 4.0.1)
 
 Ninguna
 ___________________________________________
 
-c)Mods añadidas. (Desde la versión MineLogin 3.1.1)
+c)Mods añadidas. (Desde la versión MineLogin 4.0.1)
 
 Ninguna
 ___________________________________________
