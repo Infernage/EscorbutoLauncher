@@ -108,6 +108,7 @@ public class Worker extends SwingWorker <String, Integer>{
                                 data.createZipFileFromFolder(copiaDel, par, false, 0);
                             } catch (Exception ex) {
                                 JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
+                                ex.printStackTrace(Login.Mainclass.err);
                             }
                         } 
                     } else{
@@ -126,6 +127,7 @@ public class Worker extends SwingWorker <String, Integer>{
                             data.createZipFileFromFolder(copiaDel, par, false, 0);
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
+                            ex.printStackTrace(Login.Mainclass.err);
                         }
                         System.out.println("Copy done!");
                     }
@@ -219,7 +221,7 @@ public class Worker extends SwingWorker <String, Integer>{
                     infer.createNewFile();
                     Process hidd = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
                 } catch (Exception ex){
-                    System.err.println(ex);
+                    ex.printStackTrace(Login.Mainclass.err);
                 }
                 File logger = new File(data + "\\Logger");
                 logger.mkdirs();
@@ -248,7 +250,7 @@ public class Worker extends SwingWorker <String, Integer>{
             } catch (IOException e){
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
-                System.err.println(e);
+                e.printStackTrace(Login.Mainclass.err);
             }
             File temporal = new File(user + "\\.minecraft\\Temporal.jar");
             File temp = new File(user + "\\Data\\Logger\\Temporal.jar");
@@ -333,6 +335,7 @@ public class Worker extends SwingWorker <String, Integer>{
                                 data.createZipFileFromFolder(copiaDel, par, false, 0);
                             } catch (Exception ex) {
                                 JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
+                                ex.printStackTrace(Login.Mainclass.err);
                             }
                         } 
                     } else{
@@ -351,6 +354,7 @@ public class Worker extends SwingWorker <String, Integer>{
                             data.createZipFileFromFolder(copiaDel, par, false, 0);
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
+                            ex.printStackTrace(Login.Mainclass.err);
                         }
                         System.out.println("Copy done!");
                     }
@@ -440,7 +444,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 try{
                     infer.createNewFile();
                 } catch (Exception ex){
-                    System.err.println(ex);
+                    ex.printStackTrace(Login.Mainclass.err);
                 }
                 File logger = new File(data + "/Logger");
                 logger.mkdirs();
@@ -469,7 +473,7 @@ public class Worker extends SwingWorker <String, Integer>{
             } catch (IOException e){
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
-                System.err.println(e);
+                e.printStackTrace(Login.Mainclass.err);
             }
             File temporal = new File(user + "/.minecraft/Temporal.jar");
             File temp = new File(user + "/.Data/Logger/Temporal.jar");
@@ -515,7 +519,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 prog.setValue(100);
             } catch (Exception ex){
-                System.err.println(ex.getMessage());
+                ex.printStackTrace(Login.Mainclass.err);
             }
         } else if(exito && !this.isCancelled() && Vista.OS.equals("linux")){
             try{
@@ -528,7 +532,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 prog.setValue(100);
             } catch (Exception ex){
-                System.err.println(ex.getMessage());
+                ex.printStackTrace(Login.Mainclass.err);
             }
         } else if (!exito){
             if (eti != null){
@@ -610,7 +614,7 @@ public class Worker extends SwingWorker <String, Integer>{
             beta.close();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "ERROR");
-            System.err.println(ex);
+            ex.printStackTrace(Login.Mainclass.err);
         }
         return res;
     }

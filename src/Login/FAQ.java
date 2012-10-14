@@ -210,6 +210,7 @@ public class FAQ extends javax.swing.JDialog {
             Desktop.getDesktop().browse(new URI("http://minechinchas.blogspot.com.es/"));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "No se ha encontrado la página Web");
+            ex.printStackTrace(Mainclass.err);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -220,6 +221,7 @@ public class FAQ extends javax.swing.JDialog {
             Desktop.getDesktop().browse(new URI("http://minechinchas.blogspot.com.es/2012/09/bugs-y-problemas.html"));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "No se ha encontrado la página Web");
+            ex.printStackTrace(Mainclass.err);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 

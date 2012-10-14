@@ -2,13 +2,8 @@ package Login;
 
 
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
-import java.util.*;
+import javax.swing.*;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -287,19 +282,7 @@ public class Vista extends javax.swing.JFrame {
             ven.setVisible(true);
         } catch (IOException e){
             JOptionPane.showMessageDialog(null, "Error en el registro");
-            if (!error.exists()){
-                try {
-                    error.createNewFile();
-                } catch (IOException ex) {
-                }
-            }
-                try {
-                    PrintWriter pw = new PrintWriter (error);
-                    pw.print(e.getMessage());
-                    pw.println();
-                    pw.close();
-                } catch (IOException ex) {
-                }
+            e.printStackTrace(Mainclass.err);
             System.exit(0);
         }
             this.dispose();
@@ -338,7 +321,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setTitle(Mainclass.title + " " + Mainclass.version);
                 ven.setVisible(true);
             } catch (IOException e){
-                System.err.println(e);
+                e.printStackTrace(Mainclass.err);
             }
             this.dispose();
         }
@@ -375,7 +358,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setTitle(Mainclass.title + " " + Mainclass.version);
                 ven.setVisible(true);
             } catch (IOException e){
-                System.err.println(e);
+                e.printStackTrace(Mainclass.err);
             }
             this.dispose();
         }

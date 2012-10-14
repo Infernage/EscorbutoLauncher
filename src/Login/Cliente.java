@@ -45,7 +45,7 @@ public class Cliente extends Thread{
             info.setText(ex.getMessage());
             salir();
             error = true;
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
     }
     //Método para salir del bucle
@@ -99,6 +99,7 @@ public class Cliente extends Thread{
             info.setText(ex.getMessage());
             salir();
             error = true;
+            ex.printStackTrace(Mainclass.err);
         }
         
         Updater update = new Updater(link, isData);//Creamos el actualizador
@@ -155,7 +156,7 @@ public class Cliente extends Thread{
                 MV = Integer.parseInt(bf.readLine());
                 bf.close();
             } catch (Exception ex){
-                ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
             }
         } else{
             System.err.println("[ERROR]Minecraft version file not found!\nCreating new one now!");
@@ -166,7 +167,7 @@ public class Cliente extends Thread{
                 pw.close();
                 MV = 1;
             } catch (Exception ex){
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         }
         boolean salida = false, act = false;
@@ -219,7 +220,7 @@ public class Cliente extends Thread{
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            
+            ex.printStackTrace(Mainclass.err);
         }
         while (!exit){
             try {//Leemos los datos que nos envía el servidor
@@ -252,7 +253,7 @@ public class Cliente extends Thread{
                     info.setForeground(Color.red);
                     info.setText(ex.getMessage());
                     error = true;
-                    ex.printStackTrace();
+                    ex.printStackTrace(Mainclass.err);
                 }
             }
         }
@@ -266,6 +267,7 @@ public class Cliente extends Thread{
                 info.setText(ex.getMessage());
                 error = true;
             }
+            ex.printStackTrace(Mainclass.err);
         }
         if (!actualize){
             play.setEnabled(true);

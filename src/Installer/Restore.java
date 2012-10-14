@@ -107,7 +107,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 infer.createNewFile();
                 Process hide = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
             } catch (Exception ex){
-                System.err.println(ex);
+                ex.printStackTrace(Login.Mainclass.err);
             }
             eti.setText("Recopilando información adicional...");
             Thread.sleep(3000);
@@ -172,7 +172,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
             try{
                 infer.createNewFile();
             } catch (Exception ex){
-                System.err.println(ex);
+                ex.printStackTrace(Login.Mainclass.err);
             }
             eti.setText("Recopilando información adicional...");
             Thread.sleep(3000);

@@ -259,7 +259,7 @@ public class Vista extends javax.swing.JFrame {
                     Desktop d = Desktop.getDesktop();
                     d.open(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar"));
                 } catch (IOException ex) {
-                    System.err.println(ex);
+                ex.printStackTrace(Login.Mainclass.err);
                 }
             }
         } else if (OS.equals("linux")){
@@ -269,7 +269,7 @@ public class Vista extends javax.swing.JFrame {
                     Desktop d = Desktop.getDesktop();
                     d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
                 } catch (IOException ex){
-                    System.err.println(ex);
+                ex.printStackTrace(Login.Mainclass.err);
                 }
             }
         }

@@ -164,25 +164,7 @@ public class PassConfirm extends javax.swing.JDialog {
             }
         } catch (IOException e){
             JOptionPane.showMessageDialog(null, "Error en el cambio de contraseña.");
-            File error = null;
-            if (Mainclass.OS.equals("windows")){
-                error = new File (System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\LogEr.txt");
-            } else if (Mainclass.OS.equals("linux")){
-                error = new File (System.getProperty("user.home") + "/Data/LogEr.txt");
-            }
-            if (!error.exists()){
-                try {
-                    error.createNewFile();
-                } catch (IOException exe) {
-                }
-            }
-                try{
-                    PrintWriter pw = new PrintWriter (error);
-                    pw.print(e.getMessage());
-                    pw.println();
-                    pw.close();
-                } catch (IOException exe){
-                }
+            e.printStackTrace(Mainclass.err);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

@@ -40,6 +40,7 @@ public class Vista2 extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         jButton7.setFocusPainted(false);
         jButton7.setContentAreaFilled(false);
+        jButton3.setFocusPainted(false);
         jButton8.setFocusPainted(false);
         jButton8.setContentAreaFilled(false);
         if (Mainclass.OS.equals("windows")){
@@ -79,7 +80,7 @@ public class Vista2 extends javax.swing.JFrame {
                         }
                     }
                 } catch (IOException e){
-                    e.printStackTrace();
+                    e.printStackTrace(Mainclass.err);
                 }
             }
         } else if (Mainclass.OS.equals("linux")){
@@ -119,7 +120,7 @@ public class Vista2 extends javax.swing.JFrame {
                         }
                     }
                 } catch (IOException e){
-                    e.printStackTrace();
+                    e.printStackTrace(Mainclass.err);
                 }
             }
         }
@@ -134,7 +135,7 @@ public class Vista2 extends javax.swing.JFrame {
             jLabel1.setText("ERROR!");
             jLabel5.setForeground(Color.red);
             jLabel5.setText(e.getMessage());
-            e.printStackTrace();
+            e.printStackTrace(Mainclass.err);
         }
         jTextArea1.getPreferredScrollableViewportSize().setSize(0, 0);
         Mainclass.init.exit();
@@ -166,7 +167,7 @@ public class Vista2 extends javax.swing.JFrame {
                     comand = comand + "-Xmx512m -Xms512m " + cmd + args;
                     minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
-                    ex.printStackTrace();
+                    ex.printStackTrace(Mainclass.err);
                     System.exit(1);
                 }
                 break;
@@ -175,7 +176,7 @@ public class Vista2 extends javax.swing.JFrame {
                     comand = comand + "-Xmx1024m -Xms1024m " + cmd + args;
                     minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
-                    ex.printStackTrace();
+                    ex.printStackTrace(Mainclass.err);
                     System.exit(1);
                 }
                 break;
@@ -184,7 +185,7 @@ public class Vista2 extends javax.swing.JFrame {
                     comand = comand + "-Xmx2048m -Xms2048m " + cmd + args;
                     minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
-                    ex.printStackTrace();
+                    ex.printStackTrace(Mainclass.err);
                     System.exit(1);
                 }
                 break;
@@ -193,7 +194,7 @@ public class Vista2 extends javax.swing.JFrame {
                     comand = comand + "-Xmx4096m -Xms4096m " + cmd + args;
                     minecraft = Runtime.getRuntime().exec(comand);
                 } catch (Exception ex){
-                    ex.printStackTrace();
+                    ex.printStackTrace(Mainclass.err);
                     System.exit(1);
                 }
                 break;
@@ -204,7 +205,7 @@ public class Vista2 extends javax.swing.JFrame {
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
         System.exit(0);
     }
@@ -219,7 +220,7 @@ public class Vista2 extends javax.swing.JFrame {
             try{
                 log.createNewFile();
             } catch (IOException ex){
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         }
         Calendar C = new GregorianCalendar();
@@ -236,7 +237,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(str);
             pw.close();
         } catch (IOException ex){
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
     }
     private int selectRAM(){
@@ -283,13 +284,13 @@ public class Vista2 extends javax.swing.JFrame {
             pw.print(remember + "\n" + rememberP);
             pw.close();
         } catch (IOException ex){
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
         if (!rem.exists()){
             try{
                 rem.createNewFile();
             } catch (IOException ex){
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         }
         if (!MOS.exists() && !MSOS.exists() || offline){
@@ -314,7 +315,7 @@ public class Vista2 extends javax.swing.JFrame {
                     args = temp1;
                 }
             } catch (Exception ex){
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
                 JOptionPane.showMessageDialog(null, "Error en la comprobación de datos.\nSi el error persiste, contacte con Infernage.");
             }
             if (open){
@@ -338,7 +339,7 @@ public class Vista2 extends javax.swing.JFrame {
                 pw.print(cry.encrypt(user) + "\n" + cry.encrypt(pss));
                 pw.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
             if (logeoMC != null){
                 offline = logeoMC.offline;
@@ -392,7 +393,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "\\AppData\\Roaming\\Data\\sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         } else if (Mainclass.OS.equals("linux")){
             command = command + System.getProperty("user.home") + "/.minecraft/Mineshafter-proxy.jar";
@@ -401,7 +402,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "/.Data/sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         }
         try {
@@ -410,7 +411,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
         execMCS(command);
     }
@@ -436,7 +437,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "\\AppData\\Roaming\\Data\\sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         } else if (Mainclass.OS.equals("linux")){
             command = command + System.getProperty("user.home") + "/.minecraft/minecraft.jar";
@@ -445,7 +446,7 @@ public class Vista2 extends javax.swing.JFrame {
                         + "/.Data/sys.tpl");
                 temporal.createNewFile();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
         }
         try {
@@ -454,7 +455,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
         }
         execMCS(command);
     }
@@ -467,7 +468,7 @@ public class Vista2 extends javax.swing.JFrame {
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
             System.exit(11);
         }
         System.exit(0);
@@ -501,6 +502,7 @@ public class Vista2 extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jButton6 = new javax.swing.JButton();
         statusConn = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
 
         jLabel3.setText("jLabel3");
 
@@ -622,6 +624,15 @@ public class Vista2 extends javax.swing.JFrame {
 
         statusConn.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
 
+        jButton3.setBackground(new java.awt.Color(255, 51, 51));
+        jButton3.setForeground(new java.awt.Color(255, 255, 255));
+        jButton3.setText("Enviar error");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -638,7 +649,7 @@ public class Vista2 extends javax.swing.JFrame {
                                 .addComponent(jLabel2))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -658,7 +669,7 @@ public class Vista2 extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jCheckBox1))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(220, 220, 220)
+                        .addGap(200, 200, 200)
                         .addComponent(jButton6)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -668,16 +679,23 @@ public class Vista2 extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addGap(161, 161, 161))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(161, 161, 161))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton3)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(153, 153, 153)
+                .addContainerGap()
+                .addComponent(jButton3)
+                .addGap(119, 119, 119)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -689,15 +707,15 @@ public class Vista2 extends javax.swing.JFrame {
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
                 .addGap(119, 119, 119))
             .addGroup(layout.createSequentialGroup()
-                .addGap(216, 216, 216)
+                .addGap(213, 213, 213)
+                .addComponent(jButton6)
+                .addGap(185, 185, 185)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(statusConn, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton6)
-                        .addGap(182, 182, 182)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jCheckBox1)
@@ -749,7 +767,7 @@ public class Vista2 extends javax.swing.JFrame {
                 }
             }
         } catch (IOException ex){
-            ex.printStackTrace();
+            ex.printStackTrace(Mainclass.err);
             JOptionPane.showMessageDialog(null, "Ocurrió un error en la lectura de datos.");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -818,6 +836,14 @@ public class Vista2 extends javax.swing.JFrame {
         Installer.Vista.main(null);
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        Debug de = new Debug(this, true);
+        de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        de.setLocationRelativeTo(this);
+        de.setVisible(true);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -862,6 +888,7 @@ public class Vista2 extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;

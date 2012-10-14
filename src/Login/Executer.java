@@ -1,8 +1,6 @@
 package Login;
 
 
-import java.io.IOException;
-import javax.swing.JOptionPane;
 
 /*
  * To change this template, choose Tools | Templates

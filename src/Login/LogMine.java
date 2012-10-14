@@ -15,8 +15,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -80,7 +78,7 @@ public class LogMine extends Thread{
             String str1 = response.toString();
             return str1;
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(Mainclass.err);
             return null;
         } finally {
             if (connection != null)
@@ -125,7 +123,7 @@ public class LogMine extends Thread{
             System.out.println("Initializing minecraft...");
             Vista2.playMC(userName, password, ind);
         } catch (UnsupportedEncodingException ex) {
-            System.err.println(ex);
+            ex.printStackTrace(Mainclass.err);
         }
     }
 }

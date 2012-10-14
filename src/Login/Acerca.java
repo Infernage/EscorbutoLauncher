@@ -138,6 +138,7 @@ public class Acerca extends javax.swing.JDialog {
             Desktop.getDesktop().browse(new URI("http://xn--borrachoonio-khb.com/"));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "No se ha encontrado la página Web");
+            ex.printStackTrace(Mainclass.err);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed

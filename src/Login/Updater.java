@@ -10,8 +10,6 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.*;
 import javax.swing.JOptionPane;
 /**
@@ -96,7 +94,7 @@ public class Updater extends Thread{
             file.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "[ERROR] Download crashed!");
-            e.printStackTrace();
+            e.printStackTrace(Mainclass.err);
         }
     }
     //Método de descompresión
@@ -183,6 +181,7 @@ public class Updater extends Thread{
             zip.close();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+            ex.printStackTrace(Mainclass.err);
         }
         File delete = new File(zipper);
         delete.delete();
@@ -218,7 +217,7 @@ public class Updater extends Thread{
                 old.delete();
                 borrarFiles(oldlib);
             } catch (Exception ex){
-                ex.printStackTrace();
+                ex.printStackTrace(Mainclass.err);
             }
             temp();
             return;
@@ -244,7 +243,7 @@ public class Updater extends Thread{
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Updater.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace(Mainclass.err);
             }
         }
         exe.out();
@@ -262,7 +261,7 @@ public class Updater extends Thread{
                 d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
             }
         } catch (IOException ex) {
-            System.err.println(ex);
+            ex.printStackTrace(Mainclass.err);
         } finally{
             System.exit(0);
         }

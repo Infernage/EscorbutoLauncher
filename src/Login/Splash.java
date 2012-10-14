@@ -101,7 +101,7 @@ public class Splash extends JFrame implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                System.err.println(ex.getMessage());
+                ex.printStackTrace(Mainclass.err);
             }
         }
     }

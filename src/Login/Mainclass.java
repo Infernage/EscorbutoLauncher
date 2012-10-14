@@ -23,6 +23,14 @@ public class Mainclass {
     public static String OS = System.getProperty("os.name");
     public static Map<String, Thread> hilos;
     public static Splash init;
+    public static PrintStream err;
+    public static ErrStream error;
+    
+    public static void setThreadError(){
+        error = new ErrStream("Errores");
+        error.start();
+        hilos.put("Errores", error);
+    }
     
     public static void suspend(Vista2 see){
         Iterator<String> it = hilos.keySet().iterator();
@@ -38,7 +46,7 @@ public class Mainclass {
                         System.out.println("Thread " + thread.getName() + " is not active!");
                     }
                 } catch (InterruptedException ex) {
-                    System.err.println(ex);
+                    ex.printStackTrace(err);
                 }
             }
         }
@@ -66,13 +74,14 @@ public class Mainclass {
         t.start();
         hilos = new HashMap<String, Thread>();
         hilos.put("Splash", t);
+        setThreadError();
         StringTokenizer token = new StringTokenizer(OS, " ");
         OS = token.nextToken().toLowerCase();
         token = null;
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Mainclass.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(err);
         }
         if (OS.equals("windows")){
             //Creamos las variables
@@ -116,7 +125,7 @@ public class Mainclass {
                    copy(actual, runner);
                    copyDirectory(actuallib, runnerlib);
                } catch (IOException ex) {
-                   System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                }
            } else if (runner.exists() && runnerlib.exists()){
                System.out.println("Already copied!");
@@ -124,13 +133,13 @@ public class Mainclass {
                 try {
                     copy(actual, runner);
                 } catch (IOException ex) {
-                    System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                 }
            } else if (runner.exists() && !runnerlib.exists()){
                 try {
                     copyDirectory(actuallib, runnerlib);
                 } catch (IOException ex) {
-                    System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                 }
            }
             String name = "data.cfg", booleano = "boolean.txt";//Nombre de ficheros de datos
@@ -147,7 +156,7 @@ public class Mainclass {
                     BufferedReader bf = new BufferedReader (new FileReader (fichero));
                     boo = bf.readLine();
                 } catch (IOException e){
-                    
+                    e.printStackTrace(err);
                 }
                 if (boo.equals("true")){
                     //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
@@ -170,7 +179,7 @@ public class Mainclass {
                    pw.print("false");
                    pw.close();
                 } catch (IOException e){
-                        
+                    e.printStackTrace(err);
                 }
                 //Abrimos Vista
                 Vista.main(path.toString(), pss, fichero.getAbsolutePath());
@@ -217,7 +226,7 @@ public class Mainclass {
                    copy(actual, runner);
                    copyDirectory(actuallib, runnerlib);
                } catch (IOException ex) {
-                   System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                }
            } else if (runner.exists() && runnerlib.exists()){
                System.out.println("Already copied!");
@@ -225,13 +234,13 @@ public class Mainclass {
                 try {
                     copy(actual, runner);
                 } catch (IOException ex) {
-                    System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                 }
            } else if (runner.exists() && !runnerlib.exists()){
                 try {
                     copyDirectory(actuallib, runnerlib);
                 } catch (IOException ex) {
-                    System.err.println(ex.getMessage());
+                    ex.printStackTrace(err);
                 }
            }
            String name = "data.cfg", booleano = "boolean.txt";//Nombre de ficheros de datos
@@ -248,7 +257,7 @@ public class Mainclass {
                    BufferedReader bf = new BufferedReader (new FileReader (fichero));
                    boo = bf.readLine();
                } catch (IOException e){
-                   
+                    e.printStackTrace(Mainclass.err);
                }
                if (boo.equals("true")){
                    //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
@@ -271,7 +280,7 @@ public class Mainclass {
                    pw.print("false");
                    pw.close();
                } catch (IOException e){
-                   
+                    e.printStackTrace(Mainclass.err);
                }
                //Abrimos Vista
                Vista.main(path.toString(), pss, fichero.getAbsolutePath());

@@ -416,6 +416,7 @@ public class Lista extends javax.swing.JDialog {
                 update();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
+                ex.printStackTrace(Login.Mainclass.err);
             }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
