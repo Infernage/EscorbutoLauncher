@@ -104,7 +104,9 @@ public class Restore extends SwingWorker<Integer, Integer>{
             }
             File infer = new File(mine.getAbsolutePath() + "\\Infernage.hdn");
             try{
-                infer.createNewFile();
+                if (!infer.exists()){
+                    infer.createNewFile();
+                }
                 Process hide = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
             } catch (Exception ex){
                 ex.printStackTrace(Login.Mainclass.err);
@@ -170,7 +172,9 @@ public class Restore extends SwingWorker<Integer, Integer>{
             }
             File infer = new File(mine.getAbsolutePath() + "/.Infernage.hdn");
             try{
-                infer.createNewFile();
+                if (!infer.exists()){
+                    infer.createNewFile();
+                }
             } catch (Exception ex){
                 ex.printStackTrace(Login.Mainclass.err);
             }
