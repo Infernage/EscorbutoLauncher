@@ -6,12 +6,9 @@ package Login;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.*;
 /**
  *
  * @author Reed
@@ -290,6 +287,10 @@ public class Mainclass {
             JOptionPane.showMessageDialog(null, "Your operative system is not supported! Only are supported"
                     + " Windows and Linux.\nOperative system in this computer: " + OS + "\nIf you are running one "
                     + "of these operative systems, contact with me: Infernage");
+            Debug de = new Debug(null, true);
+            de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            de.setLocationRelativeTo(null);
+            de.setVisible(true);
             System.exit(9);
         }
     }

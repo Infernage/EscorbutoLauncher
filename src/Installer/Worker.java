@@ -4,10 +4,13 @@ package Installer;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import Login.Mainclass;
 import java.awt.Color;
 import javax.swing.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
@@ -22,6 +25,7 @@ public class Worker extends SwingWorker <String, Integer>{
     private boolean direct, exito = true;
     private Calendar C;
     private Vista fr;
+    private File copyTemp;
     //Constructor del SwingWorker
     public Worker (JLabel lab, JProgressBar pro, JButton boton, JButton boton1, boolean temp){
         eti = lab;
@@ -33,6 +37,27 @@ public class Worker extends SwingWorker <String, Integer>{
     }
     public Worker (JProgressBar pro){
         this(new JLabel(), pro, null, null, false);
+    }
+    public void back(){
+        if (Vista.OS.equals("windows")){
+            File mineTemp = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\.minecraft");
+            if (mineTemp.exists()){
+                borrarData(mineTemp);
+                mineTemp.delete();
+            }
+            File minecraft = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
+            if (!minecraft.exists()){
+                minecraft.mkdirs();
+            } else{
+                borrarData(minecraft);
+            }
+            try {
+                copyDirectory(copyTemp, minecraft);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
+                ex.printStackTrace(Mainclass.err);
+            }
+        }
     }
     //Método cuando se produce el this.execute()
     @Override
@@ -76,6 +101,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
+                copyTemp = File.createTempFile("file", ".thp");
+                copyTemp.deleteOnExit();
+                File copiaDel = new File(user + "\\.minecraft");
+                copyDirectory(copiaDel, copyTemp);
                 String say = null;
                 if (bot != null){
                     say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
@@ -83,7 +112,6 @@ public class Worker extends SwingWorker <String, Integer>{
                     say = "¿Desea realizar copia de seguridad de su Minecraft?";
                 }
                 int i = JOptionPane.showConfirmDialog(null, say);
-                File copiaDel = new File(user + "\\.minecraft");
                 if (i == 0){
                     System.out.println("Doing encripted copy...");
                     StringBuilder str = new StringBuilder().append(C.get(Calendar.DAY_OF_MONTH)).append("_").append(C.get(Calendar.MONTH) + 1).append("_").append(C.get(Calendar.YEAR));
@@ -109,6 +137,7 @@ public class Worker extends SwingWorker <String, Integer>{
                             } catch (Exception ex) {
                                 JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
                                 ex.printStackTrace(Login.Mainclass.err);
+                                this.back();
                             }
                         } 
                     } else{
@@ -128,6 +157,7 @@ public class Worker extends SwingWorker <String, Integer>{
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
                             ex.printStackTrace(Login.Mainclass.err);
+                            this.back();
                         }
                         System.out.println("Copy done!");
                     }
@@ -251,6 +281,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
                 e.printStackTrace(Login.Mainclass.err);
+                this.back();
             }
             File temporal = new File(user + "\\.minecraft\\Temporal.jar");
             File temp = new File(user + "\\Data\\Logger\\Temporal.jar");
@@ -303,6 +334,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
+                copyTemp = File.createTempFile("file", ".thp");
+                copyTemp.deleteOnExit();
+                File copiaDel = new File(user + "/.minecraft");
+                copyDirectory(copiaDel, copyTemp);
                 String say = null;
                 if (bot != null){
                     say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
@@ -310,7 +345,6 @@ public class Worker extends SwingWorker <String, Integer>{
                     say = "¿Desea realizar copia de seguridad de su Minecraft?";
                 }
                 int i = JOptionPane.showConfirmDialog(null, say);
-                File copiaDel = new File(user + "/.minecraft");
                 if (i == 0){
                     System.out.println("Doing encripted copy...");
                     StringBuilder str = new StringBuilder().append(C.get(Calendar.DAY_OF_MONTH)).append("_").append(C.get(Calendar.MONTH) + 1).append("_").append(C.get(Calendar.YEAR));
@@ -336,6 +370,7 @@ public class Worker extends SwingWorker <String, Integer>{
                             } catch (Exception ex) {
                                 JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
                                 ex.printStackTrace(Login.Mainclass.err);
+                                this.back();
                             }
                         } 
                     } else{
@@ -355,6 +390,7 @@ public class Worker extends SwingWorker <String, Integer>{
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
                             ex.printStackTrace(Login.Mainclass.err);
+                            this.back();
                         }
                         System.out.println("Copy done!");
                     }
@@ -474,6 +510,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado ningún archivo de la carpeta.\n" + e.getMessage());
                 exito = false;
                 e.printStackTrace(Login.Mainclass.err);
+                this.back();
             }
             File temporal = new File(user + "/.minecraft/Temporal.jar");
             File temp = new File(user + "/.Data/Logger/Temporal.jar");
