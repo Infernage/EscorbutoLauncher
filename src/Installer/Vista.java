@@ -73,12 +73,11 @@ public class Vista extends javax.swing.JFrame {
         jLabel2.setText("");
     }
     //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
-    private void install(boolean direct){
+    private Worker install(boolean direct){
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        work = new Worker (jLabel2, jProgressBar1, jButton4, jButton1, direct);
-        work.add(this);
-        work.execute();
+        Worker worker = new Worker (jLabel2, jProgressBar1, jButton4, jButton1, direct);
+        worker.add(this);
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
@@ -86,6 +85,20 @@ public class Vista extends javax.swing.JFrame {
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
         jButton6.setVisible(false);
+        return worker;
+    }
+    private void installSMP(boolean direct){
+        work = this.install(direct);
+        work.execute();
+    }
+    private void installSSP(boolean direct){
+        work = this.install(direct);
+        if (OS.equals("windows")){
+            work.setInstallPath("inst\\instSP.dat");
+        } else if (OS.equals("linux")){
+            work.setInstallPath("inst/instSP.dat");
+        }
+        work.execute();
     }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
@@ -244,7 +257,19 @@ public class Vista extends javax.swing.JFrame {
         if (i == 0){
             boolean direct = jCheckBox1.isSelected();
             System.out.println("Installing...");
-            install(direct);
+            Election ele = new Election(this, true);
+            ele.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            ele.setLocationRelativeTo(this);
+            ele.setVisible(true);
+            if (ele.SMP){
+                ele.removeAll();
+                ele = null;
+                installSMP(direct);
+            } else if (ele.SSP){
+                ele.removeAll();
+                ele = null;
+                installSSP(direct);
+            }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 

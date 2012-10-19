@@ -6,11 +6,9 @@ package Installer;
  */
 import Login.Mainclass;
 import java.awt.Color;
-import javax.swing.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.*;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
@@ -26,6 +24,7 @@ public class Worker extends SwingWorker <String, Integer>{
     private Calendar C;
     private Vista fr;
     private File copyTemp;
+    private String installPath;
     //Constructor del SwingWorker
     public Worker (JLabel lab, JProgressBar pro, JButton boton, JButton boton1, boolean temp){
         eti = lab;
@@ -37,6 +36,9 @@ public class Worker extends SwingWorker <String, Integer>{
     }
     public Worker (JProgressBar pro){
         this(new JLabel(), pro, null, null, false);
+    }
+    public void setInstallPath(String path){
+        installPath = path;
     }
     public void back(){
         if (Vista.OS.equals("windows")){
@@ -67,7 +69,11 @@ public class Worker extends SwingWorker <String, Integer>{
             String user = System.getProperty("user.home") + "\\AppData\\Roaming";
             File fichsrc = null;
             if (bot != null){
-                fichsrc = new File("inst\\inst.dat");
+                if (installPath == null){
+                    fichsrc = new File("inst\\inst.dat");
+                } else{
+                    fichsrc = new File(installPath);
+                }
             } else{
                 fichsrc = new File(System.getProperty("user.home") + "\\Desktop\\Update\\inst\\inst.dat");
             }
@@ -302,7 +308,11 @@ public class Worker extends SwingWorker <String, Integer>{
             String user = System.getProperty("user.home");
             File fichsrc = null;
             if (bot != null){
-                fichsrc = new File("inst/inst.dat");
+                if (installPath == null){
+                    fichsrc = new File("inst/inst.dat");
+                } else{
+                    fichsrc = new File(installPath);
+                }
             } else{
                 fichsrc = new File(System.getProperty("user.home") + "/Desktop/Update/inst/inst.dat");
             }

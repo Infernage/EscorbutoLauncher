@@ -107,6 +107,10 @@ public class Debug extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        if (jTextField1.getText().equals("") || jTextArea1.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "No has introducido ningún texto.");
+            return;
+        }
         Parameters par = new Parameters();
         Session ses = Session.getDefaultInstance(par.getPs());
         ses.setDebug(true);
