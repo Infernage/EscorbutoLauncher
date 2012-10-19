@@ -10,8 +10,6 @@ import java.applet.Applet;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Reed

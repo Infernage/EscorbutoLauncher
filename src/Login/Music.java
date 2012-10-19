@@ -6,11 +6,9 @@ package Login;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-import javax.swing.*;
-import javax.sound.sampled.*;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.sound.sampled.*;
+import javax.swing.*;
 /**
  *
  * @author Reed

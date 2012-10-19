@@ -3,13 +3,8 @@ package Installer;
 
 import java.awt.Color;
 import java.awt.Desktop;
-import javax.swing.WindowConstants;
-import javax.swing.*;
 import java.io.*;
-import java.util.StringTokenizer;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.*;
 
 /*
  * To change this template, choose Tools | Templates

@@ -4,10 +4,10 @@ package Installer;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-import java.io.*;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;

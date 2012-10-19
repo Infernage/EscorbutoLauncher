@@ -5,7 +5,6 @@ package Installer;
  * and open the template in the editor.
  */
 import java.util.*;
-import javax.swing.JOptionPane;
 /**
  *
  * @author Reed
