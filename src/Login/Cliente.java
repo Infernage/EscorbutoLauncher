@@ -25,6 +25,7 @@ public class Cliente extends Thread{
     private JButton play;//Botón jugar
     private JFrame fr;//Ventana
     private boolean isData, write = false;
+    private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com";
     //Creamos el cliente
     public Cliente(JLabel A, JLabel B, JButton C, URL url, JFrame fra){
         super("Cliente");
@@ -57,12 +58,12 @@ public class Cliente extends Thread{
         Vista2.jProgressBar1.setVisible(true);
         boolean exit = false;
         try {
-            if (link.contains("2shared.com")){
+            if (link.contains(hostPrincipal)){
                 URL url = new URL(link);
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                 String lin;
                 while (((lin = in.readLine()) != null) && !exit){
-                    if (lin.contains("2shared.com/download") && lin.contains(".zip")){
+                    if (lin.contains(hostPrincipal + "/download") && lin.contains(".zip")){
                         StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
@@ -74,16 +75,16 @@ public class Cliente extends Thread{
                     }
                 }
                 in.close();
-            } else if (link.contains("sendspace.com")){
+            } else if (link.contains(hostSecundario)){
                 URL url = new URL(link);
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                 String lin;
                 while (((lin = in.readLine()) != null) && !exit){
-                    if (lin.contains("download_button") && lin.contains("sendspace.com") && lin.contains(".zip")){
+                    if (lin.contains("download_button") && lin.contains(hostSecundario) && lin.contains(".zip")){
                         StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
-                            if (te.contains(".zip") && te.contains("sendspace.com")){
+                            if (te.contains(".zip") && te.contains(hostSecundario)){
                                 link = te;
                                 exit = true;
                             }
@@ -116,10 +117,10 @@ public class Cliente extends Thread{
             StringTokenizer toke = new StringTokenizer(data.get(i), "<>\"");
             while (toke.hasMoreTokens()){
                 String temp = toke.nextToken();
-                if (temp.contains("2shared.com") || temp.contains("sendspace.com")){
+                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario)){
                     lin = temp;
                 }
-                if (temp.contains(".") && !temp.contains("2shared.com") && !temp.contains("sendspace.com")){
+                if (temp.contains(".") && !temp.contains(hostPrincipal) && !temp.contains(hostSecundario)){
                     ver = temp;
                 }
             }
@@ -131,10 +132,10 @@ public class Cliente extends Thread{
             StringTokenizer toke = new StringTokenizer(login.get(i), "<>\"");
             while (toke.hasMoreTokens()){
                 String temp = toke.nextToken();
-                if (temp.contains("2shared.com") || temp.contains("sendspace.com")){
+                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario)){
                     lin = temp;
                 }
-                if (temp.contains(".") && !temp.contains("2shared.com") && !temp.contains("sendspace.com")){
+                if (temp.contains(".") && !temp.contains(hostPrincipal) && !temp.contains(hostSecundario)){
                     ver = temp;
                 }
             }
@@ -241,7 +242,7 @@ public class Cliente extends Thread{
                         List<String> temp = lista;
                         mapa.put("Login", temp);
                     }
-                    if ((msg.contains("2shared.com") || msg.contains("sendspace.com")) && write){
+                    if ((msg.contains(hostPrincipal) || msg.contains(hostSecundario)) && write){
                         lista.add(msg);
                     }
                 }

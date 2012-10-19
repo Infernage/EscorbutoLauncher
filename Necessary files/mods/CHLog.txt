@@ -1,30 +1,29 @@
-ï»¿INDICE
+INDICE
 a)Changelog
 b)Mods eliminadas.
-c)Mods aÃ±adidas.
+c)Mods añadidas.
 d)Bugs.
 ___________________________________________
 
-b) Changelog. (Desde la versiÃ³n MineLogin 4.0.1)
+b) Changelog. (Desde la versión MineLogin 4.0.2)
 
 ||Instalador||
-Nada
+-Añadido soporte de instalación de modo Singleplayer.
+-Mejorado el sistema de instalación. Ahora, si ocurre algún error por algún motivo durante la instalación, no se queda a medias para evitar errores.
 
 ||Login||
--Arreglado actualizador. Ahora no se corrompe la descarga desde 1 de los hosters.
--Arreglado barra de progreso. Ahora muestra correctamente el progreso de descarga en MBytes.
--AÃ±adido soporte para partidas antiguas. Ahora la instalaciÃ³n no borra tus mapas.
+-Añadido soporte de errores. Ahora, si el login se corrompe, saldrá una ventanita de envío de errores en la que se podrá poner la descripción del mismo y toda la información. También existe un botón por si algo no funciona bien, se puede enviar un error.
 
 ||Minecraft||
 Nada
 ___________________________________________
 
-b)Mods eliminadas (Desde la versiÃ³n MineLogin 4.0.1)
+b)Mods eliminadas (Desde la versión MineLogin 4.0.2)
 
 Ninguna
 ___________________________________________
 
-c)Mods aÃ±adidas. (Desde la versiÃ³n MineLogin 4.0.1)
+c)Mods añadidas. (Desde la versión MineLogin 4.0.2)
 
 Ninguna
 ___________________________________________
