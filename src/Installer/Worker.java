@@ -107,10 +107,11 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
-                copyTemp = File.createTempFile("file", ".thp");
+                copyTemp = new File(user + "\\Data\\TMP");
+                copyTemp.mkdirs();
                 copyTemp.deleteOnExit();
                 File copiaDel = new File(user + "\\.minecraft");
-                copyDirectory(copiaDel, copyTemp);
+                copyHiddenDirectory(copiaDel, copyTemp);
                 String say = null;
                 if (bot != null){
                     say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
@@ -252,6 +253,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 copyDirectory(minetemp, fichdst);
                 borrarData(minetemp);
                 minetemp.delete();
+                borrarData(copyTemp);
                 File infer = new File(fichdst.getAbsolutePath() + "\\Infernage.hdn");
                 try{
                     infer.createNewFile();
@@ -344,10 +346,11 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
             }
             if (fichdst.isDirectory() && fichdst.exists()){
-                copyTemp = File.createTempFile("file", ".thp");
+                copyTemp = new File(user + "/.Data/TMP");
+                copyTemp.mkdirs();
                 copyTemp.deleteOnExit();
                 File copiaDel = new File(user + "/.minecraft");
-                copyDirectory(copiaDel, copyTemp);
+                copyHiddenDirectory(copiaDel, copyTemp);
                 String say = null;
                 if (bot != null){
                     say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
@@ -486,6 +489,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 copyDirectory(minetemp, fichdst);
                 borrarData(minetemp);
                 minetemp.delete();
+                borrarData(copyTemp);
                 File infer = new File(fichdst.getAbsolutePath() + "/.Infernage.hdn");
                 try{
                     infer.createNewFile();
@@ -617,6 +621,22 @@ public class Worker extends SwingWorker <String, Integer>{
             }
             System.out.println("Deleting old data: " + ficheros[x].getName());
             ficheros[x].delete();
+        }
+    }
+    //Copiar directorio oculto
+    private void copyHiddenDirectory(File srcDir, File dstDir) throws IOException {
+        if (srcDir.isDirectory()) { 
+            if (!dstDir.exists()) { 
+                dstDir.mkdir(); 
+            }
+             
+            String[] children = srcDir.list(); 
+            for (int i=0; i<children.length; i++) {
+                copyHiddenDirectory(new File(srcDir, children[i]), 
+                    new File(dstDir, children[i])); 
+            } 
+        } else { 
+            copyData(srcDir, dstDir); 
         }
     }
     //Copiar directorio de un sitio a otro
