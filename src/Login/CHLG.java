@@ -2,9 +2,13 @@ package Login;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
@@ -25,14 +29,21 @@ public class CHLG extends Thread{
     }
     private void inicializar(){
         try{
-            //Leemos el txt en formato Unicode
-            FileInputStream in = null;
+            File fich = null;
             if (Mainclass.OS.equals("windows")){
-                in = new FileInputStream(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\mods\\CHLog.txt");
+                fich = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\CHLog.txt");
+                if (!fich.exists()){
+                    copy(fich);
+                } 
             } else if (Mainclass.OS.equals("linux")){
-                in = new FileInputStream(System.getProperty("user.home") + "/.minecraft/mods/CHLog.txt");
+                fich = new File(System.getProperty("user.home") + "/.Data/CHLog.txt");
+                if (!fich.exists()){
+                    copy(fich);
+                }
             }
-            InputStreamReader isr = new InputStreamReader (in, "UTF8");
+            //Leemos el txt en formato Unicode
+            FileInputStream in = new FileInputStream(fich);
+            InputStreamReader isr = new InputStreamReader (in, "iso-8859-1");
             BufferedReader bf = new BufferedReader (isr);
             String temp;
             area.append(bf.readLine());
@@ -47,6 +58,17 @@ public class CHLG extends Thread{
             JOptionPane.showMessageDialog(null, "Error al abrir el ChangeLog.");
             e.printStackTrace(Mainclass.err);
         }
+    }
+    private void copy (File dst) throws IOException{
+        InputStream in = getClass().getResourceAsStream("/Login/CHLog.txt");
+        OutputStream out = new FileOutputStream(dst);
+        byte[] buffer = new byte[1024];
+        int size;
+        while ((size = in.read(buffer)) > 0){
+            out.write(buffer, 0, size);
+        }
+        in.close();
+        out.close();
     }
     @Override
     public void run(){

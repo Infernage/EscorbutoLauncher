@@ -8,11 +8,12 @@ ___________________________________________
 b) Changelog. (Desde la versión MineLogin 4.0.2)
 
 ||Instalador||
--Añadido soporte de instalación de modo Singleplayer.
+-Añadido soporte de instalación de modo Singleplayer. Por ahora está desactivado hasta que implemente los datos.
 -Mejorado el sistema de instalación. Ahora, si ocurre algún error por algún motivo durante la instalación, no se queda a medias para evitar errores.
 
 ||Login||
 -Añadido soporte de errores. Ahora, si el login se corrompe, saldrá una ventanita de envío de errores en la que se podrá poner la descripción del mismo y toda la información. También existe un botón por si algo no funciona bien, se puede enviar un error.
+-Cambiado ubicación del Changelog.
 
 ||Minecraft||
 Nada

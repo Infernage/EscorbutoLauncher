@@ -148,7 +148,7 @@ public class Vista extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Instalador Minecraft 1.2.5");
+        setTitle("Instalador Minecraft");
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -252,7 +252,7 @@ public class Vista extends javax.swing.JFrame {
         if (i == 0){
             boolean direct = jCheckBox1.isSelected();
             System.out.println("Installing...");
-            Election ele = new Election(this, true);
+            /*Election ele = new Election(this, true);
             ele.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             ele.setLocationRelativeTo(this);
             ele.setVisible(true);
@@ -264,7 +264,8 @@ public class Vista extends javax.swing.JFrame {
                 ele.removeAll();
                 ele = null;
                 installSSP(direct);
-            }
+            }*/
+            installSMP(direct);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
