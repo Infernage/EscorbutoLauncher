@@ -22,16 +22,17 @@ public class Cliente extends Thread{
     private Map<String, String> linksD;//Lista de links del servidor(Data)
     private Map<String, String> links;// Lista de links del servidor(Login)
     private JLabel info, state;//Etiquetas para indicar el estado de la actualizacion
-    private JButton play;//Botón jugar
+    private JButton play, installer;//Botón jugar e instalar
     private JFrame fr;//Ventana
     private boolean isData, write = false;
     private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com";
     //Creamos el cliente
-    public Cliente(JLabel A, JLabel B, JButton C, URL url, JFrame fra){
+    public Cliente(JLabel A, JLabel B, JButton C, JButton D, URL url, JFrame fra){
         super("Cliente");
         info = B;
         state = A;
         play = C;
+        installer = D;
         fr = fra;
         state.setText("Comprobando actualizaciones...");
         mapa = new HashMap<String, List<String>>();
@@ -272,6 +273,7 @@ public class Cliente extends Thread{
         }
         if (!actualize){
             play.setEnabled(true);
+            installer.setEnabled(true);
         }
     }
 }

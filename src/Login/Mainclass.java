@@ -80,209 +80,7 @@ public class Mainclass {
         } catch (InterruptedException ex) {
             ex.printStackTrace(err);
         }
-        if (OS.equals("windows")){
-            //Creamos las variables
-            StringBuilder path = new StringBuilder(System.getProperty("user.home"));//Path del sistema
-            File mine = new File(path.toString() + "\\AppData\\Roaming\\.minecraft");
-            if (mine.exists()){
-                File[] mines = mine.listFiles();
-                File infer = new File(mine.getAbsolutePath() + "\\Infernage.hdn");
-                if ((mines.length < 7) || !infer.exists()){
-                    System.out.println("Ejecutando instalador...");
-                    Installer.Vista.main(args);
-                    return;
-                }
-            } else{
-                System.out.println("Ejecutando instalador...");
-                Installer.Vista.main(args);
-                return;
-            }
-            File dat = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data");
-            if (!dat.exists()){
-                System.out.println("Ejecutando instalador...");
-                Installer.Vista.main(args);
-                return;
-            } else{
-                File[] datas = dat.listFiles();
-                if (datas.length < 1){
-                    System.out.println("Ejecutando instalador...");
-                    Installer.Vista.main(args);
-                    return;
-                }
-            }
-            path.append("\\AppData\\Roaming\\Data");//Agregamos los datos
-            File runner = new File(path.toString() + "\\Logger\\RUN.jar");
-            File runnerlib = new File(path.toString() + "\\Logger\\lib");
-            File actual = new File(System.getProperty("user.dir") + "\\RUN.jar");
-            File actuallib = new File(System.getProperty("user.dir") + "\\lib");
-            if (!runner.exists() && !runnerlib.exists()){
-               File dir = new File(path.toString() + "\\Logger");
-               dir.mkdirs();
-               try {
-                   copy(actual, runner);
-                   copyDirectory(actuallib, runnerlib);
-               } catch (IOException ex) {
-                    ex.printStackTrace(err);
-               }
-           } else if (runner.exists() && runnerlib.exists()){
-               System.out.println("Already copied!");
-           } else if (!runner.exists() && runnerlib.exists()){
-                try {
-                    copy(actual, runner);
-                } catch (IOException ex) {
-                    ex.printStackTrace(err);
-                }
-           } else if (runner.exists() && !runnerlib.exists()){
-                try {
-                    copyDirectory(actuallib, runnerlib);
-                } catch (IOException ex) {
-                    ex.printStackTrace(err);
-                }
-           }
-            String name = "data.cfg", booleano = "boolean.txt";//Nombre de ficheros de datos
-            String pss = "My Pass Phrase";//Nombre de frase pass
-            String boo = path.toString() + "\\" + booleano;//Path del fichero booleano
-            File fich = new File(path.toString());
-            fich.mkdirs();
-            path.append("\\").append(name);
-            File fichero = new File (boo);
-            //Controlamos si es la primera vez que se ejecuta y si hay registro o no
-            if (fichero.exists()){
-                try{
-                   //Leemos el fichero si existe
-                    BufferedReader bf = new BufferedReader (new FileReader (fichero));
-                    boo = bf.readLine();
-                } catch (IOException e){
-                    e.printStackTrace(err);
-                }
-                if (boo.equals("true")){
-                    //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
-                    Vista2 vista = new Vista2(pss);
-                    vista.setIconImage(new ImageIcon(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\5547.png").getImage());
-                    vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    vista.setTitle(title + " " + version);
-                    vista.setLocationRelativeTo(null);
-                    vista.setVisible(true);
-                    vista.pack();
-                } else{
-                    //Sino, no se ha registrado, y abrimos la Vista
-                    Vista.main(path.toString(), pss, fichero.getAbsolutePath());
-                }
-            } else {
-                //Si no existe el fichero, lo creamos y escribimos en él false
-                try{
-                   fichero.createNewFile();
-                   PrintWriter pw = new PrintWriter(fichero);
-                   pw.print("false");
-                   pw.close();
-                } catch (IOException e){
-                    e.printStackTrace(err);
-                }
-                //Abrimos Vista
-                Vista.main(path.toString(), pss, fichero.getAbsolutePath());
-            }
-        } else if (OS.equals("linux")){
-           //Creamos las variables
-           StringBuilder path = new StringBuilder(System.getProperty("user.home"));//Path del sistema
-           File mine = new File(path.toString() + "/.minecraft");
-            if (mine.exists()){
-                File[] mines = mine.listFiles();
-                File infer = new File(mine.getAbsolutePath() + "/.Infernage.hdn");
-                if ((mines.length < 7) || !infer.exists()){
-                    System.out.println("Ejecutando instalador...");
-                    Installer.Vista.main(args);
-                    return;
-                }
-            } else{
-                System.out.println("Ejecutando instalador...");
-                Installer.Vista.main(args);
-                return;
-            }
-            File dat = new File(System.getProperty("user.home") + "/.Data");
-            if (!dat.exists()){
-                System.out.println("Ejecutando instalador...");
-                Installer.Vista.main(args);
-                return;
-            } else {
-                File[] datas = dat.listFiles();
-                if (datas.length < 1){
-                    System.out.println("Ejecutando instalador...");
-                    Installer.Vista.main(args);
-                    return;
-                }
-            }
-           path.append("/Data");//Agregamos los datos
-           File runner = new File(path.toString() + "/Logger/RUN.jar");
-           File runnerlib = new File(path.toString() + "/Logger/lib");
-           File actual = new File(System.getProperty("user.dir") + "/RUN.jar");
-           File actuallib = new File(System.getProperty("user.dir") + "/lib");
-           if (!runner.exists() && !runnerlib.exists()){
-               File dir = new File(path.toString() + "/Logger");
-               dir.mkdirs();
-               try {
-                   copy(actual, runner);
-                   copyDirectory(actuallib, runnerlib);
-               } catch (IOException ex) {
-                    ex.printStackTrace(err);
-               }
-           } else if (runner.exists() && runnerlib.exists()){
-               System.out.println("Already copied!");
-           } else if (!runner.exists() && runnerlib.exists()){
-                try {
-                    copy(actual, runner);
-                } catch (IOException ex) {
-                    ex.printStackTrace(err);
-                }
-           } else if (runner.exists() && !runnerlib.exists()){
-                try {
-                    copyDirectory(actuallib, runnerlib);
-                } catch (IOException ex) {
-                    ex.printStackTrace(err);
-                }
-           }
-           String name = "data.cfg", booleano = "boolean.txt";//Nombre de ficheros de datos
-           String pss = "My Pass Phrase";//Nombre de frase pass
-           String boo = path.toString() + "/" + booleano;//Path del fichero booleano
-           File fich = new File(path.toString());
-           fich.mkdirs();
-           path.append("/").append(name);
-           File fichero = new File (boo);
-           //Controlamos si es la primera vez que se ejecuta y si hay registro o no
-           if (fichero.exists()){
-                try{
-                   //Leemos el fichero si existe
-                   BufferedReader bf = new BufferedReader (new FileReader (fichero));
-                   boo = bf.readLine();
-               } catch (IOException e){
-                    e.printStackTrace(Mainclass.err);
-               }
-               if (boo.equals("true")){
-                   //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
-                   Vista2 vista = new Vista2(pss);
-                   vista.setIconImage(new ImageIcon(System.getProperty("user.home") + "/.minecraft/5547.png").getImage());
-                   vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                   vista.setTitle(title + " " + version);
-                   vista.setLocationRelativeTo(null);
-                   vista.setVisible(true);
-                   vista.pack();
-               } else{
-                   //Sino, no se ha registrado, y abrimos la Vista
-                   Vista.main(path.toString(), pss, fichero.getAbsolutePath());
-               }
-           } else {
-               //Si no existe el fichero, lo creamos y escribimos en él false
-               try{
-                   fichero.createNewFile();
-                   PrintWriter pw = new PrintWriter(fichero);
-                   pw.print("false");
-                   pw.close();
-               } catch (IOException e){
-                    e.printStackTrace(Mainclass.err);
-               }
-               //Abrimos Vista
-               Vista.main(path.toString(), pss, fichero.getAbsolutePath());
-           }
-        } else{
+        if (!OS.equals("windows") && !OS.equals("linux")){
             System.err.println("[ERROR]Found operative system not supported! Exiting system!");
             JOptionPane.showMessageDialog(null, "Your operative system is not supported! Only are supported"
                     + " Windows and Linux.\nOperative system in this computer: " + OS + "\nIf you are running one "
@@ -292,6 +90,101 @@ public class Mainclass {
             de.setLocationRelativeTo(null);
             de.setVisible(true);
             System.exit(9);
+        }
+        File mine = new File(Sources.path(Sources.DirMC));
+        if (mine.exists()){
+            File[] mines = mine.listFiles();
+            File infer = new File(mine.getAbsolutePath() + Sources.sep() + Sources.infernage);
+            if ((mines.length < 7) || !infer.exists()){
+                System.out.println("Ejecutando instalador...");
+                Installer.Vista.main(args);
+                return;
+            }
+        } else{
+            System.out.println("Ejecutando instalador...");
+            Installer.Vista.main(args);
+            return;
+        }
+        File dat = new File(Sources.path(Sources.DirData));
+        if (!dat.exists()){
+            System.out.println("Ejecutando instalador...");
+            Installer.Vista.main(args);
+            return;
+        } else{
+            File[] datas = dat.listFiles();
+            if (datas.length < 1){
+                Installer.Vista.main(args);
+                return;
+            }
+        }
+        File runner = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+                + Sources.sep() + Sources.jar));
+        File runnerlib = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+                + Sources.sep() + Sources.Dirlibs));
+        File actual = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+                + Sources.sep() + Sources.jar));
+        File actuallib = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+                + Sources.sep() + Sources.Dirlibs));
+        if (!runner.exists() && !runnerlib.exists()){
+            File dir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles));
+            dir.mkdirs();
+            try{
+                copy(actual, runner);
+                copyDirectory(actuallib, runnerlib);
+            } catch (IOException ex){
+                ex.printStackTrace(err);
+            }
+        } else if (runner.exists() && runnerlib.exists()){
+            System.out.println("Already copied!");
+        } else if (!runner.exists() && runnerlib.exists()){
+            try{
+                copy(actual, runner);
+            } catch (IOException ex){
+                ex.printStackTrace(err);
+            }
+        } else if (runner.exists() && !runnerlib.exists()){
+            try{
+                copyDirectory(actuallib, runnerlib);
+            } catch (IOException ex){
+                ex.printStackTrace(err);
+            }
+        }
+        File fich = new File(Sources.path(Sources.DirData));
+        fich.mkdirs();
+        File fichero = new File (Sources.path(Sources.DirData + Sources.sep() + Sources.bool));
+        //Controlamos si es la primera vez que se ejecuta y si hay registro o no
+        String boo = "";
+        if (fichero.exists()){
+            try{
+                BufferedReader bf = new BufferedReader (new FileReader (fichero));
+                boo = bf.readLine();
+            } catch (IOException ex){
+                ex.printStackTrace(err);
+            }
+            if (boo.equals("true")){
+                //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
+                Vista2 vista = new Vista2(Sources.pss);
+                vista.setIconImage(new ImageIcon(Sources.path(Sources.DirMC + Sources.sep() + "5547.png")).getImage());
+                vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                vista.setTitle(title + " " + version);
+                vista.setLocationRelativeTo(null);
+                vista.setVisible(true);
+                vista.pack();
+            } else{
+                //Sino, no se ha registrado, y abrimos la Vista
+                Vista.main(Sources.path(Sources.DirData + Sources.sep()), Sources.pss, fichero.getAbsolutePath());
+            }
+        } else{
+            //Si no existe el fichero, lo creamos y escribimos en él false
+            try{
+                fichero.createNewFile();
+                PrintWriter pw = new PrintWriter(fichero);
+                pw.print("false");
+                pw.close();
+            } catch (IOException ex){
+                ex.printStackTrace(err);
+            }
+            Vista.main(Sources.path(Sources.DirData), Sources.pss, fichero.getAbsolutePath());
         }
     }
     //Borrar fichero o directorio

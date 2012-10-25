@@ -127,7 +127,7 @@ public class Vista2 extends javax.swing.JFrame {
         //Creamos el cliente del actualizador
         try{
             URL url = new URL("http://minechinchas.blogspot.com/2012/09/downloads.html");
-            Cliente client = new Cliente(jLabel1, jLabel5, jButton5, url, this);
+            Cliente client = new Cliente(jLabel1, jLabel5, jButton5, jButton6, url, this);
             client.start();
             Mainclass.hilos.put("Cliente", client);
         } catch(Exception e){
