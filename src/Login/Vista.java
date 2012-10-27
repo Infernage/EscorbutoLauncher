@@ -3,6 +3,8 @@ package Login;
 
 
 import java.io.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.swing.*;
 /*
  * To change this template, choose Tools | Templates
@@ -15,22 +17,64 @@ import javax.swing.*;
  */
 public class Vista extends javax.swing.JFrame {
     private File fichero;
-    private File error;
-    private String pass;
+    private String fich;
     private File booleano;
     /**
      * Creates new form Vista
      */
-    public Vista(String fich, String pss, String boo) {
+    public Vista(String fich, String boo) {
         initComponents();
         Mainclass.init.exit();
-        fichero = new File(fich);
-        error = new File (fich.replaceFirst("data.cfg", "LogEr.txt"));
-        pass = pss;
+        this.fich = fich;
         booleano = new File (boo);
         this.setTitle("Registro Minecraft 1.2.5");
     }
-
+    private void createLoginFile(String type, String account, String password, String word) throws IOException{
+        fichero = new File(fich + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + jTextField1.getText() + "NM.dat");
+        fichero.createNewFile();
+        Calendar C = new GregorianCalendar();
+        StringBuilder str = new StringBuilder("File created at ").append(C.get(Calendar.DAY_OF_MONTH)).append("/")
+                .append(C.get(Calendar.MONTH) + 1).append("/")
+                .append(C.get(Calendar.YEAR)).append("_")
+                .append(C.get(Calendar.HOUR_OF_DAY)).append(":")
+                .append(C.get(Calendar.MINUTE)).append(":")
+                .append(C.get(Calendar.SECOND));
+        PrintWriter pw = new PrintWriter (fichero);
+        pw.println(str);
+        pw.println(type);
+        pw.println(account);
+        pw.println(password);
+        pw.print(word);
+        pw.close();
+    }
+    private boolean checkDuplicateAcc(String name){
+        File tmpDir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+                + Sources.DirTMP));
+        if (!tmpDir.exists()){
+            tmpDir.mkdirs();
+        }
+        if (!Sources.download(tmpDir.getAbsolutePath() + Sources.sep() + name + "NM.dat", name + "NM.dat")){
+            if (!Sources.duplicate){
+                return false;
+            } else{
+                return true;
+            }
+        } else{
+            try {
+                BufferedReader bf = new BufferedReader(new FileReader(new File(tmpDir.getAbsolutePath()
+                        + Sources.sep() + name + "NM.dat")));
+                System.out.println(bf.readLine());
+                if (bf.readLine().equals("DEL")){
+                    return false;
+                } else{
+                    return true;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace(Mainclass.err);
+                return false;
+            }
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -227,7 +271,7 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Botón de registro, se inicializan las variables @exito controla si se registra o no
         boolean exito = true;
-        StringECP crypt = new StringECP(pass);
+        StringECP crypt = new StringECP(Sources.pss);
         String encrypted = null;
         String encryptedPass = null;
         String secretW = null;
@@ -236,7 +280,16 @@ public class Vista extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Debes meter un nombre de usuario.");
             exito = false;
         } else{
-            encrypted = crypt.encrypt(jTextField1.getText());
+            if (jTextField1.getText().contains("/") || jTextField1.getText().contains("\\") || 
+                    jTextField1.getText().contains(":") || jTextField1.getText().contains("*") ||
+                    jTextField1.getText().contains("?") || jTextField1.getText().contains("\"") ||
+                    jTextField1.getText().contains("<") || jTextField1.getText().contains(">") ||
+                    jTextField1.getText().contains("|")){
+                JOptionPane.showMessageDialog(null, "Los caracteres / \\ : * ? \" < > | no están permitidos en el nombre.");
+                exito = false;
+            } else{
+                encrypted = crypt.encrypt(jTextField1.getText());
+            }
         }
         if (new String (jPasswordField1.getPassword()).equals("")){
             JOptionPane.showMessageDialog(null, "Debes introducir una contraseña.");
@@ -258,33 +311,48 @@ public class Vista extends javax.swing.JFrame {
         }
         //Si todo está correcto, @exito = true
         if (exito){
-           try{
-               //Creamos el fichero con los datos del registro
-            fichero.createNewFile();
-            PrintWriter pw = new PrintWriter (fichero);
-            pw.print(encrypted);
-            pw.println();
-            pw.print(encryptedPass);
-            pw.println();
-            pw.print(secretW);
-            pw.close();
+            if (checkDuplicateAcc(jTextField1.getText())){
+                JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+                return;
+            }
             this.setVisible(false);
-            //Escribimos en el fichero booleano la palabra true para indicar que el registro ha sido exitoso
-            PrintWriter pw1 = new PrintWriter (booleano);
-            pw1.print("true");
-            pw1.close();
-            //Abrimos Vista2
-            Vista2 ven = new Vista2(pass);
-            ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            ven.pack();
-            ven.setLocationRelativeTo(null);
-            ven.setTitle(Mainclass.title + " " + Mainclass.version);
-            ven.setVisible(true);
-        } catch (IOException e){
-            JOptionPane.showMessageDialog(null, "Error en el registro");
-            e.printStackTrace(Mainclass.err);
-            System.exit(0);
-        }
+            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
+            Sources.download(tmp, Sources.lsNM);
+            try {
+                PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
+                p.println(jTextField1.getText());
+                p.close();
+                if (!Sources.upload(tmp, Sources.lsNM)){
+                    new File(tmp).delete();
+                    throw new IOException("Failed connection to the server!");
+                }
+                new File(tmp).delete();
+                //Creamos el fichero con los datos del registro
+                this.createLoginFile("OFF", encrypted, encryptedPass, secretW);
+                if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
+                    throw new IOException("Failed connection to the server!");
+                }
+                fichero.delete();
+                //Escribimos en el fichero booleano la palabra true para indicar que el registro ha sido exitoso
+                PrintWriter pw = new PrintWriter (booleano);
+                pw.print("true");
+                pw.close();
+                //Abrimos Vista2
+                Vista2 ven = new Vista2();
+                ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                ven.pack();
+                ven.setLocationRelativeTo(null);
+                ven.setTitle(Mainclass.title + " " + Mainclass.version);
+                ven.setVisible(true);
+            } catch (IOException e){
+                JOptionPane.showMessageDialog(null, "Error en el registro");
+                e.printStackTrace(Mainclass.err);
+                Debug de = new Debug(null, true);
+                de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                de.setLocationRelativeTo(null);
+                de.setVisible(true);
+                System.exit(10);
+            }
             this.dispose();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -293,28 +361,44 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         /*Botón para indicar que se tiene cuenta de Minecraft Oficial
          */
-        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás el registro y pasarás al login.\n¿Estás seguro de continuar?");
+        if (jTextField1.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
+            return;
+        }
+        if (checkDuplicateAcc(jTextField1.getText())){
+            JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+            return;
+        }
+        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
+                + " tienes una cuenta oficial.\n¿Estás seguro de continuar?");
         if (i == 0){
+            this.setVisible(false);
+            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
             try {
-                //Creamos el fichero de datos vacío
-                fichero.createNewFile();
-                //Creamos el fichero para saber que la cuenta es Oficial
-                File MinecraftUser = null;
-                if (Mainclass.OS.equals("windows")){
-                    MinecraftUser = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\MOS.bon");
-                } else if (Mainclass.OS.equals("linux")){
-                    MinecraftUser = new File(System.getProperty("user.home") + "/.Data/MOS.bon");
+                if(!Sources.download(tmp, Sources.lsNM)){
+                    new File(tmp).delete();
+                    throw new IOException("Failed connection to the server!");
                 }
-                MinecraftUser.createNewFile();
-                PrintWriter p = new PrintWriter(MinecraftUser);
-                p.print("said_/&/JT&^*$/&(/*Ç_said");
+                PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
+                p.println(jTextField1.getText());
                 p.close();
+                if (!Sources.upload(tmp, Sources.lsNM)){
+                    new File(tmp).delete();
+                    throw new IOException("Failed connection to the server!");
+                }
+                new File(tmp).delete();
+                //Creamos el fichero de datos con el nombre
+                this.createLoginFile("MC", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
+                if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
+                    throw new IOException("Failed connection to the server!");
+                }
+                fichero.delete();
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
                 PrintWriter pw = new PrintWriter(this.booleano);
                 pw.print("true");
                 pw.close();
                 //Abrimos Vista2
-                Vista2 ven = new Vista2(pass);
+                Vista2 ven = new Vista2();
                 ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 ven.pack();
                 ven.setLocationRelativeTo(null);
@@ -330,28 +414,44 @@ public class Vista extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         //Lo mismo que el ActionPerformed anterior, pero con Mineshafter
-        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás el registro y pasarás al login.\n¿Estás seguro de continuar?");
+        if (jTextField1.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
+            return;
+        }
+        if (checkDuplicateAcc(jTextField1.getText())){
+            JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+            return;
+        }
+        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
+                + " tienes una cuenta de Mineshafter.\n¿Estás seguro de continuar?");
         if (i == 0){
+            this.setVisible(false);
+            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
             try {
-                //Creamos el fichero de datos vacío
-                fichero.createNewFile();
-                //Creamos el fichero para saber que la cuenta es Oficial
-                File MineshafterUser = null;
-                if (Mainclass.OS.equals("windows")){
-                    MineshafterUser = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\MSOS.bon");
-                } else if (Mainclass.OS.equals("linux")){
-                    MineshafterUser = new File(System.getProperty("user.home") + "/.Data/MSOS.bon");
+                if(!Sources.download(tmp, Sources.lsNM)){
+                    new File(tmp).delete();
+                    throw new IOException("Failed connection to the server!");
                 }
-                MineshafterUser.createNewFile();
-                PrintWriter p = new PrintWriter(MineshafterUser);
-                p.print("said_/HT&)$^)/%(¨¨Ç_said");
+                PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
+                p.println(jTextField1.getText());
                 p.close();
+                if (!Sources.upload(tmp, Sources.lsNM)){
+                    new File(tmp).delete();
+                    throw new IOException("Failed connection to the server!");
+                }
+                new File(tmp).delete();
+                //Creamos el fichero de datos vacío
+                this.createLoginFile("MS", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "\"said_/HT;&)$^)_said", "said_/%*;^(¨¨Ç_said");
+                if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
+                    throw new IOException("Failed connection to the server!");
+                }
+                fichero.delete();
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
                 PrintWriter pw = new PrintWriter(this.booleano);
                 pw.print("true");
                 pw.close();
                 //Abrimos Vista2
-                Vista2 ven = new Vista2(pass);
+                Vista2 ven = new Vista2();
                 ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 ven.pack();
                 ven.setLocationRelativeTo(null);
@@ -367,7 +467,7 @@ public class Vista extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(final String args, final String pass, final String boo) {
+    public static void main(final String args, final String boo) {
         /*
          * Set the Nimbus look and feel
          */
@@ -401,7 +501,7 @@ public class Vista extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new Vista(args, pass, boo).setVisible(true);
+                new Vista(args, boo).setVisible(true);
             }
         });
     }

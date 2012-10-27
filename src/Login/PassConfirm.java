@@ -13,14 +13,12 @@ import javax.swing.JOptionPane;
  * @author Reed
  */
 public class PassConfirm extends javax.swing.JDialog {
-    private String p;
     /**
      * Creates new form PassConfirm
      */
-    public PassConfirm(java.awt.Frame parent, boolean modal, String pass) {
+    public PassConfirm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        p = pass;
     }
 
     /**
@@ -39,6 +37,8 @@ public class PassConfirm extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -56,45 +56,53 @@ public class PassConfirm extends javax.swing.JDialog {
             }
         });
 
+        jLabel4.setText("Nombre de cuenta:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(98, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(98, 98, 98))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextField2)
                     .addComponent(jPasswordField1)
                     .addComponent(jPasswordField2, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
                     .addComponent(jTextField1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(98, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(98, 98, 98))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jPasswordField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -103,23 +111,51 @@ public class PassConfirm extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         //Botón de aceptar
+        if ((jTextField2.getText() == null) || jTextField2.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Introduzca el nombre de cuenta");
+            return;
+        }
         boolean change = false;
         try{
-            BufferedReader bf = null;
-            if (Mainclass.OS.equals("windows")){
-                bf = new BufferedReader(new FileReader (new File (System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\data.cfg")));
-            } else if (Mainclass.OS.equals("linux")){
-                bf = new BufferedReader(new FileReader (new File (System.getProperty("user.home") + "/Roaming/Data/data.cfg")));
+            File tmp = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+                    + Vista2.getFile(jTextField2.getText() + "NM")));
+            if (!tmp.exists()){
+                if (!Sources.download(tmp.getAbsolutePath(), jTextField2.getText() + "NM.dat")){
+                    JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar"
+                            + " con el servidor.");
+                    return;
+                }
             }
-            String temp = null, temp1 = null;
-            temp = bf.readLine();
-            temp = bf.readLine();
+            BufferedReader bf = new BufferedReader(new FileReader(tmp));
+            System.out.println(bf.readLine());
+            String temp = bf.readLine();
+            if (temp.equals("DEL")){
+                JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar "
+                        + "con el servidor");
+                bf.close();
+                tmp.delete();
+                return;
+            } else if (temp.equals("MC") || temp.equals("MS")){
+                String A = null;
+                if (temp.equals("MS")){
+                    A = "Mineshafter";
+                } else if (temp.equals("MC")){
+                    A = "Minecraft oficial";
+                }
+                JOptionPane.showMessageDialog(null, "Tu tipo de cuenta no permite cambiar la contraseña desde aquí.\n"
+                        + "Tipo de cuenta: " + A);
+                bf.close();
+                return;
+            }
+            String A = null, B = null;
+            bf.readLine();
+            bf.readLine();
             //Nos quitamos de encima el nombre de usuario y la contraseña y vamos directamente a la palabra secreta
-            StringECP crypt = new StringECP(p);
-            temp1 = bf.readLine();
-            temp = crypt.decrypt(temp1);
+            StringECP crypt = new StringECP(Sources.pss);
+            B = bf.readLine();
+            A = crypt.decrypt(B);
             //Desencriptamos la palabra y comprobamos si es la escrita en el área de texto
-            if(temp.equals(jTextField1.getText())){
+            if (A.equals(jTextField1.getText())){
                 change = true;
             }
             bf.close();
@@ -128,32 +164,19 @@ public class PassConfirm extends javax.swing.JDialog {
                 String pass1 = new String (jPasswordField1.getPassword()), pass2 = new String (jPasswordField2.getPassword());
                 if (pass1.equals(pass2)){
                     //Si coincide, obtenemos el nombre de usuario y lo desencriptamos
-                    if (Mainclass.OS.equals("windows")){
-                        bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\data.cfg")));
-                    } else if (Mainclass.OS.equals("linux")){
-                        bf = new BufferedReader (new FileReader (new File(System.getProperty("user.home") + "/Data/data.cfg")));
+                    bf = new BufferedReader(new FileReader(tmp));
+                    StringBuilder str = new StringBuilder(bf.readLine()).append("\n").append(bf.readLine()).append("\n");
+                    str.append(bf.readLine()).append("\n").append(pass1).append("\n");
+                    String tem;
+                    while ((tem = bf.readLine()) != null){
+                        str.append(tem).append("\n");
                     }
-                    String tem = bf.readLine();
-                    if (tem != null){
-                    String user = crypt.decrypt(tem);
-                    //Escribimos de nuevo el nombre de usuario, la nueva contraseña y la palabra secreta en el fichero de datos
-                    PrintWriter pw = null;
-                    if (Mainclass.OS.equals("windows")){
-                        pw = new PrintWriter(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\data.cfg"));
-                    } else if (Mainclass.OS.equals("linux")){
-                        pw = new PrintWriter(new File(System.getProperty("user.home") + "/Data/data.cfg"));
-                    }
-                    pw.print(crypt.encrypt(user));
-                    pw.println();
-                    pw.print(crypt.encrypt(pass1));
-                    pw.println();
-                    pw.print(crypt.encrypt(temp));
+                    PrintWriter pw = new PrintWriter(tmp);
+                    pw.print(str.toString());
                     pw.close();
-                    JOptionPane.showMessageDialog(null, "La contraseña ha sido cambiada satisfactoriamente. Recuerda tu contraseña siempre.");
-                    } else{
-                        JOptionPane.showMessageDialog(null, "Eres usuario oficial de Minecraft o Mineshafter, no puedes cambiar tu contraseña desde aquí.");
-                    }
                     bf.close();
+                    Mainclass.synch(tmp);
+                    JOptionPane.showMessageDialog(null, "La contraseña ha sido cambiada satisfactoriamente. Recuerda tu contraseña siempre.");
                     this.dispose();
                 } else{
                     JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.");
@@ -204,7 +227,7 @@ public class PassConfirm extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                PassConfirm dialog = new PassConfirm(new javax.swing.JFrame(), true, args);
+                PassConfirm dialog = new PassConfirm(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                     @Override
@@ -221,8 +244,10 @@ public class PassConfirm extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JPasswordField jPasswordField2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }

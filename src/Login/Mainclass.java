@@ -62,6 +62,100 @@ public class Mainclass {
                  + "  " + Thread.currentThread().isInterrupted() + "  " + Thread.currentThread().isDaemon());
     }
     /**
+     * Method to synchronize the local files with the server. ALWAYS the server files have priority.
+     */
+    public static void synchAllFiles(){
+        File base = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM));
+        File tmpDir = new File(base.getAbsolutePath() + Sources.sep() + "TMP");
+        if (!base.exists()){
+            System.err.println("Syncronization is disabled!");
+            return;
+        }
+        if (!tmpDir.exists()){
+            System.out.println("Creating temporally directory");
+            tmpDir.mkdirs();
+        }
+        List <File> names = new ArrayList<File>();
+        List <File> tmp = new ArrayList<File>();
+        File[] ficheros = base.listFiles();
+        for (int x = 0; x < ficheros.length; x++){
+            if (!ficheros[x].isDirectory() && !ficheros[x].getName().equals(Sources.lsNM)){
+                names.add(new File(base.getAbsolutePath() + Sources.sep() + ficheros[x].getName()));
+            }
+        }
+        if (names.isEmpty()){
+            System.out.println("No base files to synchronize!");
+            return;
+        }
+        for (int i = 0; i < names.size(); i++){
+            tmp.add(new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(names.get(i).getName())));
+            if (!Sources.download(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(names.get(i).getName())
+                    , nameFiles(names.get(i).getName()))){
+                System.err.println("[ERROR]Sync interrupted!");
+            }
+        }
+        BufferedReader bf = null;
+        PrintWriter pw = null;
+        for (int i = 0; i < names.size(); i++){
+             try{
+                 bf = new BufferedReader(new FileReader(tmp.get(i)));
+                 pw = new PrintWriter(names.get(i));
+                 String temp;
+                 while((temp = bf.readLine()) != null){
+                     pw.println(temp);
+                 }
+                 bf.close();
+                 pw.close();
+                 tmp.get(i).delete();
+             } catch (IOException ex){
+                ex.printStackTrace(err);
+             }
+        }
+        tmp.clear();
+        names.clear();
+        tmp = null;
+        names = null;
+        System.gc();
+    }
+    /**
+     * Method to synchronize one file with the server. This override the server file.
+     * @param sync The local file to synchronize.
+     */
+    public static void synch(File sync){
+        File tmpDir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep() + "TMP"));
+        if (!tmpDir.exists()){
+            System.out.println("Creating temporally directory");
+        }
+        File tmp = new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(sync.getName()));
+        try{
+            tmp.createNewFile();
+        } catch (IOException ex){
+            ex.printStackTrace(err);
+            System.err.println("[ERROR]Failed to synchronize with the server!");
+        }
+        if (!Sources.upload(tmp.getAbsolutePath(), tmp.getName())){
+            JOptionPane.showMessageDialog(null, "Error al conectar con el servidor");
+            System.err.println("[ERROR]Failed to synchronize with the server!");
+        }
+        tmp.delete();
+    }
+    private static String nameFiles(String name){
+        StringTokenizer token = new StringTokenizer(name, "_");
+        StringBuilder str = new StringBuilder();
+        String tmp = null;
+        while(token.hasMoreTokens()){
+            tmp = token.nextToken();
+            if (!tmp.contains(".")){
+                int A = Integer.parseInt(tmp);
+                char B = (char) A;
+                str.append(B);
+            } else{
+                str.append(tmp);
+            }
+        }
+        return str.toString();
+    }
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -163,7 +257,7 @@ public class Mainclass {
             }
             if (boo.equals("true")){
                 //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
-                Vista2 vista = new Vista2(Sources.pss);
+                Vista2 vista = new Vista2();
                 vista.setIconImage(new ImageIcon(Sources.path(Sources.DirMC + Sources.sep() + "5547.png")).getImage());
                 vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 vista.setTitle(title + " " + version);
@@ -172,7 +266,7 @@ public class Mainclass {
                 vista.pack();
             } else{
                 //Sino, no se ha registrado, y abrimos la Vista
-                Vista.main(Sources.path(Sources.DirData + Sources.sep()), Sources.pss, fichero.getAbsolutePath());
+                Vista.main(Sources.path(Sources.DirData + Sources.sep()), fichero.getAbsolutePath());
             }
         } else{
             //Si no existe el fichero, lo creamos y escribimos en él false
@@ -184,11 +278,11 @@ public class Mainclass {
             } catch (IOException ex){
                 ex.printStackTrace(err);
             }
-            Vista.main(Sources.path(Sources.DirData), Sources.pss, fichero.getAbsolutePath());
+            Vista.main(Sources.path(Sources.DirData), fichero.getAbsolutePath());
         }
     }
     //Borrar fichero o directorio
-    private static void borrarFichero (File fich){
+    public static void borrarFichero (File fich){
         File[] ficheros = fich.listFiles();
         for (int x = 0; x < ficheros.length; x++){
             if (ficheros[x].isDirectory()){
@@ -198,7 +292,7 @@ public class Mainclass {
         }
     }
     //Copiar directorio de un sitio a otro
-    private static void copyDirectory(File srcDir, File dstDir) throws IOException {
+    public static void copyDirectory(File srcDir, File dstDir) throws IOException {
         if (srcDir.isDirectory()) { 
             if (!dstDir.exists()) { 
                 dstDir.mkdir(); 
@@ -214,7 +308,7 @@ public class Mainclass {
         } 
     }
     //Copiar fichero de un sitio a otro
-    private static void copy(File src, File dst) throws IOException { 
+    public static void copy(File src, File dst) throws IOException { 
         InputStream in = new FileInputStream(src); 
         OutputStream out = new FileOutputStream(dst);
         byte[] buf = new byte[4096]; 

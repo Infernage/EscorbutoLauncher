@@ -18,16 +18,62 @@ import java.net.URL;
  */
 public class Sources {
     private static String separatorWin = "\\", separatorLin = "/";
+    public static boolean duplicate = false;
+    /**
+     * This gets the password
+     */
     public static String pss = "My Pass Phrase";
+    /**
+     * This gets the file name which check if the installed minecraft is supported by the Login
+     */
     public static String infernage = "Infernage.hdn";
+    /**
+     * This gets the configuration file name of the server
+     */
     public static String lsNM = "ALLNM-MC.cfg";
+    /**
+     * This gets the file name which check if it's the first time that is oppened
+     */
     public static String bool = "boolean.txt";
+    /**
+     * This gets this jar name
+     */
     public static String jar = "RUN.jar";
+    /**
+     * This gets the file name which check if the remember option was used
+     */
+    public static String rmb = "RMB.txt";
+    /**
+     * This gets the directory name of libraries used by this jar
+     */
     public static String Dirlibs = "lib";
+    /**
+     * This gets the directory name of data files stored in this PC
+     */
     public static String DirData = "Data";
+    /**
+     * This gets the directory name of minecraft
+     */
     public static String DirMC = ".minecraft";
+    /**
+     * This gets the directory name used to store all jars used by this
+     */
     public static String Dirfiles = "Logger";
+    /**
+     * This gets the directory name used to store files from the server
+     */
     public static String DirNM = "Base";
+    /**
+     * This gets the directory name used to store temporally files from the server
+     */
+    public static String DirTMP = "TMP";
+    /**
+     * This method upload a file to the server. This is used to log of Login.
+     * @param pathFile The local path name of the file.
+     * @param name The name of the file at the server.
+     * @return {@code true} If was upload correctly;
+     * {@code false} If there was a problem.
+     */
     public static boolean upload(String pathFile, String name){
         try{
             OutputStream out = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
@@ -47,7 +93,13 @@ public class Sources {
             return false;
         }
     }
-    public static void download(String pathFile, String name){
+    /**
+     * This method download a file from the server. It's used to log of Login.
+     * @param pathFile The local path name of the file.
+     * @param name The name of the file at the server.
+     * @return {@code true} If the file was download correctly; {@code false} If there was a problem.
+     */
+    public static boolean download(String pathFile, String name){
         try{
             InputStream is = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
                     + name + ";type=i").openConnection().getInputStream();
@@ -59,11 +111,31 @@ public class Sources {
             is.close();
             bw.flush();
             bw.close();
+            duplicate = true;
+            return duplicate;
         } catch (Exception ex){
-            System.err.println(ex.toString());
-            System.err.println("[ERROR] Connection failed!");
+            duplicate = false;
+            if (ex.toString().contains("FileNotFound")){
+                System.err.println("[ERROR]The requested file doesn't exist!");
+                ex.printStackTrace(Mainclass.err);
+            } else{
+                System.err.println("[ERROR]Connection failed!");
+                ex.printStackTrace(Mainclass.err);
+            }
+            return false;
         }
     }
+    /**
+     * This method gets the default path on Windows or Linux.
+     * @param name The path name starting from default. It's possible to choose which path name can be
+     *  returned.
+     * @return 
+     * <ul>
+     * <li> {@code null} if the OS is not supported.
+     * <li> The default path if {@param name} is {@code null}.
+     * <li> The path name starting from default if {@param name} it's not {@code null}.
+     * </ul>
+     */
     public static String path(String name){
         System.err.println(name);
         String Wtmp = System.getProperty("user.home") + "\\AppData\\Roaming";
@@ -79,6 +151,13 @@ public class Sources {
         }
         return null;
     }
+    /**
+     * This method gets the default separator depending of each OS.
+     * @return <ul>
+     * <li>{@code null} if the OS is not supported.
+     * <li> The default separator.
+     * </ul>
+     */
     public static String sep(){
         if (Mainclass.OS.equals("windows")){
             return separatorWin;
