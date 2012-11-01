@@ -19,15 +19,25 @@ public class Vista extends javax.swing.JFrame {
     private File fichero;
     private String fich;
     private File booleano;
+    private boolean nuevo;
+    private Vista2 vis;
+    public boolean open = true;
     /**
      * Creates new form Vista
      */
     public Vista(String fich, String boo) {
+        this(fich, boo, false);
+    }
+    public Vista(String fich, String boo, boolean bool){
         initComponents();
         Mainclass.init.exit();
         this.fich = fich;
         booleano = new File (boo);
+        nuevo = bool;
         this.setTitle("Registro Minecraft 1.2.5");
+    }
+    public void setNew(Vista2 vista){
+        vis = vista;
     }
     private void createLoginFile(String type, String account, String password, String word) throws IOException{
         fichero = new File(fich + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + jTextField1.getText() + "NM.dat");
@@ -102,7 +112,12 @@ public class Vista extends javax.swing.JFrame {
         jTextField2 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setText("Bienvenido!");
@@ -337,6 +352,10 @@ public class Vista extends javax.swing.JFrame {
                 PrintWriter pw = new PrintWriter (booleano);
                 pw.print("true");
                 pw.close();
+                if (nuevo){
+                    vis.visible();
+                    this.dispose();
+                }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
                 ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -394,9 +413,13 @@ public class Vista extends javax.swing.JFrame {
                 }
                 fichero.delete();
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
-                PrintWriter pw = new PrintWriter(this.booleano);
+                PrintWriter pw = new PrintWriter(booleano);
                 pw.print("true");
                 pw.close();
+                if (nuevo){
+                    vis.visible();
+                    this.dispose();
+                }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
                 ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -447,9 +470,13 @@ public class Vista extends javax.swing.JFrame {
                 }
                 fichero.delete();
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
-                PrintWriter pw = new PrintWriter(this.booleano);
+                PrintWriter pw = new PrintWriter(booleano);
                 pw.print("true");
                 pw.close();
+                if (nuevo){
+                    vis.visible();
+                    this.dispose();
+                }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
                 ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -464,10 +491,15 @@ public class Vista extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        vis.visible();
+    }//GEN-LAST:event_formWindowClosing
+
     /**
      * @param args the command line arguments
      */
-    public static void main(final String args, final String boo) {
+    public static Vista main(final String args, final String boo, final boolean bool) {
         /*
          * Set the Nimbus look and feel
          */
@@ -494,16 +526,17 @@ public class Vista extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Vista.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        final Vista vis = new Vista(args, boo, bool);
         /*
          * Create and display the form
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new Vista(args, boo).setVisible(true);
+                vis.setVisible(true);
             }
         });
+        return vis;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
