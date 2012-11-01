@@ -41,11 +41,7 @@ public class Executer extends Thread{
     public void run(){
         double inst = 0;
         double perc = 0;
-        if (Mainclass.OS.equals("windows")){
-            buscar(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\.minecraft"));
-        } else if (Mainclass.OS.equals("linux")){
-            buscar(new File(System.getProperty("user.home") + "/.Data/.minecraft"));
-        }
+        buscar(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC)));
         size = tam/1048576;
         tam = 0;
         while(!exit){

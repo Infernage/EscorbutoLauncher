@@ -117,7 +117,7 @@ public class PassConfirm extends javax.swing.JDialog {
         }
         boolean change = false;
         try{
-            File tmp = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+            File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                     + Vista2.getFile(jTextField2.getText() + "NM")));
             if (!tmp.exists()){
                 if (!Sources.download(tmp.getAbsolutePath(), jTextField2.getText() + "NM.dat")){
@@ -193,7 +193,7 @@ public class PassConfirm extends javax.swing.JDialog {
     /**
      * @param args the command line arguments
      */
-    public static void main(final String args) {
+    public static void main(String[] args) {
         /*
          * Set the Nimbus look and feel
          */

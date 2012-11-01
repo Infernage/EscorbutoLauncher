@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /*
@@ -29,8 +31,36 @@ public class Vista2 extends javax.swing.JFrame {
      * Creates new form Vista2
      */
     public Vista2() {
+        try{
+            System.out.print("Checking minecraft.jar... ");
+            File jar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "minecraft.jar"));
+            if (!jar.exists()){
+                System.out.print("FAILED\nExporting new one now... ");
+                InputStream in = getClass().getResourceAsStream("/Installer/minecraft.jar");
+                OutputStream out = new FileOutputStream(jar);
+                byte[] buffer = new byte[1024];
+                int size;
+                while((size = in.read(buffer)) > 0){
+                    out.write(buffer, 0, size);
+                }
+                in.close();
+                out.close();
+            }
+            System.out.println("OK");
+            File mine = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
+            System.out.print("Checking minecraft.jar... ");
+            if (!Installer.Worker.check(jar, mine)){
+                mine.delete();
+                Mainclass.copy(jar, mine);
+            }
+            System.out.println("OK");
+        } catch (Exception ex){
+            ex.printStackTrace(Mainclass.err);
+        }
+        System.out.print("Setting background... ");
         //Asignamos el fondo al Panel
         setContentPane(new Background());
+        System.out.println("OK");
         initComponents();
         jProgressBar1.setVisible(false);
         inicializar();
@@ -40,10 +70,12 @@ public class Vista2 extends javax.swing.JFrame {
         jButton3.setFocusPainted(false);
         jButton8.setFocusPainted(false);
         jButton8.setContentAreaFilled(false);
-        File rem = new File (Sources.path(Sources.DirData + Sources.sep() + Sources.rmb)), 
-                base = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM));
+        System.out.println("Checking login files... OK");
+        File rem = new File (Sources.path(Sources.DirData() + Sources.sep() + Sources.rmb)), 
+                base = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM));
         if(!base.exists()){
             base.mkdirs();
+            System.out.println("Created base file");
         }
         if (!Sources.download(base.getAbsolutePath() + Sources.sep() + Sources.lsNM, Sources.lsNM)){
             System.err.println("Connection failed. Syncronization won't start!");
@@ -53,6 +85,7 @@ public class Vista2 extends javax.swing.JFrame {
             Mainclass.synchAllFiles();
         }
         //Controlamos las pestañas de recordar
+        System.out.print("Checking remember files... ");
         if (rem.exists()){
             try{
                 BufferedReader bf = new BufferedReader (new FileReader(rem));
@@ -85,16 +118,19 @@ public class Vista2 extends javax.swing.JFrame {
                         jPasswordField1.setText(tmp);
                     }
                 }
+                System.out.println("OK");
             } catch (IOException ex){
                 ex.printStackTrace(Mainclass.err);
             }
         }
         //Creamos el cliente del actualizador
         try{
+            System.out.print("Initialiting updater... ");
             URL url = new URL("http://minechinchas.blogspot.com/2012/09/downloads.html");
             Cliente client = new Cliente(jLabel1, jLabel5, jButton5, jButton6, url, this);
             client.start();
             Mainclass.hilos.put("Cliente", client);
+            System.out.println("OK");
         } catch(Exception e){
             jLabel1.setForeground(Color.red);
             jLabel1.setText("ERROR!");
@@ -130,11 +166,28 @@ public class Vista2 extends javax.swing.JFrame {
         return str.toString();
     }
     private void inicializar(){
+        System.out.print("Loading changelog... ");
         CHLG text = new CHLG(jTextArea1);
         text.start();
         Mainclass.hilos.put("ChangeLog", text);
+        System.out.println("OK");
     }
     private void mineOff(){
+        File bat = new File(Sources.path(Sources.DirMC + Sources.sep() + "bin" + Sources.sep()
+            + "com.bat"));
+        if (!bat.exists()){
+            try {
+                bat.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace(Mainclass.err);
+            }
+        }
+        PrintWriter pw = null;
+        try{
+            pw = new PrintWriter(bat);
+        } catch (IOException ex){
+            ex.printStackTrace(Mainclass.err);
+        }
         statusConn.setText("");
         Process minecraft = null;
         final String cmd = "-cp \"%APPDATA%/.minecraft/bin/minecraft.jar;%APPDATA%/.minecraft/bin/lwjgl.jar;%APPDATA%/.minecraft/bin/lwjgl_util.jar;%APPDATA%/.minecraft/bin/jinput.jar\" -Djava.library.path=\"%APPDATA%/.minecraft/bin/natives\" net.minecraft.client.Minecraft ";
@@ -143,43 +196,36 @@ public class Vista2 extends javax.swing.JFrame {
         int tam = selectRAM();
         switch(tam){
             case 1:
-                try{
-                    comand = comand + "-Xmx512m -Xms512m " + cmd + args;
-                    minecraft = Runtime.getRuntime().exec(comand);
-                } catch (Exception ex){
-                    ex.printStackTrace(Mainclass.err);
-                    System.exit(1);
-                }
+                comand = comand + "-Xmx512m -Xms512m " + cmd + args;
+                pw.print(comand);
                 break;
             case 2:
-                try{
-                    comand = comand + "-Xmx1024m -Xms1024m " + cmd + args;
-                    minecraft = Runtime.getRuntime().exec(comand);
-                } catch (Exception ex){
-                    ex.printStackTrace(Mainclass.err);
-                    System.exit(1);
-                }
+                comand = comand + "-Xmx1024m -Xms1024m " + cmd + args;
+                pw.print(comand);
                 break;
             case 3:
-                try{
-                    comand = comand + "-Xmx2048m -Xms2048m " + cmd + args;
-                    minecraft = Runtime.getRuntime().exec(comand);
-                } catch (Exception ex){
-                    ex.printStackTrace(Mainclass.err);
-                    System.exit(1);
-                }
+                comand = comand + "-Xmx2048m -Xms2048m " + cmd + args;
+                pw.print(comand);
                 break;
             case 4:
-                try{
-                    comand = comand + "-Xmx4096m -Xms4096m " + cmd + args;
-                    minecraft = Runtime.getRuntime().exec(comand);
-                } catch (Exception ex){
-                    ex.printStackTrace(Mainclass.err);
-                    System.exit(1);
-                }
+                comand = comand + "-Xmx4096m -Xms4096m " + cmd + args;
+                pw.print(comand);
                 break;
         }
+        pw.close();
         inputLog(jTextField1.getText());
+        try{
+            System.out.println(comand);
+            minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
+        } catch (IOException ex){
+            this.setVisible(false);
+            ex.printStackTrace(Mainclass.err);
+            Debug de = new Debug(null, true);
+            de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            de.setLocationRelativeTo(null);
+            de.setVisible(true);
+            System.exit(1);
+        }
         try {
             if (minecraft == null){
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
@@ -195,7 +241,8 @@ public class Vista2 extends javax.swing.JFrame {
      * @param text The username.
      */
     private void inputLog(String text){
-        File log = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep() + getFile(text + "NM")));
+        File log = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
+                + getFile(text + "NM")));
         Calendar C = new GregorianCalendar();
         StringBuilder str = new StringBuilder("Connected at ");
         str.append(C.get(Calendar.DAY_OF_MONTH)).append("/")
@@ -233,6 +280,7 @@ public class Vista2 extends javax.swing.JFrame {
     private void Play(){
         //Método del botón ¡Jugar!
         see = this;
+        System.out.println("Setting connection");
         jButton5.setEnabled(false);
         statusConn.setForeground(Color.white);
         if (!offline){
@@ -240,7 +288,8 @@ public class Vista2 extends javax.swing.JFrame {
         }
         boolean remember = jCheckBox1.isSelected(), rememberP = jCheckBox2.isSelected();
         //Comprobamos si el Recordar está activo y lo recordamos para un futuro
-        File rem = new File (Sources.path(Sources.DirData + Sources.sep() + Sources.rmb));
+        File rem = new File (Sources.path(Sources.DirData() + Sources.sep() + Sources.rmb));
+        System.out.print("Checking remember file... ");
         try{
             if (!rem.exists()){
                 rem.createNewFile();
@@ -258,17 +307,68 @@ public class Vista2 extends javax.swing.JFrame {
                 ex.printStackTrace(Mainclass.err);
             }
         }
+        System.out.println("OK");
         if (offline){
+            System.out.println("Setting parameter: OFFLINE");
             args = jTextField1.getText();
             mineOff();
             return;
         }
         try{
-            File tmp = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+            File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                     + getFile(jTextField1.getText() + "NM")));
-            BufferedReader bf = new BufferedReader(new FileReader(tmp));
-            System.out.println(bf.readLine());
-            String temp = bf.readLine();
+            BufferedReader bf = null;
+            String temp = null;
+            if (!tmp.exists()){
+                System.out.println("Local file not found! Looking for existing file at the server...");
+                if (!Sources.download(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                        + Sources.sep() + Sources.DirTMP + Sources.sep()
+                        + jTextField1.getText() + "NM.dat"), jTextField1.getText() + "NM.dat")){
+                        System.out.println("Error downloading the file!");
+                        try{
+                        bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                        + jTextField1.getText() + "NM.dat;type=i").openConnection().getInputStream()));
+                        System.out.println(bf.readLine());
+                        temp = bf.readLine();
+                    } catch (Exception ex){
+                        ex.printStackTrace(Mainclass.err);
+                        if (ex.toString().contains("FileNotFound")){
+                            JOptionPane.showMessageDialog(null, "La cuenta no existe");
+                            return;
+                        }
+                    }
+                } else{
+                    File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                        + Sources.sep() + Sources.DirTMP + Sources.sep()
+                        + jTextField1.getText() + "NM.dat"));
+                    File B = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                        + Sources.sep() + Sources.DirTMP + Sources.sep()
+                        + getFile(jTextField1.getText() + "NM")));
+                    A.renameTo(B);
+                    A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                        + Sources.sep() + getFile(jTextField1.getText() + "NM")));
+                    Mainclass.copy(B, A);
+                    B.delete();
+                    A = null;
+                    B = null;
+                    System.gc();
+                    try{
+                        bf = new BufferedReader(new FileReader(tmp));
+                        System.out.println(bf.readLine());
+                        temp = bf.readLine();
+                    } catch (IOException ex){
+                        ex.printStackTrace(Mainclass.err);
+                    }
+                }
+            } else{
+                try{
+                    bf = new BufferedReader(new FileReader(tmp));
+                    System.out.println(bf.readLine());
+                    temp = bf.readLine();
+                } catch (IOException ex){
+                    ex.printStackTrace(Mainclass.err);
+                }
+            }
             if (temp.equals("OFF")){
                 String temp1 = bf.readLine(), temp2 = bf.readLine();
                 boolean open = false;
@@ -280,6 +380,7 @@ public class Vista2 extends javax.swing.JFrame {
                     args = A;
                 }
                 if (open){
+                    bf.close();
                     mineOff();
                 } else{
                     JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos.");
@@ -333,7 +434,7 @@ public class Vista2 extends javax.swing.JFrame {
                 break;
         }
         command = command + " -jar " + Sources.path(Sources.DirMC + Sources.sep() + "Mineshafter-proxy.jar");
-        File temporal = new File(Sources.path(Sources.DirData + Sources.sep() + "sys.tpl"));
+        File temporal = new File(Sources.path(Sources.DirData() + Sources.sep() + "sys.tpl"));
         try{
             temporal.createNewFile();
         } catch (IOException ex){
@@ -362,7 +463,7 @@ public class Vista2 extends javax.swing.JFrame {
                 break;
         }
         command = command + " -jar " + Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar");
-        File temporal = new File(Sources.path(Sources.DirData + Sources.sep() + "sys.tpl"));
+        File temporal = new File(Sources.path(Sources.DirData() + Sources.sep() + "sys.tpl"));
         try{
             temporal.createNewFile();
         } catch(IOException ex){
@@ -422,6 +523,7 @@ public class Vista2 extends javax.swing.JFrame {
         jButton6 = new javax.swing.JButton();
         statusConn = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         jLabel3.setText("jLabel3");
 
@@ -552,6 +654,8 @@ public class Vista2 extends javax.swing.JFrame {
             }
         });
 
+        jButton4.setText("Registrarse");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -589,7 +693,10 @@ public class Vista2 extends javax.swing.JFrame {
                                 .addComponent(jCheckBox1))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(200, 200, 200)
-                        .addComponent(jButton6)))
+                        .addComponent(jButton6))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(63, 63, 63)
+                        .addComponent(jButton4)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -628,7 +735,9 @@ public class Vista2 extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(213, 213, 213)
                 .addComponent(jButton6)
-                .addGap(185, 185, 185)
+                .addGap(88, 88, 88)
+                .addComponent(jButton4)
+                .addGap(74, 74, 74)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(statusConn, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -664,7 +773,7 @@ public class Vista2 extends javax.swing.JFrame {
         try{
             String account = JOptionPane.showInputDialog("Introduzca el nombre de la cuenta:");
             if (account != null){
-                File A = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+                File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                         + getFile(account + "NM")));
                 if (!A.exists()){
                     if (!Sources.download(A.getAbsolutePath(), account + "NM.dat")){
@@ -830,6 +939,7 @@ public class Vista2 extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;

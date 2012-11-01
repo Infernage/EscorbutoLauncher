@@ -4,6 +4,7 @@
  */
 package Login;
 import Debugger.Parameters;
+import java.awt.event.KeyEvent;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -41,6 +42,12 @@ public class Debug extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField1KeyPressed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setText("Nombre del error");
@@ -131,6 +138,16 @@ public class Debug extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "No se pudo enviar el mensaje");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_CONTROL){
+            String a = jTextField1.getText();
+            if (a.equals("DEBUGMODE")){
+                jTextArea1.setText("ERRORSTREAM:\n" + Mainclass.error.err.toString());
+            }
+        }
+    }//GEN-LAST:event_jTextField1KeyPressed
 
     /**
      * @param args the command line arguments

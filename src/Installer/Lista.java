@@ -4,6 +4,7 @@ package Installer;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import Login.Sources;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -80,37 +81,20 @@ public class Lista extends javax.swing.JDialog {
         }
     }
     private void arbol(){
-        if (Vista.OS.equals("windows")){
-            String arb = System.getProperty("user.home") + "\\Desktop\\Copia Minecraft";
-            for (int i = 0; i < ordenada.size(); i++){
-                String temp = copy(ordenada.get(i));
-                StringTokenizer token = new StringTokenizer (temp, "¬"); //Separamos la carpeta fecha de la carpeta hora
-                String dia = token.nextToken();
-                String hora = token.nextToken();
-                File mine = new File(arb + "\\" + dia + "\\" + hora + "\\.minecraft");
-                if (mine.exists()){
-                    decriptada.add(ordenada.get(i));
-                } else{
-                    encriptada.add(ordenada.get(i));
-                }
+        for (int i = 0; i < ordenada.size(); i++){
+            String temp = copy(ordenada.get(i));
+            StringTokenizer token = new StringTokenizer (temp, "¬"); //Separamos la carpeta fecha de la carpeta hora
+            String dia = token.nextToken();
+            String hora = token.nextToken();
+            File mine = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"
+                        + Sources.sep() + dia + Sources.sep() + hora + Sources.sep() + Sources.DirMC));
+            if (mine.exists()){
+                decriptada.add(ordenada.get(i));
+            } else {
+                encriptada.add(ordenada.get(i));
             }
-            initialiteTree();
-        } else if (Vista.OS.equals("linux")){
-            String arb = System.getProperty("user.home") + "/Desktop/Copia Minecraft";
-            for (int i = 0; i < ordenada.size(); i++){
-                String temp = copy(ordenada.get(i));
-                StringTokenizer token = new StringTokenizer (temp, "¬"); //Separamos la carpeta fecha de la carpeta hora
-                String dia = token.nextToken();
-                String hora = token.nextToken();
-                File mine = new File(arb + "/" + dia + "/" + hora + "/.minecraft");
-                if (mine.exists()){
-                    decriptada.add(ordenada.get(i));
-                } else{
-                    encriptada.add(ordenada.get(i));
-                }
-            }
-            initialiteTree();
         }
+        initialiteTree();
     }
     private String copy(Fechas f){
         StringBuilder str = new StringBuilder().append(f.dia).append("_").append(f.mes).append("_").append(f.año).append("¬").append(f.hora).append(";").append(f.minuto).append(";").append(f.segundo).append("-").append(f.mili);

@@ -17,7 +17,6 @@ public class Mainclass {
     //Versión
     public final static String title = "MineLogin";
     public final static String version = "V4.1.0";
-    public static String OS = System.getProperty("os.name");
     public static Map<String, Thread> hilos;
     public static Splash init;
     public static PrintStream err;
@@ -65,7 +64,7 @@ public class Mainclass {
      * Method to synchronize the local files with the server. ALWAYS the server files have priority.
      */
     public static void synchAllFiles(){
-        File base = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM));
+        File base = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM));
         File tmpDir = new File(base.getAbsolutePath() + Sources.sep() + "TMP");
         if (!base.exists()){
             System.err.println("Syncronization is disabled!");
@@ -122,16 +121,32 @@ public class Mainclass {
      * @param sync The local file to synchronize.
      */
     public static void synch(File sync){
-        File tmpDir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep() + "TMP"));
+        File tmpDir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep() 
+                + Sources.DirTMP));
         if (!tmpDir.exists()){
             System.out.println("Creating temporally directory");
         }
         File tmp = new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(sync.getName()));
+        System.out.print("Creating temp file to synchronize... ");
         try{
             tmp.createNewFile();
+            PrintWriter pw = new PrintWriter(tmp);
+            BufferedReader bf = new BufferedReader(new FileReader(sync));
+            String temp = null;
+            while((temp = bf.readLine()) != null){
+                pw.println(temp);
+            }
+            pw.close();
+            bf.close();
+            System.out.println("OK");
         } catch (IOException ex){
+            System.out.println("FAILED");
             ex.printStackTrace(err);
             System.err.println("[ERROR]Failed to synchronize with the server!");
+            tmp.delete();
+            JOptionPane.showMessageDialog(null, "Error al sincronizarse con el servidor. Comprueba que "
+                    + "estás conectado a internet");
+            return;
         }
         if (!Sources.upload(tmp.getAbsolutePath(), tmp.getName())){
             JOptionPane.showMessageDialog(null, "Error al conectar con el servidor");
@@ -163,21 +178,23 @@ public class Mainclass {
         init = new Splash();
         Thread t = new Thread(init, "Splash");
         t.start();
+        System.out.println("Loading files..."); //Se crea el Splash
         hilos = new HashMap<String, Thread>();
         hilos.put("Splash", t);
+        System.out.println("Setting new ErrorStream..."); //Se crea el nuevo hilo de errores
         setThreadError();
-        StringTokenizer token = new StringTokenizer(OS, " ");
-        OS = token.nextToken().toLowerCase();
-        token = null;
+        System.out.println("Setting OS..."); //Se implementa el sistema operativo
+        Sources.setOS();
+        System.out.println("OS: " + Sources.OS);
         try {
-            Thread.sleep(2000);
+            Thread.sleep(500);
         } catch (InterruptedException ex) {
             ex.printStackTrace(err);
         }
-        if (!OS.equals("windows") && !OS.equals("linux")){
+        if (!Sources.OS.equals("windows") && !Sources.OS.equals("linux")){ //Si el OS no es soportado lanzamos error
             System.err.println("[ERROR]Found operative system not supported! Exiting system!");
             JOptionPane.showMessageDialog(null, "Your operative system is not supported! Only are supported"
-                    + " Windows and Linux.\nOperative system in this computer: " + OS + "\nIf you are running one "
+                    + " Windows and Linux.\nOperative system in this computer: " + Sources.OS + "\nIf you are running one "
                     + "of these operative systems, contact with me: Infernage");
             Debug de = new Debug(null, true);
             de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -186,41 +203,53 @@ public class Mainclass {
             System.exit(9);
         }
         File mine = new File(Sources.path(Sources.DirMC));
+        System.out.print("Checking minecraft state... ");
         if (mine.exists()){
             File[] mines = mine.listFiles();
-            File infer = new File(mine.getAbsolutePath() + Sources.sep() + Sources.infernage);
-            if ((mines.length < 7) || !infer.exists()){
-                System.out.println("Ejecutando instalador...");
+            File infer = new File(mine.getAbsolutePath() + Sources.sep() + Sources.infernage());
+            if ((mines.length < 7) || !infer.exists()){ /*Si la instalación del minecraft está fallida
+             * o si no es la instalación de este login
+             */
+                System.out.print("FAILED\n");
+                System.out.println("Executing installer...");
                 Installer.Vista.main(args);
                 return;
             }
-        } else{
-            System.out.println("Ejecutando instalador...");
+        } else{ //Si el minecraft no está instalado
+            System.out.print("FAILED\n");
+            System.out.println("Executing installer...");
             Installer.Vista.main(args);
             return;
         }
-        File dat = new File(Sources.path(Sources.DirData));
-        if (!dat.exists()){
-            System.out.println("Ejecutando instalador...");
+        File dat = new File(Sources.path(Sources.DirData()));
+        if (!dat.exists()){ //Si los datos no existen
+            System.out.print("FAILED\n");
+            System.out.println("Executing installer...");
             Installer.Vista.main(args);
             return;
         } else{
             File[] datas = dat.listFiles();
-            if (datas.length < 1){
+            if (datas.length < 1){ //Si los datos creados están corruptos
+                System.out.print("FAILED\n");
+                System.out.println("Executing installer...");
                 Installer.Vista.main(args);
                 return;
             }
         }
-        File runner = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+        //Comprobamos el estado de los jars
+        System.out.print("OK\n");
+        System.out.print("Checking source files... ");
+        File runner = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
-        File runnerlib = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+        File runnerlib = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.Dirlibs));
-        File actual = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+        File actual = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
-        File actuallib = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles 
+        File actuallib = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.Dirlibs));
         if (!runner.exists() && !runnerlib.exists()){
-            File dir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.Dirfiles));
+            System.out.print("FAILED\nExporting source files...\n");
+            File dir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
             dir.mkdirs();
             try{
                 copy(actual, runner);
@@ -229,25 +258,29 @@ public class Mainclass {
                 ex.printStackTrace(err);
             }
         } else if (runner.exists() && runnerlib.exists()){
-            System.out.println("Already copied!");
+            System.out.print("OK\n");
         } else if (!runner.exists() && runnerlib.exists()){
+            System.out.print("FAILED\nExporting source files...\n");
             try{
                 copy(actual, runner);
             } catch (IOException ex){
                 ex.printStackTrace(err);
             }
         } else if (runner.exists() && !runnerlib.exists()){
+            System.out.print("FAILED\nExporting source files...");
             try{
                 copyDirectory(actuallib, runnerlib);
+                System.out.println("OK");
             } catch (IOException ex){
                 ex.printStackTrace(err);
             }
         }
-        File fich = new File(Sources.path(Sources.DirData));
+        File fich = new File(Sources.path(Sources.DirData()));
         fich.mkdirs();
-        File fichero = new File (Sources.path(Sources.DirData + Sources.sep() + Sources.bool));
+        File fichero = new File (Sources.path(Sources.DirData() + Sources.sep() + Sources.bool));
         //Controlamos si es la primera vez que se ejecuta y si hay registro o no
         String boo = "";
+        System.out.println("Checking files");
         if (fichero.exists()){
             try{
                 BufferedReader bf = new BufferedReader (new FileReader (fichero));
@@ -257,6 +290,7 @@ public class Mainclass {
             }
             if (boo.equals("true")){
                 //Si en el fichero hay un true, significa que ya se ha registrado y abrimos la Vista2
+                System.out.println("Openning Login file");
                 Vista2 vista = new Vista2();
                 vista.setIconImage(new ImageIcon(Sources.path(Sources.DirMC + Sources.sep() + "5547.png")).getImage());
                 vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -266,7 +300,8 @@ public class Mainclass {
                 vista.pack();
             } else{
                 //Sino, no se ha registrado, y abrimos la Vista
-                Vista.main(Sources.path(Sources.DirData + Sources.sep()), fichero.getAbsolutePath());
+                System.out.println("Openning Register file");
+                Vista.main(Sources.path(Sources.DirData() + Sources.sep()), fichero.getAbsolutePath());
             }
         } else{
             //Si no existe el fichero, lo creamos y escribimos en él false
@@ -278,7 +313,8 @@ public class Mainclass {
             } catch (IOException ex){
                 ex.printStackTrace(err);
             }
-            Vista.main(Sources.path(Sources.DirData), fichero.getAbsolutePath());
+            System.out.println("Openning Register file");
+            Vista.main(Sources.path(Sources.DirData()), fichero.getAbsolutePath());
         }
     }
     //Borrar fichero o directorio

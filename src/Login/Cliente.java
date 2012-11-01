@@ -145,13 +145,9 @@ public class Cliente extends Thread{
             }
         }
         Iterator<String> it = linksD.keySet().iterator();
-        File fich = null;
+        File fich = new File(Sources.path(Sources.DirMC + Sources.sep() + "bin" + Sources.sep() 
+                + "MVer.cfg"));
         int MV = 0;
-        if (Mainclass.OS.equals("windows")){
-            fich = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\bin\\MVer.cfg");
-        } else if (Mainclass.OS.equals("linux")){
-            fich = new File(System.getProperty("user.home") + "/.minecraft/bin/MVer.cfg");
-        }
         if (fich.exists()){
             try{
                 BufferedReader bf = new BufferedReader(new FileReader(fich));

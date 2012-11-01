@@ -19,6 +19,7 @@ import java.net.URL;
 public class Sources {
     private static String separatorWin = "\\", separatorLin = "/";
     public static boolean duplicate = false;
+    public static String OS;
     /**
      * This gets the password
      */
@@ -26,7 +27,15 @@ public class Sources {
     /**
      * This gets the file name which check if the installed minecraft is supported by the Login
      */
-    public static String infernage = "Infernage.hdn";
+    public static String infernage(){
+        String win = "Infernage.hdn", lin = ".Infernage.hdn";
+        if (OS.equals("windows")){
+            return win;
+        } else if (OS.equals("linux")){
+            return lin;
+        }
+        return null;
+    }
     /**
      * This gets the configuration file name of the server
      */
@@ -44,13 +53,25 @@ public class Sources {
      */
     public static String rmb = "RMB.txt";
     /**
+     * This gets the name of directory and file of installation
+     */
+    public static String Dirsrc = "inst";
+    /**
      * This gets the directory name of libraries used by this jar
      */
     public static String Dirlibs = "lib";
     /**
      * This gets the directory name of data files stored in this PC
      */
-    public static String DirData = "Data";
+    public static String DirData() {
+        String win = "Data", lin = ".Data";
+        if (OS.equals("windows")){
+            return win;
+        } else if (OS.equals("linux")){
+            return lin;
+        }
+        return null;
+    }
     /**
      * This gets the directory name of minecraft
      */
@@ -67,6 +88,20 @@ public class Sources {
      * This gets the directory name used to store temporally files from the server
      */
     public static String DirTMP = "TMP";
+    /** 
+     * This method asigns the OS name
+     */ 
+    public static void setOS(){
+        String aux = System.getProperty("os.name");
+        aux = aux.toLowerCase();
+        if (aux.contains("win")){
+            OS = "windows";
+        } else if (aux.contains("lin")){
+            OS = "linux";
+        } else{
+            OS = "NONSUPP";
+        }
+    }
     /**
      * This method upload a file to the server. This is used to log of Login.
      * @param pathFile The local path name of the file.
@@ -140,13 +175,13 @@ public class Sources {
         System.err.println(name);
         String Wtmp = System.getProperty("user.home") + "\\AppData\\Roaming";
         String Ltmp = System.getProperty("user.home");
-        if (Mainclass.OS.equals("windows") && (name != null)){
+        if (OS.equals("windows") && (name != null)){
             return Wtmp + "\\" + name;
-        } else if (Mainclass.OS.equals("linux") && (name != null)){
+        } else if (OS.equals("linux") && (name != null)){
             return Ltmp + "/" + name;
-        } else if (Mainclass.OS.equals("windows") && (name == null)){
+        } else if (OS.equals("windows") && (name == null)){
             return Wtmp;
-        } else if (Mainclass.OS.equals("linux") && (name == null)){
+        } else if (OS.equals("linux") && (name == null)){
             return Ltmp;
         }
         return null;
@@ -159,9 +194,9 @@ public class Sources {
      * </ul>
      */
     public static String sep(){
-        if (Mainclass.OS.equals("windows")){
+        if (OS.equals("windows")){
             return separatorWin;
-        } else if (Mainclass.OS.equals("linux")){
+        } else if (OS.equals("linux")){
             return separatorLin;
         }
         return null;

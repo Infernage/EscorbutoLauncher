@@ -1,6 +1,7 @@
 package Installer;
 
 
+import Login.Sources;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.*;
@@ -19,27 +20,18 @@ public class Vista extends javax.swing.JFrame {
     private Worker work;//Installer
     private Unworker unwork;//Uninstaller
     private Restore restau;//Restorer
-    public static String OS = Login.Mainclass.OS;//Operative system
     /**
      * Creates new form Vista
      */
     public Vista() {
-        System.out.println("Executing with " + OS);
         initComponents();
-        if (OS.equals("windows")){
-            File instalation = new File(System.getProperty("user.dir") + "\\inst\\inst.dat");
-            if (!instalation.exists()){
-                jButton2.setEnabled(false);
-                jLabel3.setForeground(Color.red);
-                jLabel3.setText("Archivos de instalación no encontrados");
-            }
-        } else if (OS.equals("linux")){
-            File instalation = new File(System.getProperty("user.dir") + "/inst/inst.dat");
-            if (!instalation.exists()){
-                jButton2.setEnabled(false);
-                jLabel3.setForeground(Color.red);
-                jLabel3.setText("Archivos de instalación no encontrados");
-            }
+        File instalation = new File(System.getProperty("user.dir") + Sources.sep() + Sources.Dirsrc
+                + Sources.sep() + Sources.Dirsrc + ".dat");
+        if (!instalation.exists()){
+            System.out.println("Installation files not found! Disabling option of install");
+            jButton2.setEnabled(false);
+            jLabel3.setForeground(Color.red);
+            jLabel3.setText("Archivos de instalación no encontrados");
         }
         Login.Mainclass.init.exit();
         jButton4.setVisible(false);
@@ -69,6 +61,7 @@ public class Vista extends javax.swing.JFrame {
     }
     //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
     private Worker install(boolean direct){
+        System.out.println("Creating new install thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
         Worker worker = new Worker (jLabel2, jProgressBar1, jButton4, jButton1, direct);
@@ -88,15 +81,12 @@ public class Vista extends javax.swing.JFrame {
     }
     private void installSSP(boolean direct){
         work = this.install(direct);
-        if (OS.equals("windows")){
-            work.setInstallPath("inst\\instSP.dat");
-        } else if (OS.equals("linux")){
-            work.setInstallPath("inst/instSP.dat");
-        }
+        work.setInstallPath(Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + "SP.dat");
         work.execute();
     }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
+        System.out.println("Creating new uninstall thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
         unwork = new Unworker(jLabel2, jProgressBar1, jButton4, jButton1, this);
@@ -112,6 +102,7 @@ public class Vista extends javax.swing.JFrame {
     
     //Botón restaurar que ejecuta el restaurador
     private void restauring(){
+        System.out.println("Creating new restorer thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
         restau = new Restore(this, jLabel2, jProgressBar1, jButton4, jButton1);
@@ -273,25 +264,13 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Botón Finalizar
         System.out.println("Exiting");
-        if (OS.equals("windows")){
-            File run = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
-            if (run.exists() && work.isDone()){
-                try {
-                    Desktop d = Desktop.getDesktop();
-                    d.open(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar"));
-                } catch (IOException ex) {
+        File run = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
+        if (run.exists() && work.isDone()){
+            try {
+                Desktop d = Desktop.getDesktop();
+                d.open(new File(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "Temporal.jar"));
+            } catch (IOException ex) {
                 ex.printStackTrace(Login.Mainclass.err);
-                }
-            }
-        } else if (OS.equals("linux")){
-            File run = new File(System.getProperty("user.home") + "/.minecraft/RUN.jar");
-            if (run.exists() && work.isDone()){
-                try{
-                    Desktop d = Desktop.getDesktop();
-                    d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
-                } catch (IOException ex){
-                ex.printStackTrace(Login.Mainclass.err);
-                }
             }
         }
         System.exit(0);

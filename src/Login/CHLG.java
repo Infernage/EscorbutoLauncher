@@ -29,17 +29,9 @@ public class CHLG extends Thread{
     }
     private void inicializar(){
         try{
-            File fich = null;
-            if (Mainclass.OS.equals("windows")){
-                fich = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\CHLog.txt");
-                if (!fich.exists()){
-                    copy(fich);
-                } 
-            } else if (Mainclass.OS.equals("linux")){
-                fich = new File(System.getProperty("user.home") + "/.Data/CHLog.txt");
-                if (!fich.exists()){
-                    copy(fich);
-                }
+            File fich = new File(Sources.path(Sources.DirData() + Sources.sep() + "CHLog.txt"));
+            if (!fich.exists()){
+                copy(fich);
             }
             //Leemos el txt en formato Unicode
             FileInputStream in = new FileInputStream(fich);

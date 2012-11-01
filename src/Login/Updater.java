@@ -27,11 +27,7 @@ public class Updater extends Thread{
         super("Updater");
         data = isData;
         link = host;
-        if (Mainclass.OS.equals("windows")){
-            path = System.getProperty("user.home") + "\\Desktop\\Update";
-        } else if (Mainclass.OS.equals("linux")){
-            path = System.getProperty("user.home") + "/Desktop/Update";
-        }
+        path = Sources.path("Desktop" + Sources.sep() + "Update");
     }
     private void borrarFiles (File fich){
         File[] ficheros = fich.listFiles();
@@ -58,19 +54,10 @@ public class Updater extends Thread{
             connection.setRequestProperty("Range", "bytes=" + 0 + "-");
             // Conectamos al servidor
             connection.connect();
-            String path = null;
-            if (Mainclass.OS.equals("windows")){
-                path = System.getProperty("user.home") + "\\Desktop";
-            } else if (Mainclass.OS.equals("linux")){
-                path = System.getProperty("user.home") + "/Desktop";
-            }
+            String path = Sources.path("Desktop");
             // Abrimos el archivo
             name = "Update.zip";
-            if (Mainclass.OS.equals("windows")){
-                file = new RandomAccessFile(path + "\\" + name, "rw");
-            } else if (Mainclass.OS.equals("linux")){
-                file = new RandomAccessFile(path + "/" + name, "rw");
-            }
+            file = new RandomAccessFile(path + Sources.sep() + name, "rw");
             file.seek(0);
             //Obtenemos el stream de la URL
             stream = connection.getInputStream();
@@ -100,12 +87,7 @@ public class Updater extends Thread{
     //Método de descompresión
     private void descomprimir(){
         //Creamos la carpeta donde van a ir los archivos
-        String zipper = null;
-        if (Mainclass.OS.equals("windows")){
-            zipper = System.getProperty("user.home") + "\\Desktop\\" + name;
-        } else if (Mainclass.OS.equals("linux")){
-            zipper = System.getProperty("user.home") + "/Desktop/" + name;
-        }
+        String zipper = Sources.path("Desktop" + Sources.sep() + name);
         File mine = new File(path);
         if (mine.exists()){
             borrarFiles(mine);
@@ -133,48 +115,25 @@ public class Updater extends Thread{
                 if (entrada.getName().endsWith("/")){
                     direc = true;
                 }
-                if (Mainclass.OS.equals("windows")){
-                    //Cambiamos el tipo de separación de carpetas
-                    StringBuilder build = new StringBuilder(path);
-                    for (int i = 0; i < lista.size(); i++){
-                        build.append("\\").append(lista.get(i));
+                //Cambiamos el tipo de separación de carpetas
+                StringBuilder build = new StringBuilder(path);
+                for (int i = 0; i < lista.size(); i++){
+                    build.append(Sources.sep()).append(lista.get(i));
+                }
+                String filero = build.toString();
+                File fich = new File(filero);
+                //Si es un directorio, creamos la carpeta
+                if (direc){
+                    fich.mkdirs();
+                } else{//Sino, traspasamos el archivo a su destino
+                    FileOutputStream salida = new FileOutputStream(fich);
+                    int leido;
+                    byte [] buffer = new byte[4096];
+                    while ((leido = zip.read(buffer)) > 0){
+                        salida.write(buffer, 0, leido);
                     }
-                    String filero = build.toString();
-                    File fich = new File(filero);
-                    //Si es un directorio, creamos la carpeta
-                    if (direc){
-                        fich.mkdirs();
-                    } else{//Sino, traspasamos el archivo a su destino
-                        FileOutputStream salida = new FileOutputStream(fich);
-                        int leido;
-                        byte [] buffer = new byte[4096];
-                        while ((leido = zip.read(buffer)) > 0){
-                            salida.write(buffer, 0, leido);
-                        }
-                        //Cerramos todos los escuchadores
-                        salida.close();
-                    }
-                } else if (Mainclass.OS.equals("linux")){
-                    //Cambiamos el tipo de separación de carpetas
-                    StringBuilder build = new StringBuilder(path);
-                    for (int i = 0; i < lista.size(); i++){
-                        build.append("/").append(lista.get(i));
-                    }
-                    String filero = build.toString();
-                    File fich = new File(filero);
-                    //Si es un directorio, creamos la carpeta
-                    if (direc){
-                        fich.mkdirs();
-                    } else{//Sino, traspasamos el archivo a su destino
-                        FileOutputStream salida = new FileOutputStream(fich);
-                        int leido;
-                        byte [] buffer = new byte[4096];
-                        while ((leido = zip.read(buffer)) > 0){
-                            salida.write(buffer, 0, leido);
-                        }
-                        //Cerramos todos los escuchadores
-                        salida.close();
-                    }
+                    //Cerramos todos los escuchadores
+                    salida.close();
                 }
                 zip.closeEntry();
             }
@@ -190,21 +149,12 @@ public class Updater extends Thread{
     private void exec(){
             //Por último ejecutamos el nuevo login
         if (!data){
-            File old = null;
-            File oldlib = null;
-            File next = null;
-            File nextlib = null;
-            if (Mainclass.OS.equals("windows")){
-                old = new File(System.getProperty("user.home") + "\\Desktop\\Update\\RUN.jar");
-                oldlib = new File(System.getProperty("user.home") + "\\Desktop\\Update\\lib");
-                next = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft\\RUN.jar");
-                nextlib = new File(System.getProperty("user.home") +  "\\AppData\\Roaming\\.minecraft\\lib");
-            } else if (Mainclass.OS.equals("linux")){
-                old = new File(System.getProperty("user.home") + "/Desktop/Update/RUN.jar");
-                oldlib = new File(System.getProperty("user.home") + "/Desktop/Update/RUN.jar");
-                next = new File(System.getProperty("user.home") + "/.minecraft/RUN.jar");
-                nextlib = new File(System.getProperty("user.home") + "/.minecraft/lib");
-            }
+            File old = new File(Sources.path("Desktop" + Sources.sep() + "Update" + Sources.sep() 
+                    + Sources.jar));
+            File oldlib = new File(Sources.path("Desktop" + Sources.sep() + "Update" + Sources.sep()
+                    + Sources.Dirlibs));
+            File next = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
+            File nextlib = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.Dirlibs));
             if (next.exists()){
                 next.delete();
             }
@@ -229,14 +179,8 @@ public class Updater extends Thread{
         Vista2.jProgressBar1.setValue(0);
         work = new Installer.Worker(Vista2.jProgressBar1);
         work.execute();
-        Executer exe = null;
-        if (Mainclass.OS.equals("windows")){
-            File dst = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\.minecraft");
-            exe = new Executer(dst);
-        } else if (Mainclass.OS.equals("linux")){
-            File dst = new File(System.getProperty("user.home") + "/.minecraft");
-            exe = new Executer(dst);
-        }
+        File dst = new File(Sources.path(Sources.DirMC));
+        Executer exe = new Executer(dst);
         exe.setDaemon(true);
         Mainclass.hilos.put("Installer", exe);
         while(!work.isDone() && !work.isCancelled()){
@@ -255,11 +199,8 @@ public class Updater extends Thread{
         try {
             System.out.println("Executing new process");
             Desktop d = Desktop.getDesktop();
-            if (Mainclass.OS.equals("windows")){
-                d.open(new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\Logger\\Temporal.jar"));
-            } else if (Mainclass.OS.equals("linux")){
-                d.open(new File(System.getProperty("user.home") + "/.Data/Logger/Temporal.jar"));
-            }
+            d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
+                    + "Temporal.jar")));
         } catch (IOException ex) {
             ex.printStackTrace(Mainclass.err);
         } finally{

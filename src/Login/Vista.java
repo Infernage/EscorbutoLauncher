@@ -48,7 +48,7 @@ public class Vista extends javax.swing.JFrame {
         pw.close();
     }
     private boolean checkDuplicateAcc(String name){
-        File tmpDir = new File(Sources.path(Sources.DirData + Sources.sep() + Sources.DirNM + Sources.sep()
+        File tmpDir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                 + Sources.DirTMP));
         if (!tmpDir.exists()){
             tmpDir.mkdirs();
@@ -316,7 +316,7 @@ public class Vista extends javax.swing.JFrame {
                 return;
             }
             this.setVisible(false);
-            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
+            String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             Sources.download(tmp, Sources.lsNM);
             try {
                 PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
@@ -373,7 +373,7 @@ public class Vista extends javax.swing.JFrame {
                 + " tienes una cuenta oficial.\n¿Estás seguro de continuar?");
         if (i == 0){
             this.setVisible(false);
-            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
+            String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
                 if(!Sources.download(tmp, Sources.lsNM)){
                     new File(tmp).delete();
@@ -426,7 +426,7 @@ public class Vista extends javax.swing.JFrame {
                 + " tienes una cuenta de Mineshafter.\n¿Estás seguro de continuar?");
         if (i == 0){
             this.setVisible(false);
-            String tmp = Sources.path(Sources.DirData + Sources.sep() + Sources.lsNM);
+            String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
                 if(!Sources.download(tmp, Sources.lsNM)){
                     new File(tmp).delete();

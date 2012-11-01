@@ -28,13 +28,9 @@ public class Systray extends Thread{
     public Systray(Vista2 vista, boolean tmp){
         super("Systray");
         vis = vista;
-        if (tmp) try {
-            File[] files = null;
-            if (Mainclass.OS.equals("windows")){
-                files = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\Data").listFiles();
-            } else if (Mainclass.OS.equals("linux")){
-                files = new File(System.getProperty("user.home") + "/.Data").listFiles();
-            }
+        if (tmp) {
+            try {
+            File[] files = new File(Sources.path(Sources.DirData())).listFiles();
             boolean exit = false;
             int cont = 0;
             while (!exit && cont < files.length){
@@ -65,7 +61,7 @@ public class Systray extends Thread{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        else{
+    } else{
             tempo = null;
             pid = null;
         }
@@ -97,15 +93,17 @@ public class Systray extends Thread{
                 @Override
                 public void actionPerformed(ActionEvent e){
                     minecraft.destroy();
-                    if (pid != null) try{
-                        if (Mainclass.OS.equals("windows")){
+                    if (pid != null) {
+                        try{
+                        if (Sources.OS.equals("windows")){
                             Process p = Runtime.getRuntime().exec("taskkill /pid " + pid);
-                        } else if (Mainclass.OS.equals("linux")){
+                        } else if (Sources.OS.equals("linux")){
                             Process p = Runtime.getRuntime().exec("kill -9 " + pid);
                         }
                     } catch (Exception ex){
                         ex.printStackTrace();
                     }
+                }
                     exit = true;
                     tray.remove(icono);
                     icono = null;
@@ -175,9 +173,9 @@ public class Systray extends Thread{
     public void run(){
         this.init();
         String cmd = null;
-        if (Mainclass.OS.equals("windows")){
+        if (Sources.OS.equals("windows")){
             cmd = System.getenv("windir") + "\\system32\\tasklist.exe";
-        } else if (Mainclass.OS.equals("linux")){
+        } else if (Sources.OS.equals("linux")){
             cmd = "ps -ef";
         }
         while(!exit){
