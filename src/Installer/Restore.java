@@ -46,9 +46,10 @@ public class Restore extends SwingWorker<Integer, Integer>{
     protected Integer doInBackground() throws Exception {
         System.out.println("Restore thread execution(OK)");
         //Cogemos la base de datos de las copias de seguridad
-        System.out.println("Getting backup files");
+        System.out.print("Getting backup files... ");
         File copia = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"));
         ficheros(copia);//Listamos los ficheros que haya en copia
+        System.out.println("OK");
         if (this.isCancelled()){
             return 0;
         }
@@ -59,7 +60,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
         vist.setVisible(true);
         String fi = vist.copia(); //Obtenemos la seleccionada
         if (fi.equals("null")){
-            System.out.println("Restoring system cancelled...");
+            System.out.println("Restoring system cancelled!");
             this.cancel(true);
             return 0;
         }
@@ -67,13 +68,14 @@ public class Restore extends SwingWorker<Integer, Integer>{
         String dia = token.nextToken();
         String hora = token.nextToken();
         token = null;
-        System.out.println("Getting backup path");
+        System.out.print("Getting backup path... ");
         rest = new File(copia.getAbsolutePath() + Sources.sep() + dia + Sources.sep() + hora + Sources.sep()
                 + Sources.DirMC);
         newRest = new File(copia.getAbsolutePath() + Sources.sep() + dia + Sources.sep() + hora
                 + Sources.sep() + Sources.Dirsrc + ".dat");
         pro.setValue(10);
         int temp = 0;
+        System.out.println("OK");
         if (!rest.exists() && !newRest.exists()){//Si las carpetas no existen, saltamos con error
             System.out.println("No files found!");
             JOptionPane.showMessageDialog(null, "Error, no se ha podido encontrar la restauración.");

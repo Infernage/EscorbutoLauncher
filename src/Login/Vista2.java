@@ -8,8 +8,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /*
@@ -784,10 +782,12 @@ public class Vista2 extends javax.swing.JFrame {
         try{
             String account = JOptionPane.showInputDialog("Introduzca el nombre de la cuenta:");
             if (account != null){
+                System.out.print("Checking account name... ");
                 File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                         + getFile(account + "NM")));
                 if (!A.exists()){
                     if (!Sources.download(A.getAbsolutePath(), account + "NM.dat")){
+                        System.out.println("FAILED");
                         JOptionPane.showMessageDialog(null, "La cuenta solicitada no existe o ha habido un error comprobando los datos.");
                         return;
                     }
@@ -795,6 +795,7 @@ public class Vista2 extends javax.swing.JFrame {
                     System.out.println(bf.readLine());
                     String temp = bf.readLine();
                     if (temp.equals("DEL")){
+                        System.out.println("FAILED");
                         JOptionPane.showMessageDialog(null, "La cuenta solicitada no existe o ha habido un error comprobando los datos.");
                         bf.close();
                         A.delete();
@@ -806,11 +807,13 @@ public class Vista2 extends javax.swing.JFrame {
                 System.out.println(bf.readLine());
                 String temp = bf.readLine();
                 if (temp.equals("MC") || temp.equals("MS")){
+                    System.out.println("OK");
                     JOptionPane.showMessageDialog(null, "Los datos de la cuenta solo pueden ser accedidos mediante "
                             + "sus respectivos sitios de minecraft o mineshafter.");
                     bf.close();
                     return;
                 } else if (temp.equals("OFF")){
+                    System.out.print("OK\nChecking secret word... ");
                     String word = JOptionPane.showInputDialog("Introduzca la palabra secreta:");
                     if (word != null){
                         StringECP cry = new StringECP(Sources.pss);
@@ -818,9 +821,11 @@ public class Vista2 extends javax.swing.JFrame {
                         String P = bf.readLine();
                         String W = bf.readLine();
                         if (word.equals(W)){
+                            System.out.println("OK");
                             JOptionPane.showMessageDialog(null, "Su nombre de cuenta es " + cry.decrypt(U)
                                 + " con una contraseña de " + cry.decrypt(P));
                         } else{
+                            System.out.println("FAILED");
                             JOptionPane.showMessageDialog(null, "Palabra secreta incorrecta");
                         }
                     }
@@ -892,6 +897,7 @@ public class Vista2 extends javax.swing.JFrame {
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
         //Botón instalador
+        System.out.println("Changing to installer mode...............");
         this.setVisible(false);
         see = this;
         Installer.Vista.main(null);

@@ -204,6 +204,8 @@ public class Mainclass {
             de.setVisible(true);
             System.exit(9);
         }
+        System.out.println("Checking for outdated config versions..............");
+        Outdated.checkAll();
         File mine = new File(Sources.path(Sources.DirMC));
         System.out.print("Checking minecraft state... ");
         if (mine.exists()){

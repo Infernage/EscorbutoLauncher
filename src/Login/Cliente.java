@@ -58,6 +58,7 @@ public class Cliente extends Thread{
     private void actualizar(String link){
         Vista2.jProgressBar1.setVisible(true);
         boolean exit = false;
+        System.out.print("U-Preparing transfer... ");
         try {
             if (link.contains(hostPrincipal)){
                 URL url = new URL(link);
@@ -94,7 +95,9 @@ public class Cliente extends Thread{
                 }
                 in.close();
             }
+            System.out.println("OK");
         } catch (Exception ex) {
+            System.out.println("FAILED");
             state.setForeground(Color.red);
             state.setText("ERROR!");
             info.setForeground(Color.red);
@@ -103,10 +106,11 @@ public class Cliente extends Thread{
             error = true;
             ex.printStackTrace(Mainclass.err);
         }
-        
+        System.out.print("U-Initialiting transfer... ");
         Updater update = new Updater(link, isData);//Creamos el actualizador
         update.start();//Lo ejecutamos
         Mainclass.hilos.put("Updater", update);
+        System.out.println("OK");
         play.setEnabled(false);
     }
     //Método para procesar los links
@@ -174,6 +178,7 @@ public class Cliente extends Thread{
             int MAct = Integer.parseInt(temp[1]);
             if (MAct > MV){
                 state.setText("Actualizando .minecraft...");
+                System.out.println("OK\nU-Updating minecraft...............");
                 isData = true;
                 act = true;
                 fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -196,6 +201,7 @@ public class Cliente extends Thread{
                 int V2 = Integer.parseInt(actual.nextToken());
                 if (V > V2){
                     state.setText("Actualizando a la versión " + version);
+                    System.out.println("OK\nU-Updating login...............");
                     isData = false;
                     actualize = true;
                     fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -206,6 +212,7 @@ public class Cliente extends Thread{
             }
         }
         if (!actualize){
+            System.out.println("OK\nU-No updates avaliable");
             state.setForeground(Color.GREEN);
             state.setText("No hay nuevas versiones disponibles");
         }
@@ -220,6 +227,7 @@ public class Cliente extends Thread{
         } catch (InterruptedException ex) {
             ex.printStackTrace(Mainclass.err);
         }
+        System.out.println("U-Checking for updates...............");
         while (!exit){
             try {//Leemos los datos que nos envía el servidor
                 String msg;
@@ -243,6 +251,7 @@ public class Cliente extends Thread{
                         lista.add(msg);
                     }
                 }
+                System.out.print("U-Processing data... ");
                 procesar();
             } catch (IOException ex) {
                 if (!error){

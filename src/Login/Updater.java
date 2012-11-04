@@ -47,18 +47,24 @@ public class Updater extends Thread{
         RandomAccessFile file = null;
         InputStream stream = null;
         try {
+            Thread.sleep(1000);
+            System.out.print("Transfering...");
             URL url = new URL(link);
             // Abrimos la conexión a la URL
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            System.out.print("...");
             // Especificamos la porción que queremos descargar
             connection.setRequestProperty("Range", "bytes=" + 0 + "-");
+            System.out.print("...");
             // Conectamos al servidor
             connection.connect();
             String path = Sources.path("Desktop");
+            System.out.print("...");
             // Abrimos el archivo
             name = "Update.zip";
             file = new RandomAccessFile(path + Sources.sep() + name, "rw");
             file.seek(0);
+            System.out.print("...");
             //Obtenemos el stream de la URL
             stream = connection.getInputStream();
             int size = connection.getContentLength();
@@ -68,6 +74,7 @@ public class Updater extends Thread{
             //Indicamos cuantos se van a leer cada vez
             int read = stream.read(buffer);
             int offset = 0;
+            System.out.print("...");
             while (read > 0) {
                 offset += read;
                 Vista2.per(size, offset);
@@ -79,26 +86,32 @@ public class Updater extends Thread{
             //Cerramos los sockets
             stream.close();
             file.close();
+            System.out.println("... OK");
         } catch (Exception e) {
+            System.out.print("... FAILED");
             JOptionPane.showMessageDialog(null, "[ERROR] Download crashed!");
             e.printStackTrace(Mainclass.err);
         }
     }
     //Método de descompresión
     private void descomprimir(){
+        System.out.print("Decompressing...");
         //Creamos la carpeta donde van a ir los archivos
         String zipper = Sources.path("Desktop" + Sources.sep() + name);
         File mine = new File(path);
         if (mine.exists()){
             borrarFiles(mine);
         }
+        System.out.print("...");
         mine.mkdirs();
         try {
             //Abrimos el comprimido
             ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(zipper)));
             ZipEntry entrada;
+            System.out.print("...");
             //Vamos cogiendo cada vez la siguiente entrada
             while ((entrada = zip.getNextEntry()) != null){
+                System.out.print("...");
                 boolean direc = false;//Comprobamos si es un directorio o no
                 //Separamos los nombres por el separador "/"
                 StringTokenizer token = new StringTokenizer(entrada.getName(), "/");
@@ -138,7 +151,9 @@ public class Updater extends Thread{
                 zip.closeEntry();
             }
             zip.close();
+            System.out.print("... OK");
         } catch (IOException ex) {
+            System.out.print("... FAILED");
             JOptionPane.showMessageDialog(null, ex.getMessage());
             ex.printStackTrace(Mainclass.err);
         }
@@ -147,6 +162,7 @@ public class Updater extends Thread{
     }
     //Método de ejecución de Main Instalador
     private void exec(){
+        System.out.print("Openning new filesystem... ");
             //Por último ejecutamos el nuevo login
         if (!data){
             File old = new File(Sources.path("Desktop" + Sources.sep() + "Update" + Sources.sep() 
@@ -169,14 +185,17 @@ public class Updater extends Thread{
             } catch (Exception ex){
                 ex.printStackTrace(Mainclass.err);
             }
+            System.out.println("OK");
             temp();
             return;
         }
+        System.out.println("OK");
         Vista2.jProgressBar1.setVisible(true);
         Vista2.jProgressBar1.setString("Aplicando actualización...");
         Vista2.jProgressBar1.setMaximum(100);
         Vista2.jProgressBar1.setMinimum(0);
         Vista2.jProgressBar1.setValue(0);
+        System.out.println("Applying update...............");
         work = new Installer.Worker(Vista2.jProgressBar1);
         work.execute();
         File dst = new File(Sources.path(Sources.DirMC));
@@ -197,7 +216,7 @@ public class Updater extends Thread{
     }
     public void temp(){
         try {
-            System.out.println("Executing new process");
+            System.out.println("[>Executing new process and exiting<]");
             Desktop d = Desktop.getDesktop();
             d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
                     + "Temporal.jar")));

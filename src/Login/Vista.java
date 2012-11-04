@@ -39,6 +39,25 @@ public class Vista extends javax.swing.JFrame {
     public void setNew(Vista2 vista){
         vis = vista;
     }
+    public static File createStaticLoginFile(String type, String account, String password, String word) throws IOException{
+        File tmp = new File(Sources.path(Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + account + "NM.dat"));
+        tmp.createNewFile();
+        Calendar C = new GregorianCalendar();
+        StringBuilder str = new StringBuilder("File created at ").append(C.get(Calendar.DAY_OF_MONTH)).append("/")
+                .append(C.get(Calendar.MONTH) + 1).append("/")
+                .append(C.get(Calendar.YEAR)).append("_")
+                .append(C.get(Calendar.HOUR_OF_DAY)).append(":")
+                .append(C.get(Calendar.MINUTE)).append(":")
+                .append(C.get(Calendar.SECOND));
+        PrintWriter pw = new PrintWriter (tmp);
+        pw.println(str);
+        pw.println(type);
+        pw.println(account);
+        pw.println(password);
+        pw.print(word);
+        pw.close();
+        return tmp;
+    }
     private void createLoginFile(String type, String account, String password, String word) throws IOException{
         fichero = new File(fich + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + jTextField1.getText() + "NM.dat");
         fichero.createNewFile();
@@ -291,9 +310,11 @@ public class Vista extends javax.swing.JFrame {
         String encryptedPass = null;
         String secretW = null;
         //Se controla si todos los campos están bien rellenados
+        System.out.print("Checking username... ");
         if (jTextField1.getText().equals("")){
             JOptionPane.showMessageDialog(null, "Debes meter un nombre de usuario.");
             exito = false;
+            System.out.println("FAILED");
         } else{
             if (jTextField1.getText().contains("/") || jTextField1.getText().contains("\\") || 
                     jTextField1.getText().contains(":") || jTextField1.getText().contains("*") ||
@@ -302,32 +323,43 @@ public class Vista extends javax.swing.JFrame {
                     jTextField1.getText().contains("|")){
                 JOptionPane.showMessageDialog(null, "Los caracteres / \\ : * ? \" < > | no están permitidos en el nombre.");
                 exito = false;
+                System.out.println("FAILED");
             } else{
                 encrypted = crypt.encrypt(jTextField1.getText());
+                System.out.println("OK");
             }
         }
+        System.out.print("Checking password... ");
         if (new String (jPasswordField1.getPassword()).equals("")){
             JOptionPane.showMessageDialog(null, "Debes introducir una contraseña.");
             exito = false;
+            System.out.println("FAILED");
         } else{
             String te = new String (jPasswordField1.getPassword());
             if (te.length() < 3){
                 JOptionPane.showMessageDialog(null, "La contraseña es demasiado corta.");
                 exito = false;
+                System.out.println("FAILED");
             } else{
                 encryptedPass = crypt.encrypt(new String (jPasswordField1.getPassword()));
+                System.out.println("OK");
             }
         }
+        System.out.print("Checking secret word... ");
         if (jTextField2.getText().equals("")){
             JOptionPane.showMessageDialog(null, "Debes meter una palabra secreta.");
             exito = false;
+            System.out.println("FAILED");
         } else{
             secretW = crypt.encrypt(jTextField2.getText());
+            System.out.println("OK");
         }
         //Si todo está correcto, @exito = true
         if (exito){
+            System.out.print("Creating new account... ");
             if (checkDuplicateAcc(jTextField1.getText())){
                 JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+                System.out.println("FAILED\nExisting account founded!");
                 return;
             }
             this.setVisible(false);
@@ -347,7 +379,9 @@ public class Vista extends javax.swing.JFrame {
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.print("OK\nDeleting temp files... ");
                 fichero.delete();
+                System.out.println("OK");
                 //Escribimos en el fichero booleano la palabra true para indicar que el registro ha sido exitoso
                 PrintWriter pw = new PrintWriter (booleano);
                 pw.print("true");
@@ -355,6 +389,7 @@ public class Vista extends javax.swing.JFrame {
                 if (nuevo){
                     vis.visible();
                     this.dispose();
+                    return;
                 }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
@@ -380,21 +415,27 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         /*Botón para indicar que se tiene cuenta de Minecraft Oficial
          */
+        System.out.print("Checking username... ");
         if (jTextField1.getText().equals("")){
             JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
+            System.out.println("FAILED");
             return;
         }
         if (checkDuplicateAcc(jTextField1.getText())){
             JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+            System.out.println("FAILED\nExisting account founded!");
             return;
         }
+        System.out.println("OK");
         int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
                 + " tienes una cuenta oficial.\n¿Estás seguro de continuar?");
         if (i == 0){
             this.setVisible(false);
             String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
+                System.out.print("Creating new account... ");
                 if(!Sources.download(tmp, Sources.lsNM)){
+                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
@@ -402,6 +443,7 @@ public class Vista extends javax.swing.JFrame {
                 p.println(jTextField1.getText());
                 p.close();
                 if (!Sources.upload(tmp, Sources.lsNM)){
+                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
@@ -409,9 +451,12 @@ public class Vista extends javax.swing.JFrame {
                 //Creamos el fichero de datos con el nombre
                 this.createLoginFile("MC", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
+                    System.out.println("FAILED");
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.print("OK\nDeleting temp files... ");
                 fichero.delete();
+                System.out.println("OK");
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
                 PrintWriter pw = new PrintWriter(booleano);
                 pw.print("true");
@@ -419,6 +464,7 @@ public class Vista extends javax.swing.JFrame {
                 if (nuevo){
                     vis.visible();
                     this.dispose();
+                    return;
                 }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
@@ -437,21 +483,27 @@ public class Vista extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         //Lo mismo que el ActionPerformed anterior, pero con Mineshafter
+        System.out.print("Checking username... ");
         if (jTextField1.getText().equals("")){
+            System.out.println("FAILED");
             JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
             return;
         }
         if (checkDuplicateAcc(jTextField1.getText())){
+            System.out.println("FAILED\nExisting account founded!");
             JOptionPane.showMessageDialog(null, "La cuenta ya existe");
             return;
         }
+        System.out.println("OK");
         int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
                 + " tienes una cuenta de Mineshafter.\n¿Estás seguro de continuar?");
         if (i == 0){
             this.setVisible(false);
             String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
+                System.out.print("Creating new account... ");
                 if(!Sources.download(tmp, Sources.lsNM)){
+                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
@@ -459,6 +511,7 @@ public class Vista extends javax.swing.JFrame {
                 p.println(jTextField1.getText());
                 p.close();
                 if (!Sources.upload(tmp, Sources.lsNM)){
+                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
@@ -466,9 +519,12 @@ public class Vista extends javax.swing.JFrame {
                 //Creamos el fichero de datos vacío
                 this.createLoginFile("MS", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "\"said_/HT;&)$^)_said", "said_/%*;^(¨¨Ç_said");
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
+                    System.out.println("FAILED");
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.print("OK\nDeleting temp files... ");
                 fichero.delete();
+                System.out.println("OK");
                 //Escribimos en el fichero booleano true, indicando que no hay que hacer registro
                 PrintWriter pw = new PrintWriter(booleano);
                 pw.print("true");
@@ -476,6 +532,7 @@ public class Vista extends javax.swing.JFrame {
                 if (nuevo){
                     vis.visible();
                     this.dispose();
+                    return;
                 }
                 //Abrimos Vista2
                 Vista2 ven = new Vista2();
@@ -493,6 +550,7 @@ public class Vista extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
+        System.out.println("Closing window. Returning...");
         vis.visible();
     }//GEN-LAST:event_formWindowClosing
 
