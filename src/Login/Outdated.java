@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
@@ -25,7 +26,7 @@ import javax.swing.JOptionPane;
 public class Outdated {
     public static void ver410(){
         File data = new File(Sources.path(Sources.DirData() + Sources.sep()) + "data.cfg");
-        String type = null, username = null, password = null, word = null;
+        String type = null, username = null, password = null, word = null, name = null;
         if (data.exists()){
             try{
                 BufferedReader bf = new BufferedReader(new FileReader(data));
@@ -46,13 +47,14 @@ public class Outdated {
                     type = "OFF";
                     outECP B = new outECP();
                     AES C = new AES(Sources.pss);
+                    name = B.decrypt(A);
                     username = C.encryptData(B.decrypt(A));
                     password = C.encryptData(B.decrypt(bf.readLine()));
                     word = C.encryptData(B.decrypt(bf.readLine()));
                 }
                 bf.close();
                 data.delete();
-                File upload = Vista.createStaticLoginFile(type, username, password, word);
+                File upload = Vista.createStaticLoginFile(type, name, username, password, word);
                 if (!Sources.upload(upload.getAbsolutePath(), upload.getName())){
                     throw new IOException("Failed connection to the server!");
                 }

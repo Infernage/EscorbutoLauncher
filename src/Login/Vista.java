@@ -41,8 +41,8 @@ public class Vista extends javax.swing.JFrame {
     public void setNew(Vista2 vista){
         vis = vista;
     }
-    public static File createStaticLoginFile(String type, String account, String password, String word) throws IOException{
-        File tmp = new File(Sources.path(Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + account + "NM.dat"));
+    public static File createStaticLoginFile(String type, String name, String account, String password, String word) throws IOException{
+        File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + name + "NM.dat"));
         tmp.createNewFile();
         Calendar C = new GregorianCalendar();
         StringBuilder str = new StringBuilder("File created at ").append(C.get(Calendar.DAY_OF_MONTH)).append("/")
