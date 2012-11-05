@@ -268,8 +268,8 @@ public class Vista extends javax.swing.JFrame {
         if (run.exists() && work.isDone()){
             try {
                 Desktop d = Desktop.getDesktop();
-                d.open(new File(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "Temporal.jar"));
-            } catch (IOException ex) {
+                d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "Temporal.jar")));
+            } catch (Exception ex) {
                 ex.printStackTrace(Login.Mainclass.err);
             }
         }

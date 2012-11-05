@@ -16,7 +16,7 @@ import javax.swing.*;
 public class Mainclass {
     //Versión
     public final static String title = "MineLogin";
-    public final static String version = "V4.1.0";
+    public final static String version = "V4.2.0";
     public static Map<String, Thread> hilos;
     public static Splash init;
     public static PrintStream err;
