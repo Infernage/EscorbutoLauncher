@@ -283,7 +283,7 @@ public class Vista extends javax.swing.JFrame {
             System.out.println("Exiting");
             System.exit(0);
         } else {
-            System.out.println("Disposing");
+            System.out.println("Returning...");
             Login.Vista2.see.setVisible(true);
             this.dispose();
         }

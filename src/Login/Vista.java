@@ -29,7 +29,9 @@ public class Vista extends javax.swing.JFrame {
         this(fich, boo, false);
     }
     public Vista(String fich, String boo, boolean bool){
+        System.out.print("Initialiting GUI... ");
         initComponents();
+        System.out.println("OK");
         Mainclass.init.exit();
         this.fich = fich;
         booleano = new File (boo);
@@ -305,7 +307,7 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Botón de registro, se inicializan las variables @exito controla si se registra o no
         boolean exito = true;
-        StringECP crypt = new StringECP(Sources.pss);
+        AES crypt = new AES(Sources.pss);
         String encrypted = null;
         String encryptedPass = null;
         String secretW = null;
@@ -325,7 +327,7 @@ public class Vista extends javax.swing.JFrame {
                 exito = false;
                 System.out.println("FAILED");
             } else{
-                encrypted = crypt.encrypt(jTextField1.getText());
+                encrypted = crypt.encryptData(jTextField1.getText());
                 System.out.println("OK");
             }
         }
@@ -341,7 +343,7 @@ public class Vista extends javax.swing.JFrame {
                 exito = false;
                 System.out.println("FAILED");
             } else{
-                encryptedPass = crypt.encrypt(new String (jPasswordField1.getPassword()));
+                encryptedPass = crypt.encryptData(new String (jPasswordField1.getPassword()));
                 System.out.println("OK");
             }
         }
@@ -351,31 +353,43 @@ public class Vista extends javax.swing.JFrame {
             exito = false;
             System.out.println("FAILED");
         } else{
-            secretW = crypt.encrypt(jTextField2.getText());
+            secretW = crypt.encryptData(jTextField2.getText());
             System.out.println("OK");
         }
         //Si todo está correcto, @exito = true
         if (exito){
-            System.out.print("Creating new account... ");
+            System.out.println("Creating new account...............");
+            System.out.print("Checking for created accounts... ");
             if (checkDuplicateAcc(jTextField1.getText())){
                 JOptionPane.showMessageDialog(null, "La cuenta ya existe");
                 System.out.println("FAILED\nExisting account founded!");
                 return;
             }
+            System.out.println("OK");
             this.setVisible(false);
             String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
+            System.out.print("Getting account names... ");
             Sources.download(tmp, Sources.lsNM);
+            System.out.println("OK");
             try {
+                System.out.print("Adding names... ");
                 PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
                 p.println(jTextField1.getText());
                 p.close();
+                System.out.println("OK");
+                System.out.print("Synchronizing files... ");
                 if (!Sources.upload(tmp, Sources.lsNM)){
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.println("OK");
+                System.out.print("Deleting temp files... ");
                 new File(tmp).delete();
+                System.out.println("OK");
                 //Creamos el fichero con los datos del registro
+                System.out.print("Creating new save file... ");
                 this.createLoginFile("OFF", encrypted, encryptedPass, secretW);
+                System.out.print("OK\nSynchronizing... ");
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
                     throw new IOException("Failed connection to the server!");
                 }
@@ -399,6 +413,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setTitle(Mainclass.title + " " + Mainclass.version);
                 ven.setVisible(true);
             } catch (IOException e){
+                System.out.println("FAILED");
                 JOptionPane.showMessageDialog(null, "Error en el registro");
                 e.printStackTrace(Mainclass.err);
                 Debug de = new Debug(null, true);
@@ -433,25 +448,32 @@ public class Vista extends javax.swing.JFrame {
             this.setVisible(false);
             String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
-                System.out.print("Creating new account... ");
+                System.out.println("Creating new account...............");
+                System.out.print("Getting account names... ");
                 if(!Sources.download(tmp, Sources.lsNM)){
-                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.println("OK");
+                System.out.print("Adding names... ");
                 PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
                 p.println(jTextField1.getText());
                 p.close();
+                System.out.println("OK");
+                System.out.print("Synchronizing files... ");
                 if (!Sources.upload(tmp, Sources.lsNM)){
-                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.println("OK");
+                System.out.print("Deleting temp files... ");
                 new File(tmp).delete();
+                System.out.print("OK");
                 //Creamos el fichero de datos con el nombre
-                this.createLoginFile("MC", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
+                System.out.print("Creating new save file... ");
+                this.createLoginFile("MC", new AES(Sources.pss).encryptData(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
+                System.out.print("OK\nSynchronizing... ");
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
-                    System.out.println("FAILED");
                     throw new IOException("Failed connection to the server!");
                 }
                 System.out.print("OK\nDeleting temp files... ");
@@ -475,6 +497,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setVisible(true);
             } catch (IOException e){
                 e.printStackTrace(Mainclass.err);
+                System.out.println("FAILED");
             }
             this.dispose();
         }
@@ -501,23 +524,30 @@ public class Vista extends javax.swing.JFrame {
             this.setVisible(false);
             String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.lsNM);
             try {
-                System.out.print("Creating new account... ");
+                System.out.println("Creating new account...............");
+                System.out.print("Getting account names... ");
                 if(!Sources.download(tmp, Sources.lsNM)){
-                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.println("OK");
+                System.out.print("Adding names... ");
                 PrintWriter p = new PrintWriter(new FileWriter(new File(tmp), true));
                 p.println(jTextField1.getText());
                 p.close();
+                System.out.print("Synchronizing files... ");
                 if (!Sources.upload(tmp, Sources.lsNM)){
-                    System.out.println("FAILED");
                     new File(tmp).delete();
                     throw new IOException("Failed connection to the server!");
                 }
+                System.out.println("OK");
+                System.out.print("Deleting temp files... ");
                 new File(tmp).delete();
+                System.out.println("OK");
                 //Creamos el fichero de datos vacío
-                this.createLoginFile("MS", new StringECP(Sources.pss).encrypt(jTextField1.getText()), "\"said_/HT;&)$^)_said", "said_/%*;^(¨¨Ç_said");
+                System.out.print("Creating new save file... ");
+                this.createLoginFile("MS", new AES(Sources.pss).encryptData(jTextField1.getText()), "\"said_/HT;&)$^)_said", "said_/%*;^(¨¨Ç_said");
+                System.out.print("OK\nSynchronizing... ");
                 if (!Sources.upload(fichero.getAbsolutePath(), fichero.getName())){
                     System.out.println("FAILED");
                     throw new IOException("Failed connection to the server!");
@@ -543,6 +573,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setVisible(true);
             } catch (IOException e){
                 e.printStackTrace(Mainclass.err);
+                System.out.println("FAILED");
             }
             this.dispose();
         }

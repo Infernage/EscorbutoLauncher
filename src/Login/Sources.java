@@ -23,7 +23,7 @@ public class Sources {
     /**
      * This gets the password
      */
-    public static String pss = "My Pass Phrase";
+    public static String pss = "MineClient";
     /**
      * This gets the file name which check if the installed minecraft is supported by the Login
      */

@@ -171,6 +171,9 @@ public class Updater extends Thread{
                     + Sources.Dirlibs));
             File next = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
             File nextlib = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.Dirlibs));
+            File minejar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles
+                    + Sources.sep() + "minecraft.jar"));
+            minejar.delete();
             if (next.exists()){
                 next.delete();
             }

@@ -30,7 +30,7 @@ public class Vista2 extends javax.swing.JFrame {
      */
     public Vista2() {
         try{
-            System.out.print("Checking minecraft.jar... ");
+            System.out.print("Checking this minecraft.jar... ");
             File jar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "minecraft.jar"));
             if (!jar.exists()){
                 System.out.print("FAILED\nExporting new one now... ");
@@ -46,7 +46,7 @@ public class Vista2 extends javax.swing.JFrame {
             }
             System.out.println("OK");
             File mine = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
-            System.out.print("Checking minecraft.jar... ");
+            System.out.print("Checking MC minecraft.jar... ");
             if (!Installer.Worker.check(jar, mine)){
                 mine.delete();
                 Mainclass.copy(jar, mine);
@@ -59,7 +59,9 @@ public class Vista2 extends javax.swing.JFrame {
         //Asignamos el fondo al Panel
         setContentPane(new Background());
         System.out.println("OK");
+        System.out.print("Initialiting GUI... ");
         initComponents();
+        System.out.println("OK");
         jProgressBar1.setVisible(false);
         inicializar();
         this.setLocationRelativeTo(null);
@@ -75,12 +77,18 @@ public class Vista2 extends javax.swing.JFrame {
             base.mkdirs();
             System.out.println("Created base file");
         }
+        System.out.print("Checking server status... ");
         if (!Sources.download(base.getAbsolutePath() + Sources.sep() + Sources.lsNM, Sources.lsNM)){
+            System.out.println("FAILED\nEnabling offline option...");
             System.err.println("Connection failed. Syncronization won't start!");
             connect = false;
+        } else{
+            System.out.println("OK");
         }
         if (connect){
+            System.out.print("Synchronizing all files with the server... ");
             Mainclass.synchAllFiles();
+            System.out.println("OK");
         }
         //Controlamos las pestañas de recordar
         System.out.print("Checking remember files... ");
@@ -89,7 +97,7 @@ public class Vista2 extends javax.swing.JFrame {
                 BufferedReader bf = new BufferedReader (new FileReader(rem));
                 String temp = bf.readLine();
                 String temp2 = bf.readLine();
-                StringECP t = new StringECP(Sources.pss);
+                AES t = new AES(Sources.pss);
                 File te = new File(base.getAbsolutePath() + Sources.sep() + "lstlg.data");
                 bf.close();
                 if (temp.equals("true")){
@@ -100,7 +108,7 @@ public class Vista2 extends javax.swing.JFrame {
                     temp = bf.readLine();
                     bf.close();
                     if (temp != null){
-                        String tmp = t.decrypt(temp);
+                        String tmp = t.decryptData(temp);
                         jTextField1.setText(tmp);
                     }
                 }
@@ -112,7 +120,7 @@ public class Vista2 extends javax.swing.JFrame {
                     temp2 = bf.readLine();
                     bf.close();
                     if (temp2 != null){
-                        String tmp = t.decrypt(temp2);
+                        String tmp = t.decryptData(temp2);
                         jPasswordField1.setText(tmp);
                     }
                 }
@@ -370,9 +378,9 @@ public class Vista2 extends javax.swing.JFrame {
             if (temp.equals("OFF")){
                 String temp1 = bf.readLine(), temp2 = bf.readLine();
                 boolean open = false;
-                StringECP cry = new StringECP(Sources.pss);
-                String A = cry.decrypt(temp1);
-                String B = cry.decrypt(temp2);
+                AES cry = new AES(Sources.pss);
+                String A = cry.decryptData(temp1);
+                String B = cry.decryptData(temp2);
                 if (A.equals(jTextField1.getText()) && B.equals(new String(jPasswordField1.getPassword()))){
                     open = true;
                     args = A;
@@ -546,7 +554,7 @@ public class Vista2 extends javax.swing.JFrame {
 
         jButton1.setBackground(new java.awt.Color(53, 46, 79));
         jButton1.setForeground(new java.awt.Color(51, 255, 255));
-        jButton1.setText("Recordar datos");
+        jButton1.setText("Recordar contraseña");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -785,6 +793,7 @@ public class Vista2 extends javax.swing.JFrame {
                 System.out.print("Checking account name... ");
                 File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                         + getFile(account + "NM")));
+                String system;
                 if (!A.exists()){
                     if (!Sources.download(A.getAbsolutePath(), account + "NM.dat")){
                         System.out.println("FAILED");
@@ -792,7 +801,7 @@ public class Vista2 extends javax.swing.JFrame {
                         return;
                     }
                     BufferedReader bf = new BufferedReader(new FileReader(A));
-                    System.out.println(bf.readLine());
+                    system = bf.readLine();
                     String temp = bf.readLine();
                     if (temp.equals("DEL")){
                         System.out.println("FAILED");
@@ -804,26 +813,28 @@ public class Vista2 extends javax.swing.JFrame {
                     bf.close();
                 }
                 BufferedReader bf = new BufferedReader(new FileReader(A));
-                System.out.println(bf.readLine());
+                system = bf.readLine();
                 String temp = bf.readLine();
                 if (temp.equals("MC") || temp.equals("MS")){
                     System.out.println("OK");
+                    System.out.println(system);
                     JOptionPane.showMessageDialog(null, "Los datos de la cuenta solo pueden ser accedidos mediante "
                             + "sus respectivos sitios de minecraft o mineshafter.");
                     bf.close();
                     return;
                 } else if (temp.equals("OFF")){
-                    System.out.print("OK\nChecking secret word... ");
+                    System.out.println("OK");
+                    System.out.println(system);
+                    System.out.print("Checking secret word... ");
                     String word = JOptionPane.showInputDialog("Introduzca la palabra secreta:");
                     if (word != null){
-                        StringECP cry = new StringECP(Sources.pss);
-                        String U = bf.readLine();
+                        AES cry = new AES(Sources.pss);
+                        bf.readLine();
                         String P = bf.readLine();
-                        String W = bf.readLine();
+                        String W = cry.decryptData(bf.readLine());
                         if (word.equals(W)){
                             System.out.println("OK");
-                            JOptionPane.showMessageDialog(null, "Su nombre de cuenta es " + cry.decrypt(U)
-                                + " con una contraseña de " + cry.decrypt(P));
+                            JOptionPane.showMessageDialog(null, "Su contraseña es " + cry.decryptData(P));
                         } else{
                             System.out.println("FAILED");
                             JOptionPane.showMessageDialog(null, "Palabra secreta incorrecta");

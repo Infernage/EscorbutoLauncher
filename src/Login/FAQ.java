@@ -53,13 +53,12 @@ public class FAQ extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("P: ¿Cómo puedo cambiar mi nombre en Minecraft?");
 
-        jLabel2.setText("R: Si no tienes cuenta de Minecraft oficial o de Mineshafter, tienes que contactar con algún admin y nosotros te diremos cómo");
+        jLabel2.setText("R: Si no tienes cuenta de Minecraft oficial o de Mineshafter, contacta conmigo, Infernage.");
 
         jLabel3.setText("P: ¿Qué es Mineshafter?");
 
@@ -67,7 +66,7 @@ public class FAQ extends javax.swing.JDialog {
 
         jLabel5.setText("P: Me sale X error cuando quiero hacer Y cosa. ¿Qué hago?");
 
-        jLabel6.setText("R: Contacta conmigo (Infernage) y te diré lo que tienes que hacer.");
+        jLabel6.setText("R: Contacta conmigo (Infernage) o envía un error a través del botón \"Enviar error\".");
 
         jLabel7.setText("P: ¿Para qué sirve la Palabra secreta?");
 
@@ -75,11 +74,11 @@ public class FAQ extends javax.swing.JDialog {
 
         jLabel9.setText("P: He olvidado mi Palabra secreta y quiero cambiar mi contraseña. ¿Qué hago?");
 
-        jLabel10.setText("R: Contacta conmigo (Infernage) y te diré lo que tienes que hacer.");
+        jLabel10.setText("R: Contacta conmigo (Infernage) para notificarme el reseteo de la palabra secreta.");
 
         jLabel11.setText("P: ¿Cuándo vais a actualizar el servidor a X.Y.Z versión?");
 
-        jLabel12.setText("R: El que me pregunte esto dentro del server, lo BANEO xD (Se actualizará cuando salgan las mods y tenga tiempo para actualizarlo)");
+        jLabel12.setText("R: El que me pregunte esto dentro del server, lo BANEO xD. Lo actualizaré cuando estén las mods disponibles para esa versión.");
 
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -101,50 +100,40 @@ public class FAQ extends javax.swing.JDialog {
 
         jLabel15.setText("P: Tengo X error en el minecraft/login. ¿Qué hago?");
 
-        jLabel16.setText("R: Si has encontrado algún error, coméntalo aquí:");
-
-        jButton3.setText("Click aquí");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+        jLabel16.setText("R: Si has encontrado algún error, notifícamelo a través del botón \"Enviar error\" o contacta conmigo (Infernage).");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addComponent(jLabel2)
-                        .addComponent(jLabel3)
-                        .addComponent(jLabel4)
-                        .addComponent(jLabel5)
-                        .addComponent(jLabel6)
-                        .addComponent(jLabel7)
-                        .addComponent(jLabel8)
-                        .addComponent(jLabel9)
-                        .addComponent(jLabel10)
-                        .addComponent(jLabel11)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel16)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel7)
+                                .addComponent(jLabel8)
+                                .addComponent(jLabel9)
+                                .addComponent(jLabel10)
+                                .addComponent(jLabel11)
+                                .addComponent(jLabel16)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addGap(28, 28, 28)
-                                    .addComponent(jButton1))
-                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel14)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton3))))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel14)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton2)))
-                    .addComponent(jLabel15))
+                                    .addComponent(jButton2)))
+                            .addComponent(jLabel15)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(310, 310, 310)
+                        .addComponent(jButton1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -182,17 +171,11 @@ public class FAQ extends javax.swing.JDialog {
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel16)
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -213,17 +196,6 @@ public class FAQ extends javax.swing.JDialog {
             ex.printStackTrace(Mainclass.err);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        try {
-            // TODO add your handling code here:		
-            Desktop.getDesktop().browse(new URI("http://minechinchas.blogspot.com.es/2012/09/bugs-y-problemas.html"));
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "No se ha encontrado la página Web");
-            ex.printStackTrace(Mainclass.err);
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -277,7 +249,6 @@ public class FAQ extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

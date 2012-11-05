@@ -151,9 +151,9 @@ public class PassConfirm extends javax.swing.JDialog {
             bf.readLine();
             bf.readLine();
             //Nos quitamos de encima el nombre de usuario y la contraseña y vamos directamente a la palabra secreta
-            StringECP crypt = new StringECP(Sources.pss);
+            AES crypt = new AES(Sources.pss);
             B = bf.readLine();
-            A = crypt.decrypt(B);
+            A = crypt.decryptData(B);
             //Desencriptamos la palabra y comprobamos si es la escrita en el área de texto
             if (A.equals(jTextField1.getText())){
                 change = true;
@@ -166,7 +166,8 @@ public class PassConfirm extends javax.swing.JDialog {
                     //Si coincide, obtenemos el nombre de usuario y lo desencriptamos
                     bf = new BufferedReader(new FileReader(tmp));
                     StringBuilder str = new StringBuilder(bf.readLine()).append("\n").append(bf.readLine()).append("\n");
-                    str.append(bf.readLine()).append("\n").append(pass1).append("\n");
+                    str.append(bf.readLine()).append("\n").append(crypt.encryptData(pass1)).append("\n");
+                    bf.readLine();
                     String tem;
                     while ((tem = bf.readLine()) != null){
                         str.append(tem).append("\n");
