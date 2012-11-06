@@ -89,7 +89,9 @@ public class Worker extends SwingWorker <String, Integer>{
             pw.print(true);
             pw.close();
             File del = new File(Sources.path(Sources.DirData()));
-            borrarData(del);
+            if (del.exists()){
+                borrarData(del);
+            }
         } else{
             System.out.println("Reading Data document");
             BufferedReader bf = new BufferedReader(new FileReader(fti));
@@ -102,7 +104,9 @@ public class Worker extends SwingWorker <String, Integer>{
                 pw.print(true);
                 pw.close();
                 File del = new File(Sources.path(Sources.DirData()));
-                borrarData(del);
+                if (del.exists()){
+                    borrarData(del);
+                }
             }
         }
         System.out.print("Checking for other installation... ");
@@ -281,7 +285,11 @@ public class Worker extends SwingWorker <String, Integer>{
             copyDirectory(minetemp, fichdst);
             borrarData(minetemp);
             minetemp.delete();
-            borrarData(copyTemp);
+            if (copyTemp != null){
+                if (copyTemp.exists()){
+                    borrarData(copyTemp);
+                }
+            }
             File infer = new File(fichdst.getAbsolutePath() + Sources.sep() + Sources.infernage());
             try{
                 System.out.print("Creating login files... ");

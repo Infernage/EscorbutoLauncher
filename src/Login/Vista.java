@@ -2,6 +2,8 @@ package Login;
 
 
 
+import java.awt.BorderLayout;
+import java.awt.Panel;
 import java.io.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -40,6 +42,7 @@ public class Vista extends javax.swing.JFrame {
     }
     public void setNew(Vista2 vista){
         vis = vista;
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     }
     public static File createStaticLoginFile(String type, String name, String account, String password, String word) throws IOException{
         File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + name + "NM.dat"));
@@ -132,8 +135,11 @@ public class Vista extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -196,6 +202,13 @@ public class Vista extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
         jLabel7.setText("(3 caracteres mínimo)");
 
+        jButton5.setText("Ya tengo cuenta");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -210,36 +223,39 @@ public class Vista extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1)
-                        .addGap(0, 10, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(7, 7, 7)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel7))
-                        .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel7))
+                                .addGap(23, 23, 23)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextField1)
-                                    .addComponent(jPasswordField1))
-                                .addGap(10, 10, 10))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jTextField1)
+                                            .addComponent(jPasswordField1))
+                                        .addGap(10, 10, 10))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jTextField2)
+                                        .addContainerGap())))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jTextField2)
-                                .addContainerGap())))
+                                .addGap(75, 75, 75)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(49, 49, 49)
+                                .addComponent(jButton5)
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 150, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel3)
                         .addGap(152, 152, 152))))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(110, 110, 110)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(166, 166, 166)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(110, 110, 110)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
@@ -281,7 +297,9 @@ public class Vista extends javax.swing.JFrame {
                     .addComponent(jLabel6)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -585,6 +603,42 @@ public class Vista extends javax.swing.JFrame {
         vis.visible();
     }//GEN-LAST:event_formWindowClosing
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        if (nuevo){
+            vis.visible();
+            this.dispose();
+            return;
+        }
+        this.setVisible(false);
+        /*JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setSize(300, 300);
+        frame.setLayout(new BorderLayout());
+        frame.add(new JLabel("Cargando Login..."), BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.pack();
+        frame.setVisible(true);
+        final JFrame vis2 = frame;*/
+        //Abrimos Vista2
+        final Vista vis = this;
+        Thread t = new Thread("Vista2"){
+            @Override
+            public void run(){
+                Vista2 ven = new Vista2();
+                ven.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                ven.pack();
+                ven.setLocationRelativeTo(null);
+                ven.setTitle(Mainclass.title + " " + Mainclass.version);
+                //vis2.dispose();
+                vis.dispose();
+                ven.setVisible(true);
+            }
+        };
+        t.start();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -632,6 +686,7 @@ public class Vista extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
