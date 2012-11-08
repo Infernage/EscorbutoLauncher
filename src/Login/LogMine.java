@@ -29,14 +29,16 @@ public class LogMine extends Thread{
     private String targetURL, urlParameters, userName, password;
     private JLabel label;
     private JButton play;
+    private Vista2 V;
     public boolean offline = false;
-    public LogMine(String user, String pass, JLabel lab, JButton but){
+    public LogMine(String user, String pass, JLabel lab, JButton but, Vista2 vis){
         super("LogMine");
         targetURL = "https://login.minecraft.net/";
         label = lab;
         userName = user;
         password = pass;
         play = but;
+        V = vis;
     }
     private String logMine (String targetURL, String urlParameters){
         HttpsURLConnection connection = null;
@@ -102,6 +104,7 @@ public class LogMine extends Thread{
                 if (res.trim().equals("Bad login")){
                     label.setForeground(Color.red);
                     label.setText("Login failed!");
+                    V.back();
                 } else if (res.trim().equals("Old version")){
                     label.setForeground(Color.red);
                     label.setText("Outdated minecraft launcher!");

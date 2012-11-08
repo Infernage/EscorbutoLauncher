@@ -53,7 +53,7 @@ public class Vista2 extends javax.swing.JFrame {
             }
             System.out.println("OK");
         } catch (Exception ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error en la exportación del minecraft.jar");
         }
         System.out.print("Setting background... ");
         //Asignamos el fondo al Panel
@@ -92,13 +92,20 @@ public class Vista2 extends javax.swing.JFrame {
         }
         //Controlamos las pestañas de recordar
         System.out.print("Checking remember files... ");
+        File te = new File(base.getAbsolutePath() + Sources.sep() + Sources.login);
+        if (!te.exists()){
+            try {
+                te.createNewFile();
+            } catch (IOException ex) {
+                Sources.exception(ex, "Error al recordar nombres.");
+            }
+        }
         if (rem.exists()){
             try{
                 BufferedReader bf = new BufferedReader (new FileReader(rem));
                 String temp = bf.readLine();
                 String temp2 = bf.readLine();
                 AES t = new AES(Sources.pss);
-                File te = new File(base.getAbsolutePath() + Sources.sep() + "lstlg.data");
                 bf.close();
                 if (temp.equals("true")){
                     //Si se seleccionó en un principio la pestaña, se deja seleccionada y se recuerda el usuario
@@ -125,8 +132,8 @@ public class Vista2 extends javax.swing.JFrame {
                     }
                 }
                 System.out.println("OK");
-            } catch (IOException ex){
-                ex.printStackTrace(Mainclass.err);
+            } catch (Exception ex){
+                Sources.exception(ex, "Error en la lectura del fichero.");
             }
         }
         //Creamos el cliente del actualizador
@@ -185,14 +192,14 @@ public class Vista2 extends javax.swing.JFrame {
             try {
                 bat.createNewFile();
             } catch (IOException ex) {
-                ex.printStackTrace(Mainclass.err);
+                Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 9);
             }
         }
         PrintWriter pw = null;
         try{
             pw = new PrintWriter(bat);
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 9);
         }
         statusConn.setText("");
         Process minecraft = null;
@@ -224,21 +231,14 @@ public class Vista2 extends javax.swing.JFrame {
             System.out.println(comand);
             minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
         } catch (IOException ex){
-            this.setVisible(false);
-            ex.printStackTrace(Mainclass.err);
-            Debug de = new Debug(null, true);
-            de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            de.setLocationRelativeTo(null);
-            de.setVisible(true);
-            System.exit(1);
+            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 1);
         }
         try {
             if (minecraft == null){
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            ex.printStackTrace(Mainclass.err);
-            System.exit(1);
+            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 1);
         }
         System.exit(0);
     }
@@ -264,7 +264,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.close();
             Mainclass.synch(log);
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error al sincronizar log con el server.");
         }
     }
     private int selectRAM(){
@@ -284,6 +284,8 @@ public class Vista2 extends javax.swing.JFrame {
         return tam;
     }
     private void Play(){
+        statusConn.setForeground(Color.white);
+        statusConn.setText("");
         //Método del botón ¡Jugar!
         see = this;
         System.out.println("Setting connection");
@@ -295,6 +297,24 @@ public class Vista2 extends javax.swing.JFrame {
         boolean remember = jCheckBox1.isSelected(), rememberP = jCheckBox2.isSelected();
         //Comprobamos si el Recordar está activo y lo recordamos para un futuro
         File rem = new File (Sources.path(Sources.DirData() + Sources.sep() + Sources.rmb));
+        File login = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM 
+                + Sources.sep() + Sources.login));
+        if (!login.exists()){
+            try {
+                login.createNewFile();
+                PrintWriter pw = new PrintWriter(login);
+                if (remember){
+                    pw.print(jTextField1.getText());
+                }
+                if (rememberP){
+                    pw.println();
+                    pw.print(new String(jPasswordField1.getPassword()));
+                }
+                pw.close();
+            } catch (IOException ex) {
+                Sources.exception(ex, "No se pudo crear archivo de recordatorio de datos.");
+            }
+        }
         System.out.print("Checking remember file... ");
         try{
             if (!rem.exists()){
@@ -304,14 +324,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.print(remember + "\n" + rememberP);
             pw.close();
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
-        }
-        if (!rem.exists()){
-            try{
-                rem.createNewFile();
-            } catch (IOException ex){
-                ex.printStackTrace(Mainclass.err);
-            }
+            Sources.exception(ex, "Error al crear el fichero lastlogin.");
         }
         System.out.println("OK");
         if (offline){
@@ -332,15 +345,16 @@ public class Vista2 extends javax.swing.JFrame {
                         + jTextField1.getText() + "NM.dat"), jTextField1.getText() + "NM.dat")){
                         System.out.println("Error downloading the file!");
                         try{
-                        bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
-                        + jTextField1.getText() + "NM.dat;type=i").openConnection().getInputStream()));
-                        System.out.println(bf.readLine());
-                        temp = bf.readLine();
+                            bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                                + jTextField1.getText() + "NM.dat;type=i").openConnection().getInputStream()));
+                            System.out.println(bf.readLine());
+                            temp = bf.readLine();
                     } catch (Exception ex){
-                        ex.printStackTrace(Mainclass.err);
                         if (ex.toString().contains("FileNotFound")){
-                            JOptionPane.showMessageDialog(null, "La cuenta no existe");
+                            Sources.exception(ex, "La cuenta no existe.");
                             return;
+                        } else{
+                            ex.printStackTrace(Mainclass.err);
                         }
                     }
                 } else{
@@ -363,7 +377,7 @@ public class Vista2 extends javax.swing.JFrame {
                         System.out.println(bf.readLine());
                         temp = bf.readLine();
                     } catch (IOException ex){
-                        ex.printStackTrace(Mainclass.err);
+                        Sources.exception(ex, "Error al comparar datos.");
                     }
                 }
             } else{
@@ -372,7 +386,7 @@ public class Vista2 extends javax.swing.JFrame {
                     System.out.println(bf.readLine());
                     temp = bf.readLine();
                 } catch (IOException ex){
-                    ex.printStackTrace(Mainclass.err);
+                    Sources.exception(ex, "Error al comparar datos.");
                 }
             }
             if (temp.equals("OFF")){
@@ -389,7 +403,9 @@ public class Vista2 extends javax.swing.JFrame {
                     bf.close();
                     mineOff();
                 } else{
-                    JOptionPane.showMessageDialog(null, "Contraseña y/o nombre de usuario inválidos.");
+                    statusConn.setForeground(Color.red);
+                    statusConn.setText("Login failed!");
+                    back();
                 }
             } else if (temp.equals("MC")){
                 see = this;
@@ -401,7 +417,7 @@ public class Vista2 extends javax.swing.JFrame {
                     }
                 }
                 logeoMC = new LogMine(jTextField1.getText(), new String(jPasswordField1.getPassword()),
-                        statusConn, jButton5);
+                        statusConn, jButton5, this);
                 logeoMC.start();
                 Mainclass.hilos.put("LogMine", logeoMC);
                 inputLog(jTextField1.getText());
@@ -423,8 +439,7 @@ public class Vista2 extends javax.swing.JFrame {
             }
             bf.close();
         } catch (Exception ex){
-            ex.printStackTrace(Mainclass.err);
-            JOptionPane.showMessageDialog(null, "Error en la comprobación de datos.\nSi el error persiste, contacte con Infernage.");
+            Sources.fatalException(ex, "FATAL ERROR\nError al comprobar los datos.", 2);
         }
     }
     public static void playMS (String user, String pass, int opt){
@@ -444,7 +459,8 @@ public class Vista2 extends javax.swing.JFrame {
         try{
             temporal.createNewFile();
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar mineshafter.", 2);
+            return;
         }
         try {
             PrintWriter pw = new PrintWriter(temporal);
@@ -452,7 +468,8 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar mineshafter.", 2);
+            return;
         }
         execMCS(command);
     }
@@ -473,7 +490,7 @@ public class Vista2 extends javax.swing.JFrame {
         try{
             temporal.createNewFile();
         } catch(IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar minecraft.", 2);
         }
         try {
             PrintWriter pw = new PrintWriter(temporal);
@@ -481,7 +498,7 @@ public class Vista2 extends javax.swing.JFrame {
             pw.println(pass);
             pw.close();
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar minecraft.", 2);
         }
         execMCS(command);
     }
@@ -494,13 +511,16 @@ public class Vista2 extends javax.swing.JFrame {
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            ex.printStackTrace(Mainclass.err);
-            System.exit(11);
+            Sources.fatalException(ex, "FATAL ERROR\nError al ejecutar minecraft.", 1);
         }
         System.exit(0);
     }
     public void visible(){
         this.setVisible(true);
+    }
+    public void back(){
+        jButton5.setText("Try again");
+        jButton5.setEnabled(true);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -844,8 +864,7 @@ public class Vista2 extends javax.swing.JFrame {
                 bf.close();
             }
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
-            JOptionPane.showMessageDialog(null, "Ocurrió un error en la lectura de datos");
+            Sources.exception(ex, "Ocurrió un error en la lectura de datos.");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

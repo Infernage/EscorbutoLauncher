@@ -2,8 +2,6 @@ package Login;
 
 
 
-import java.awt.BorderLayout;
-import java.awt.Panel;
 import java.io.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -611,6 +609,13 @@ public class Vista extends javax.swing.JFrame {
             return;
         }
         this.setVisible(false);
+        try {
+            PrintWriter pw = new PrintWriter(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.bool)));
+            pw.print("true");
+            pw.close();
+        } catch (FileNotFoundException ex) {
+            Sources.exception(ex, "Error al inicializar el login.");
+        }
         /*JFrame frame = new JFrame();
         frame.setUndecorated(true);
         frame.setSize(300, 300);

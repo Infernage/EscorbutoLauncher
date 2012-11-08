@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -52,6 +54,10 @@ public class Sources {
      * This gets the file name which check if the remember option was used
      */
     public static String rmb = "RMB.txt";
+    /**
+     * This gets the file name which set the last login
+     */
+    public static String login = "lstlg.data";
     /**
      * This gets the name of directory and file of installation
      */
@@ -200,5 +206,35 @@ public class Sources {
             return separatorLin;
         }
         return null;
+    }
+    /**
+     * This method show an error and exit with an error value if something is wrong.
+     * @param ex The exception to be stack.
+     * @param msg The message to show.
+     * @param num The result of system
+     */
+    public static void fatalException(Exception ex, String msg, int num){
+        JOptionPane.showMessageDialog(null, msg);
+        ex.printStackTrace(Mainclass.err);
+        Debug de = new Debug(null, true);
+        de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        de.setLocationRelativeTo(null);
+        de.setVisible(true);
+        System.exit(num);
+    }
+    /**
+     * This method show an error message if something is wrong. You can also send an error report.
+     * @param ex The exception to be stack.
+     * @param msg The message to show.
+     */
+    public static void exception(Exception ex, String msg){
+        ex.printStackTrace(Mainclass.err);
+        int i = JOptionPane.showConfirmDialog(null, msg + "\n¿Quieres enviar el error?");
+        if (i == 0){
+            Debug de = new Debug(null, true);
+            de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            de.setLocationRelativeTo(null);
+            de.setVisible(true);
+        }
     }
 }

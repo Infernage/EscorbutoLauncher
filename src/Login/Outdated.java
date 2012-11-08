@@ -25,6 +25,10 @@ import javax.swing.JOptionPane;
  */
 public class Outdated {
     public static void ver410(){
+        File RMB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.rmb));
+        if (RMB.exists()){
+            RMB.delete();
+        }
         File data = new File(Sources.path(Sources.DirData() + Sources.sep()) + "data.cfg");
         String type = null, username = null, password = null, word = null, name = null;
         if (data.exists()){
@@ -60,19 +64,17 @@ public class Outdated {
                 }
                 upload.delete();
             } catch (IOException ex){
-                JOptionPane.showMessageDialog(null, "Error en el registro");
-                ex.printStackTrace(Mainclass.err);
-                Debug de = new Debug(null, true);
-                de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                de.setLocationRelativeTo(null);
-                de.setVisible(true);
-                System.exit(10);
+                Sources.fatalException(ex, "[FATAL ERROR]\nNo se pudo sincronizar con el servidor", 3);
             }
         }
         data = null;
     }
+    public static void ver421(){
+        System.out.println("Version 4.2.2 it's absoultely equals to 4.2.1\nIt isn't necessary to do anything.");
+    }
     public static void checkAll(){
         ver410();
+        ver421();
         System.gc();
     }
     private static class outECP{
