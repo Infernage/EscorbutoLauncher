@@ -351,7 +351,8 @@ public class Vista2 extends javax.swing.JFrame {
                             temp = bf.readLine();
                     } catch (Exception ex){
                         if (ex.toString().contains("FileNotFound")){
-                            Sources.exception(ex, "La cuenta no existe.");
+                            JOptionPane.showMessageDialog(null, "La cuenta no existe.");
+                            back();
                             return;
                         } else{
                             ex.printStackTrace(Mainclass.err);
@@ -436,6 +437,7 @@ public class Vista2 extends javax.swing.JFrame {
                 inputLog(jTextField1.getText());
             } else if (temp.equals("DEL")){
                 JOptionPane.showMessageDialog(null, "La cuenta no existe.");
+                back();
             }
             bf.close();
         } catch (Exception ex){
