@@ -55,7 +55,7 @@ public class LogMine extends Thread{
             connection.connect();
             Certificate[] certs = connection.getServerCertificates();
             byte[] bytes = new byte[294];
-            DataInputStream dis = new DataInputStream(LogMine.class.getResourceAsStream("minecraft.key"));
+            DataInputStream dis = new DataInputStream(LogMine.class.getResourceAsStream("/Resources/minecraft.key"));
             dis.readFully(bytes);
             dis.close();
             Certificate c = certs[0];

@@ -52,7 +52,7 @@ public class CHLG extends Thread{
         }
     }
     private void copy (File dst) throws IOException{
-        InputStream in = getClass().getResourceAsStream("/Login/CHLog.txt");
+        InputStream in = getClass().getResourceAsStream("/Resources/CHLog.txt");
         OutputStream out = new FileOutputStream(dst);
         byte[] buffer = new byte[1024];
         int size;

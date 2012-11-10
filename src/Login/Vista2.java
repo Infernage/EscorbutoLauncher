@@ -22,6 +22,7 @@ import javax.swing.*;
 public class Vista2 extends javax.swing.JFrame {
     private String args;
     private LogMine logeoMC;
+    private LogShafter logeoMS;
     //private static Systray sys;
     public static Vista2 see;
     private boolean offline = false, connect = true;
@@ -34,7 +35,7 @@ public class Vista2 extends javax.swing.JFrame {
             File jar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "minecraft.jar"));
             if (!jar.exists()){
                 System.out.print("FAILED\nExporting new one now... ");
-                InputStream in = getClass().getResourceAsStream("/Installer/minecraft.jar");
+                InputStream in = getClass().getResourceAsStream("/Resources/minecraft.jar");
                 OutputStream out = new FileOutputStream(jar);
                 byte[] buffer = new byte[1024];
                 int size;
@@ -351,6 +352,7 @@ public class Vista2 extends javax.swing.JFrame {
                             temp = bf.readLine();
                     } catch (Exception ex){
                         if (ex.toString().contains("FileNotFound")){
+                            statusConn.setText("");
                             JOptionPane.showMessageDialog(null, "La cuenta no existe.");
                             back();
                             return;

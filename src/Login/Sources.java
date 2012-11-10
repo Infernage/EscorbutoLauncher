@@ -23,6 +23,10 @@ public class Sources {
     public static boolean duplicate = false;
     public static String OS;
     /**
+     * This gets the Mineshafter jar
+     */
+    public static String MS = "Mineshafter-proxy.jar";
+    /**
      * This gets the password
      */
     public static String pss = "MineClient";
@@ -214,7 +218,7 @@ public class Sources {
      * @param num The result of system
      */
     public static void fatalException(Exception ex, String msg, int num){
-        JOptionPane.showMessageDialog(null, msg);
+        JOptionPane.showMessageDialog(null, msg, "Oops! Hubo un gran problema!", JOptionPane.ERROR_MESSAGE);
         ex.printStackTrace(Mainclass.err);
         Debug de = new Debug(null, true);
         de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -228,13 +232,17 @@ public class Sources {
      * @param msg The message to show.
      */
     public static void exception(Exception ex, String msg){
+        int i = JOptionPane.showConfirmDialog(null, msg + "\n¿Quieres enviar el error?", 
+                "Oops! Ha ocurrido un error.", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         ex.printStackTrace(Mainclass.err);
-        int i = JOptionPane.showConfirmDialog(null, msg + "\n¿Quieres enviar el error?");
         if (i == 0){
             Debug de = new Debug(null, true);
             de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             de.setLocationRelativeTo(null);
             de.setVisible(true);
         }
+    }
+    public static void main (String[] args){
+        exception(new Exception(), "TESTING");
     }
 }

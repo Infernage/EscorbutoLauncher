@@ -220,6 +220,7 @@ public class Lista extends javax.swing.JDialog {
         });
         jScrollPane2.setViewportView(jTree1);
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/24-security-lock.png"))); // NOI18N
         jButton3.setText("Encriptar");
         jButton3.setToolTipText("Encriptar");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -228,6 +229,7 @@ public class Lista extends javax.swing.JDialog {
             }
         });
 
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/24-security-lock-open.png"))); // NOI18N
         jButton4.setText("Desencriptar");
         jButton4.setToolTipText("Desencriptar");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -244,6 +246,7 @@ public class Lista extends javax.swing.JDialog {
             }
         });
 
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/24-em-cross.png"))); // NOI18N
         jButton6.setText("Eliminar");
         jButton6.setToolTipText("Eliminar");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -252,6 +255,7 @@ public class Lista extends javax.swing.JDialog {
             }
         });
 
+        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/24-message-warn.png"))); // NOI18N
         jButton7.setText("Borrar todo");
         jButton7.setToolTipText("Eliminar todo");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -268,7 +272,7 @@ public class Lista extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 59, Short.MAX_VALUE)
+                        .addGap(0, 31, Short.MAX_VALUE)
                         .addComponent(jLabel1))
                     .addComponent(jScrollPane2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

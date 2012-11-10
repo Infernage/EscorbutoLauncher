@@ -72,7 +72,7 @@ public class Systray extends Thread{
     private void init(){
         if (SystemTray.isSupported()){
             tray = SystemTray.getSystemTray();
-            Image ic = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Login/5548.png"));
+            Image ic = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Resources/5548.png"));
             ActionListener salida = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e){

@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
@@ -16,7 +15,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
@@ -72,7 +70,11 @@ public class Outdated {
     public static void ver421(){
         System.out.println("Version 4.2.2 it's absoultely equals to 4.2.1\nIt isn't necessary to do anything.");
     }
+    public static void ver422(){
+        
+    }
     public static void checkAll(){
+        System.out.println("Actual version: " + Mainclass.version);
         ver410();
         ver421();
         System.gc();

@@ -5,27 +5,24 @@ c)Mods añadidas.
 d)Bugs.
 ___________________________________________
 
-b) Changelog. (Desde la versión MineLogin 4.1.0)
+b) Changelog. (Desde la versión MineLogin 4.2.1)
 
 ||Instalador||
--Optimizado código. El código ya no toma dos rumbos para cada SO.
--Añadido soporte para versiones antiguas (Solo a partir de la 4.1.0).
--Añadido soporte para copia de seguridad del minecraft.jar, ya no es necesario estar haciendo copias de seguridad del minecraft.jar.
+Nada
 
 ||Login||
--Optimizado código. El código ya no toma dos rumbos para cada SO.
--Añadido una minibase de datos para las cuentas.
+-Arreglado múltiples errores, entre ellos el tener que reabrir el login si alguien se equivoca escribiendo el nombre o la contraseña.
 
 ||Minecraft||
 Nada
 ___________________________________________
 
-b)Mods eliminadas (Desde la versión MineLogin 4.1.0)
+b)Mods eliminadas (Desde la versión MineLogin 4.2.1)
 
 Ninguna
 ___________________________________________
 
-c)Mods añadidas. (Desde la versión MineLogin 4.1.0)
+c)Mods añadidas. (Desde la versión MineLogin 4.2.1)
 
 Ninguna
 ___________________________________________
