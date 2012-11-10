@@ -1,14 +1,14 @@
 package Login;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
@@ -47,20 +47,17 @@ public class CHLG extends Thread{
             isr.close();
             bf.close();
         }catch(IOException e){
-            JOptionPane.showMessageDialog(null, "Error al abrir el ChangeLog.");
-            e.printStackTrace(Mainclass.err);
+            Sources.exception(e, "Error al abrir el changelog.");
         }
     }
     private void copy (File dst) throws IOException{
-        InputStream in = getClass().getResourceAsStream("/Resources/CHLog.txt");
-        OutputStream out = new FileOutputStream(dst);
-        byte[] buffer = new byte[1024];
-        int size;
-        while ((size = in.read(buffer)) > 0){
-            out.write(buffer, 0, size);
-        }
-        in.close();
-        out.close();
+        BufferedInputStream input = new BufferedInputStream(getClass().getResourceAsStream("/Resources/CHLog.txt"));
+        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dst));
+        byte[] buffer = new byte[input.available()];
+        input.read(buffer, 0, buffer.length);
+        output.write(buffer);
+        input.close();
+        output.close();
     }
     @Override
     public void run(){

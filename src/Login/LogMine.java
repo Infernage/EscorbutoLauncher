@@ -80,7 +80,7 @@ public class LogMine extends Thread{
             String str1 = response.toString();
             return str1;
         } catch (Exception e) {
-            e.printStackTrace(Mainclass.err);
+            Sources.exception(e, "Error conectándose a la página web.");
             return null;
         } finally {
             if (connection != null)
@@ -126,7 +126,7 @@ public class LogMine extends Thread{
             System.out.println("Initializing minecraft...");
             Vista2.playMC(userName, password, ind);
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "Error inicializando minecraft.", 1);
         }
     }
 }

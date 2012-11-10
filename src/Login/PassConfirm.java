@@ -186,8 +186,7 @@ public class PassConfirm extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(null, "La palabra secreta no es correcta.");
             }
         } catch (IOException e){
-            JOptionPane.showMessageDialog(null, "Error en el cambio de contraseña.");
-            e.printStackTrace(Mainclass.err);
+            Sources.exception(e, "Error en el cambio de contraseña.");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

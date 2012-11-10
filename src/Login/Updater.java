@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.zip.*;
-import javax.swing.JOptionPane;
 /**
  *
  * @author Reed
@@ -28,15 +27,6 @@ public class Updater extends Thread{
         data = isData;
         link = host;
         path = Sources.path("Desktop" + Sources.sep() + "Update");
-    }
-    private void borrarFiles (File fich){
-        File[] ficheros = fich.listFiles();
-        for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
-                borrarFiles(ficheros[x]);
-            }
-            ficheros[x].delete();
-        }
     }
     private String getFileName(URL url) {
         String fileName = url.getFile();
@@ -89,8 +79,7 @@ public class Updater extends Thread{
             System.out.println("... OK");
         } catch (Exception e) {
             System.out.print("... FAILED");
-            JOptionPane.showMessageDialog(null, "[ERROR] Download crashed!");
-            e.printStackTrace(Mainclass.err);
+            Sources.fatalException(e, "Download crashed!", 4);
         }
     }
     //Método de descompresión
@@ -100,7 +89,7 @@ public class Updater extends Thread{
         String zipper = Sources.path("Desktop" + Sources.sep() + name);
         File mine = new File(path);
         if (mine.exists()){
-            borrarFiles(mine);
+            Sources.borrarFichero(mine);
         }
         System.out.print("...");
         mine.mkdirs();
@@ -154,8 +143,7 @@ public class Updater extends Thread{
             System.out.print("... OK");
         } catch (IOException ex) {
             System.out.print("... FAILED");
-            JOptionPane.showMessageDialog(null, ex.getMessage());
-            ex.printStackTrace(Mainclass.err);
+            Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
         }
         File delete = new File(zipper);
         delete.delete();
@@ -178,13 +166,13 @@ public class Updater extends Thread{
                 next.delete();
             }
             if (nextlib.exists()){
-                borrarFiles(nextlib);
+                Sources.borrarFichero(nextlib);
             }
             try{
-                copy(old, next);
-                copyDirectory(oldlib, nextlib);
+                Sources.copy(old, next);
+                Sources.copyDirectory(oldlib, nextlib);
                 old.delete();
-                borrarFiles(oldlib);
+                Sources.borrarFichero(oldlib);
             } catch (Exception ex){
                 ex.printStackTrace(Mainclass.err);
             }
@@ -228,33 +216,6 @@ public class Updater extends Thread{
         } finally{
             System.exit(0);
         }
-    }
-    private void copy(File src, File dst) throws IOException { 
-        InputStream in = new FileInputStream(src); 
-        OutputStream out = new FileOutputStream(dst); 
-        System.out.println("Extracting " + dst.getAbsolutePath());
-        byte[] buf = new byte[4096]; 
-        int len; 
-        while ((len = in.read(buf)) > 0) { 
-            out.write(buf, 0, len); 
-        } 
-        in.close(); 
-        out.close(); 
-    }
-    private void copyDirectory(File srcDir, File dstDir) throws IOException {
-        if (srcDir.isDirectory()) { 
-            if (!dstDir.exists()) { 
-                dstDir.mkdir(); 
-            }
-             
-            String[] children = srcDir.list(); 
-            for (int i=0; i<children.length; i++) {
-                copyDirectory(new File(srcDir, children[i]), 
-                    new File(dstDir, children[i])); 
-            } 
-        } else { 
-            copy(srcDir, dstDir); 
-        } 
     }
     //Método de ejecución
     @Override

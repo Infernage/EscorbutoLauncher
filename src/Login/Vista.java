@@ -431,13 +431,7 @@ public class Vista extends javax.swing.JFrame {
                 ven.setVisible(true);
             } catch (IOException e){
                 System.out.println("FAILED");
-                JOptionPane.showMessageDialog(null, "Error en el registro");
-                e.printStackTrace(Mainclass.err);
-                Debug de = new Debug(null, true);
-                de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                de.setLocationRelativeTo(null);
-                de.setVisible(true);
-                System.exit(10);
+                Sources.fatalException(e, "Error al registrarse en el servidor.\n" + e.getMessage(), 10);
             }
             this.dispose();
         }

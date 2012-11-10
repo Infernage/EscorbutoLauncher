@@ -103,7 +103,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
         if (temp == 1){
             System.out.println("Getting no crypted file... OK");
             mine.mkdirs();
-            copyDirectory(rest, mine);//Instalamos la restauración
+            Sources.installation(eti, rest, mine);//Instalamos la restauración
         } else if (temp == 2){
             System.out.println("Getting crypted file... OK");
             //Instalamos la restauración
@@ -127,7 +127,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 Process hide = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
             }
         } catch (IOException ex){
-            ex.printStackTrace(Login.Mainclass.err);
+            Sources.exception(ex, "Error: File couldn't be created!");
         }
         eti.setText("Recopilando información adicional...");
         Thread.sleep(3000);
@@ -183,34 +183,4 @@ public class Restore extends SwingWorker<Integer, Integer>{
             ficheros[x].delete();
         }
     }
-    //Copiar directorio de un sitio a otro
-    private void copyDirectory(File srcDir, File dstDir) throws IOException {
-        if (srcDir.isDirectory()) { 
-            if (!dstDir.exists()) { 
-                dstDir.mkdir(); 
-            }
-             
-            String[] children = srcDir.list(); 
-            for (int i=0; i<children.length; i++) {
-                copyDirectory(new File(srcDir, children[i]), 
-                    new File(dstDir, children[i])); 
-            } 
-        } else { 
-            copy(srcDir, dstDir); 
-        } 
-    }
-    //Copiar fichero de un sitio a otro
-    private void copy(File src, File dst) throws IOException { 
-        InputStream in = new FileInputStream(src); 
-        OutputStream out = new FileOutputStream(dst); 
-        eti.setText("Extrayendo en " + dst.getAbsolutePath());
-         
-        byte[] buf = new byte[4096]; 
-        int len; 
-        while ((len = in.read(buf)) > 0) { 
-            out.write(buf, 0, len); 
-        } 
-        in.close(); 
-        out.close(); 
-    } 
 }

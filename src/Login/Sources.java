@@ -4,14 +4,21 @@
  */
 package Login;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
@@ -113,7 +120,7 @@ public class Sources {
         }
     }
     /**
-     * This method upload a file to the server. This is used to log of Login.
+     * This method uploads a file to the server. This is used to log of Login.
      * @param pathFile The local path name of the file.
      * @param name The name of the file at the server.
      * @return {@code true} If was upload correctly;
@@ -139,7 +146,7 @@ public class Sources {
         }
     }
     /**
-     * This method download a file from the server. It's used to log of Login.
+     * This method downloads a file from the server. It's used to log of Login.
      * @param pathFile The local path name of the file.
      * @param name The name of the file at the server.
      * @return {@code true} If the file was download correctly; {@code false} If there was a problem.
@@ -212,7 +219,7 @@ public class Sources {
         return null;
     }
     /**
-     * This method show an error and exit with an error value if something is wrong.
+     * This method showes an error and exit with an error value if something is wrong.
      * @param ex The exception to be stack.
      * @param msg The message to show.
      * @param num The result of system
@@ -227,7 +234,7 @@ public class Sources {
         System.exit(num);
     }
     /**
-     * This method show an error message if something is wrong. You can also send an error report.
+     * This method showes an error message if something is wrong. You can also send an error report.
      * @param ex The exception to be stack.
      * @param msg The message to show.
      */
@@ -240,6 +247,83 @@ public class Sources {
             de.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             de.setLocationRelativeTo(null);
             de.setVisible(true);
+        }
+    }
+   /**
+    * This method deletes a file or a directory
+    * @param fich The file or directory to delete
+    */
+    public static void borrarFichero (File fich){
+        File[] ficheros = fich.listFiles();
+        for (int x = 0; x < ficheros.length; x++){
+            if (ficheros[x].isDirectory()){
+                borrarFichero(ficheros[x]);
+            }
+            ficheros[x].delete();
+        }
+    }
+    /**
+     * This method copies a source directory to a destiny directory
+     * @param srcDir The source directory
+     * @param dstDir The destiny directory
+     * @throws IOException 
+     */
+    public static void copyDirectory(File srcDir, File dstDir) throws IOException {
+        if (srcDir.isDirectory()){
+            if (!dstDir.exists()){
+                dstDir.mkdir();
+            }
+            String[] children = srcDir.list();
+            for (int i=0; i<children.length; i++){
+                copyDirectory(new File(srcDir, children[i]),
+                    new File(dstDir, children[i]));
+            }
+        } else{
+            copy(srcDir, dstDir);
+        }
+    }
+    /**
+     * This method copies a source file to a destiny file
+     * @param src The source file
+     * @param dst The destiny file
+     * @throws IOException 
+     */
+    public static void copy(File src, File dst) throws IOException { 
+        BufferedInputStream input = new BufferedInputStream(new FileInputStream(src));
+        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dst));
+        byte[] buffer = new byte[input.available()];
+        input.read(buffer, 0, buffer.length);
+        output.write(buffer);
+        input.close();
+        output.close();
+    }
+    /**
+     * This method installs minecraft
+     * @param eti The label state
+     * @param source The source file
+     * @param destiny The destination file
+     * @throws IOException 
+     */
+    public static void installation(JLabel eti, File source, File destiny) throws IOException{
+        if (source.isDirectory()){
+            if (!destiny.exists()){
+                destiny.mkdirs();
+            }
+            String[] children = source.list();
+            for (int i=0; i<children.length; i++){
+                installation(eti, new File(source, children[i]),
+                    new File(destiny, children[i]));
+            }
+        } else{
+            BufferedInputStream input = new BufferedInputStream(new FileInputStream(source));
+            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(destiny));
+            eti.setText("Extrayendo en " + destiny.getAbsolutePath());
+            System.out.println("Extracting " + destiny.getAbsolutePath());
+            byte[] buffer = new byte[input.available()];
+            input.read(buffer, 0, buffer.length);
+            output.write(buffer);
+            input.close();
+            output.close();
         }
     }
     public static void main (String[] args){

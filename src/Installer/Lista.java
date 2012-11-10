@@ -154,15 +154,6 @@ public class Lista extends javax.swing.JDialog {
             }
         }
     }
-    private void borrarFichero (File fich){
-        File[] ficheros = fich.listFiles();
-        for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
-                borrarFichero(ficheros[x]);
-            }
-            ficheros[x].delete();
-        }
-    }
     
 
     /**
@@ -388,7 +379,7 @@ public class Lista extends javax.swing.JDialog {
                 par.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
                 par.setPassword("Minelogin 3.0.0");
                 zip.createZipFileFromFolder(mine, par, false, 0);
-                borrarFichero(mine);
+                Sources.borrarFichero(mine);
                 mine.delete();
                 decriptada.remove(fec);
                 int i = 0;
@@ -403,8 +394,7 @@ public class Lista extends javax.swing.JDialog {
                 }
                 update();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
-                ex.printStackTrace(Login.Mainclass.err);
+                Sources.exception(ex, "No se ha podido encriptar el archivo.");
             }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -447,7 +437,7 @@ public class Lista extends javax.swing.JDialog {
                 }
                 update();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
+                Sources.exception(ex, "No se ha podido desencriptar el archivo.");
             }
         }else{
             JOptionPane.showMessageDialog(null, "No se ha elegido ninguna opción");
@@ -467,7 +457,7 @@ public class Lista extends javax.swing.JDialog {
             File mine = new File(install + "\\.minecraft");
             File crypt = new File(install + "\\data.dat");
             if (mine.exists()){
-                borrarFichero(mine);
+                Sources.borrarFichero(mine);
                 mine.delete();
             }
             if (crypt.exists()){
@@ -498,7 +488,7 @@ public class Lista extends javax.swing.JDialog {
         int i = JOptionPane.showConfirmDialog(null, "¿Está seguro de que quiere eliminar TODAS las copias de seguridad? (La operación es irreversible)");
         if (i == 0){
             String install = System.getProperty("user.home") + "\\Desktop\\Copia Minecraft";
-            borrarFichero(new File(install));
+            Sources.borrarFichero(new File(install));
         }
     }//GEN-LAST:event_jButton7ActionPerformed
 

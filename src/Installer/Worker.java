@@ -55,10 +55,9 @@ public class Worker extends SwingWorker <String, Integer>{
             borrarData(minecraft);
         }
         try{
-            copyDirectory(copyTemp, minecraft);
+            Sources.installation(eti, copyTemp, minecraft);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, ex.getMessage());
         }
     }
     //Método cuando se produce el this.execute()
@@ -118,7 +117,7 @@ public class Worker extends SwingWorker <String, Integer>{
             copyTemp.deleteOnExit();
             System.out.println("OK");
             File copiaDel = new File(Sources.path(Sources.DirMC));
-            copyHiddenDirectory(copiaDel, copyTemp);
+            Sources.copyDirectory(copiaDel, copyTemp);
             String say = null;
             if (bot != null){
                 say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
@@ -153,8 +152,7 @@ public class Worker extends SwingWorker <String, Integer>{
                             par.setPassword("Minelogin 3.0.0");
                             data.createZipFileFromFolder(copiaDel, par, false, 0);
                         } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
-                            ex.printStackTrace(Login.Mainclass.err);
+                            Sources.exception(ex, ex.getMessage());
                             this.back();
                         }
                     }
@@ -173,8 +171,7 @@ public class Worker extends SwingWorker <String, Integer>{
                         par.setPassword("Minelogin 3.0.0");
                         data.createZipFileFromFolder(copiaDel, par, false, 0);
                     } catch (Exception ex){
-                        JOptionPane.showMessageDialog(null, "ERROR: " + ex.getMessage());
-                        ex.printStackTrace(Login.Mainclass.err);
+                        Sources.exception(ex, ex.getMessage());
                         this.back();
                     }
                     System.out.println("Copy done!");
@@ -282,7 +279,7 @@ public class Worker extends SwingWorker <String, Integer>{
             System.out.println("Deleting all temp files created...");
             File minetemp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC));
             fichdst.mkdirs();
-            copyDirectory(minetemp, fichdst);
+            Sources.installation(eti, minetemp, fichdst);
             borrarData(minetemp);
             minetemp.delete();
             if (copyTemp != null){
@@ -299,7 +296,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 System.out.println("OK");
             } catch (Exception ex){
-                ex.printStackTrace(Login.Mainclass.err);
+                Sources.exception(ex, "File couldn't be created!");
             }
             System.out.println("Adding source files and libraries...");
             File logger = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
@@ -318,19 +315,18 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 Thread.sleep(1000);
                 if (!desk.exists()){
-                    copy(DA, desk);
+                    Sources.installation(eti, DA, desk);
                 }
                 System.out.println("Done!");
             }
             if (!DAtemp.exists()){
-                copy(DA, DAtemp);
+                Sources.installation(eti, DA, DAtemp);
             }
             DA.delete();
         } catch (IOException e){
-            JOptionPane.showMessageDialog(null, "Error en la instalación. Comprueba que no has borrado "
+            Sources.exception(e, "Error en la instalación. Comprueba que no has borrado "
                     + "ningún archivo de la carpeta.\n" + e.getMessage());
             exito = false;
-            e.printStackTrace(Login.Mainclass.err);
             this.back();
         }
         System.out.print("Checking source files... ");
@@ -339,7 +335,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 + Sources.sep() + "Temporal.jar"));
         if (!temp.exists() && temporal.exists()){
             System.out.print("FAILED\nTrying to add... ");
-            copy(temporal, temp);
+            Sources.installation(eti, temporal, temp);
             temporal.delete();
             System.out.println("OK");
         } else if (temp.exists() && !temporal.exists()){
@@ -382,7 +378,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 prog.setValue(100);
             } catch (Exception ex){
-                ex.printStackTrace(Login.Mainclass.err);
+                Sources.exception(ex, ex.getMessage());
             }
         } else if (!exito){
             if (eti != null){
@@ -422,38 +418,6 @@ public class Worker extends SwingWorker <String, Integer>{
             ficheros[x].delete();
         }
     }
-    //Copiar directorio oculto
-    private void copyHiddenDirectory(File srcDir, File dstDir) throws IOException {
-        if (srcDir.isDirectory()) { 
-            if (!dstDir.exists()) { 
-                dstDir.mkdir(); 
-            }
-             
-            String[] children = srcDir.list(); 
-            for (int i=0; i<children.length; i++) {
-                copyHiddenDirectory(new File(srcDir, children[i]), 
-                    new File(dstDir, children[i])); 
-            } 
-        } else { 
-            copyData(srcDir, dstDir); 
-        }
-    }
-    //Copiar directorio de un sitio a otro
-    private void copyDirectory(File srcDir, File dstDir) throws IOException {
-        if (srcDir.isDirectory()) { 
-            if (!dstDir.exists()) { 
-                dstDir.mkdir(); 
-            }
-             
-            String[] children = srcDir.list(); 
-            for (int i=0; i<children.length; i++) {
-                copyDirectory(new File(srcDir, children[i]), 
-                    new File(dstDir, children[i])); 
-            } 
-        } else { 
-            copy(srcDir, dstDir); 
-        } 
-    }
     /**
      * Method to check if a file is equals to other one.
      * @param src The source file
@@ -485,35 +449,8 @@ public class Worker extends SwingWorker <String, Integer>{
             alpha.close();
             beta.close();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "ERROR");
-            ex.printStackTrace(Login.Mainclass.err);
+            Sources.exception(ex, "Error al comprobar los archivos!");
         }
         return res;
-    }
-    private void copyData(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src); 
-        OutputStream out = new FileOutputStream(dst); 
-        System.out.println("Extracting data " + dst.getAbsolutePath());
-        byte[] buf = new byte[4096]; 
-        int len; 
-        while ((len = in.read(buf)) > 0) { 
-            out.write(buf, 0, len); 
-        } 
-        in.close(); 
-        out.close(); 
-    }
-    //Copiar fichero de un sitio a otro
-    private void copy(File src, File dst) throws IOException { 
-        InputStream in = new FileInputStream(src); 
-        OutputStream out = new FileOutputStream(dst); 
-        eti.setText("Extrayendo en " + dst.getAbsolutePath());
-        System.out.println("Extracting " + dst.getAbsolutePath());
-        byte[] buf = new byte[4096]; 
-        int len; 
-        while ((len = in.read(buf)) > 0) { 
-            out.write(buf, 0, len); 
-        } 
-        in.close(); 
-        out.close(); 
     }
 }

@@ -270,7 +270,7 @@ public class Vista extends javax.swing.JFrame {
                 Desktop d = Desktop.getDesktop();
                 d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "Temporal.jar")));
             } catch (Exception ex) {
-                ex.printStackTrace(Login.Mainclass.err);
+                Sources.fatalException(ex, "No se ha podido inicializar el login!", 1);
             }
         }
         System.exit(0);

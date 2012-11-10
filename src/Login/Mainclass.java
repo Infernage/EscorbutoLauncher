@@ -107,7 +107,7 @@ public class Mainclass {
                  pw.close();
                  tmp.get(i).delete();
              } catch (IOException ex){
-                ex.printStackTrace(err);
+                Sources.exception(ex, "Error en la sincronización con el servidor.");
              }
         }
         tmp.clear();
@@ -144,7 +144,7 @@ public class Mainclass {
             ex.printStackTrace(err);
             System.err.println("[ERROR]Failed to synchronize with the server!");
             tmp.delete();
-            JOptionPane.showMessageDialog(null, "Error al sincronizarse con el servidor. Comprueba que "
+            Sources.exception(ex, "Error al sincronizarse con el servidor. Comprueba que "
                     + "estás conectado a internet");
             return;
         }
@@ -256,8 +256,8 @@ public class Mainclass {
             File dir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
             dir.mkdirs();
             try{
-                copy(actual, runner);
-                copyDirectory(actuallib, runnerlib);
+                Sources.copy(actual, runner);
+                Sources.copyDirectory(actuallib, runnerlib);
                 System.out.println("OK");
             } catch (IOException ex){
                 System.out.println("FAILED");
@@ -268,7 +268,7 @@ public class Mainclass {
         } else if (!runner.exists() && runnerlib.exists()){
             System.out.print("FAILED\nExporting source files... ");
             try{
-                copy(actual, runner);
+                Sources.copy(actual, runner);
                 System.out.println("OK");
             } catch (IOException ex){
                 System.out.println("FAILED");
@@ -277,7 +277,7 @@ public class Mainclass {
         } else if (runner.exists() && !runnerlib.exists()){
             System.out.print("FAILED\nExporting source files...");
             try{
-                copyDirectory(actuallib, runnerlib);
+                Sources.copyDirectory(actuallib, runnerlib);
                 System.out.println("OK");
             } catch (IOException ex){
                 System.out.println("FAILED");
@@ -325,43 +325,5 @@ public class Mainclass {
             System.out.println("[Openning Register file]");
             Vista.main(Sources.path(Sources.DirData()), fichero.getAbsolutePath(), false);
         }
-    }
-    //Borrar fichero o directorio
-    public static void borrarFichero (File fich){
-        File[] ficheros = fich.listFiles();
-        for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
-                borrarFichero(ficheros[x]);
-            }
-            ficheros[x].delete();
-        }
-    }
-    //Copiar directorio de un sitio a otro
-    public static void copyDirectory(File srcDir, File dstDir) throws IOException {
-        if (srcDir.isDirectory()) { 
-            if (!dstDir.exists()) { 
-                dstDir.mkdir(); 
-            }
-             
-            String[] children = srcDir.list(); 
-            for (int i=0; i<children.length; i++) {
-                copyDirectory(new File(srcDir, children[i]), 
-                    new File(dstDir, children[i])); 
-            } 
-        } else { 
-            copy(srcDir, dstDir); 
-        } 
-    }
-    //Copiar fichero de un sitio a otro
-    public static void copy(File src, File dst) throws IOException { 
-        InputStream in = new FileInputStream(src); 
-        OutputStream out = new FileOutputStream(dst);
-        byte[] buf = new byte[4096]; 
-        int len; 
-        while ((len = in.read(buf)) > 0) { 
-            out.write(buf, 0, len); 
-        } 
-        in.close(); 
-        out.close(); 
     }
 }

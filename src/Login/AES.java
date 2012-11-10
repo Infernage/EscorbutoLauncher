@@ -58,7 +58,7 @@ public class AES {
             encrypt.init(Cipher.ENCRYPT_MODE, sKey, paramSpec);
             decrypt.init(Cipher.DECRYPT_MODE, sKey, paramSpec);
         } catch (Exception ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error attempting to creating the instance!");
         }
     }
     public AES(SecretKey key, String password){
@@ -73,7 +73,7 @@ public class AES {
         try {
             seed = password.getBytes(code);
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Bytes not supported!");
         }
     }
     public String encryptData(String msg){
@@ -87,7 +87,7 @@ public class AES {
             String res = hexToString(crypted);
             return res;
         } catch (Exception ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error crypting data!");
             return null;
         }
     }
@@ -108,7 +108,7 @@ public class AES {
             }
             return res.toString();
         } catch (Exception ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error decrypting data!");
             return null;
         }
     }
@@ -120,7 +120,7 @@ public class AES {
             in.close();
             out.close();
         } catch (Exception ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error encrypting the file!");
         }
     }
     public void encryptFile(File src){
@@ -160,7 +160,7 @@ public class AES {
             in.close();
             out.close();
         } catch (Exception ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error decrypting the file!");
         }
     }
     private void encrypt(InputStream in, OutputStream out){
@@ -172,7 +172,7 @@ public class AES {
             }
             out.close();
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error: Basic encryptation failed!\nImpossible to continue!");
         }
     }
     private void decrypt(InputStream in, OutputStream out){
@@ -184,7 +184,7 @@ public class AES {
             }
             out.close();
         } catch (IOException ex){
-            ex.printStackTrace(Mainclass.err);
+            Sources.exception(ex, "Error: Basic decryptation failed!\nImpossible to continue!");
         }
     }
     private String hexToString(byte[] bytes){

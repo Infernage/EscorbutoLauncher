@@ -50,7 +50,7 @@ public class Vista2 extends javax.swing.JFrame {
             System.out.print("Checking MC minecraft.jar... ");
             if (!Installer.Worker.check(jar, mine)){
                 mine.delete();
-                Mainclass.copy(jar, mine);
+                Sources.copy(jar, mine);
             }
             System.out.println("OK");
         } catch (Exception ex){
@@ -370,7 +370,7 @@ public class Vista2 extends javax.swing.JFrame {
                     A.renameTo(B);
                     A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
                         + Sources.sep() + getFile(jTextField1.getText() + "NM")));
-                    Mainclass.copy(B, A);
+                    Sources.copy(B, A);
                     B.delete();
                     A = null;
                     B = null;
