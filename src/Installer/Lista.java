@@ -86,7 +86,7 @@ public class Lista extends javax.swing.JDialog {
             StringTokenizer token = new StringTokenizer (temp, "¬"); //Separamos la carpeta fecha de la carpeta hora
             String dia = token.nextToken();
             String hora = token.nextToken();
-            File mine = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"
+            File mine = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"
                         + Sources.sep() + dia + Sources.sep() + hora + Sources.sep() + Sources.DirMC));
             if (mine.exists()){
                 decriptada.add(ordenada.get(i));

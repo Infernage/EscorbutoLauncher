@@ -21,6 +21,7 @@ public class Mainclass {
     public static Splash init;
     public static PrintStream err;
     public static ErrStream error;
+    public static Console consola;
     
     public static void setThreadError(){
         error = new ErrStream("Errores");
@@ -87,10 +88,11 @@ public class Mainclass {
             return;
         }
         for (int i = 0; i < names.size(); i++){
-            tmp.add(new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(names.get(i).getName())));
             if (!Sources.download(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(names.get(i).getName())
                     , nameFiles(names.get(i).getName()))){
                 System.err.println("[ERROR]Sync interrupted!");
+            } else{
+                tmp.add(new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(names.get(i).getName())));
             }
         }
         BufferedReader bf = null;
@@ -106,7 +108,7 @@ public class Mainclass {
                  bf.close();
                  pw.close();
                  tmp.get(i).delete();
-             } catch (IOException ex){
+             } catch (Exception ex){
                 Sources.exception(ex, "Error en la sincronización con el servidor.");
              }
         }
@@ -175,6 +177,7 @@ public class Mainclass {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        System.setProperty("java.net.useSystemProxies", "true");
         init = new Splash();
         Thread t = new Thread(init, "Splash");
         t.start();
@@ -184,6 +187,14 @@ public class Mainclass {
         System.out.print("Setting new ErrorStream..."); //Se crea el nuevo hilo de errores
         setThreadError();
         System.out.println("OK");
+        consola = new Console();
+        consola.setVisible(true);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace(err);
+        }
+        System.out.println("Setting new OutputStream...");
         System.out.print("Setting OS... "); //Se implementa el sistema operativo
         Sources.setOS();
         System.out.println("OK");

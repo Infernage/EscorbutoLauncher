@@ -73,7 +73,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 fichsrc = new File(installPath);
             }
         } else{
-            fichsrc = new File(Sources.path("Desktop" + Sources.sep() + "Update"
+            fichsrc = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update"
                     + Sources.sep() + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
         }
         File fichdst = new File(Sources.path(Sources.DirMC));
@@ -132,7 +132,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 StringBuilder sts = new StringBuilder().append(C.get(Calendar.HOUR_OF_DAY)).append(";")
                         .append(C.get(Calendar.MINUTE)).append(";").append(C.get(Calendar.SECOND))
                         .append("-").append(C.get(Calendar.MILLISECOND));
-                File copia = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"
+                File copia = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"
                         + Sources.sep() + str.toString() + Sources.sep() + sts.toString()));
                 File zip = new File(copia.getAbsolutePath() + Sources.sep() + "data.dat");
                 if (copia.exists()){
@@ -307,7 +307,8 @@ public class Worker extends SwingWorker <String, Integer>{
             if (direct){
                 System.out.println("Creating direct access");
                 eti.setText("Creando accesos directos del sistema...");
-                File desk = new File(Sources.path("Desktop" + Sources.sep() + "RunMinecraft.jar"));
+                File desk = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" 
+                        + Sources.sep() + "RunMinecraft.jar");
                 Thread.sleep(1500);
                 for (int i = prog.getValue(); i < 99; i++){
                     prog.setValue(i+1);

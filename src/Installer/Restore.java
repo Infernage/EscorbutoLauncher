@@ -3,11 +3,7 @@ package Installer;
 
 import Login.Sources;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
@@ -47,7 +43,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
         System.out.println("Restore thread execution(OK)");
         //Cogemos la base de datos de las copias de seguridad
         System.out.print("Getting backup files... ");
-        File copia = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"));
+        File copia = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"));
         ficheros(copia);//Listamos los ficheros que haya en copia
         System.out.println("OK");
         if (this.isCancelled()){

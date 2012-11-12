@@ -50,7 +50,8 @@ public class Unworker extends SwingWorker<Integer, Integer>{
             Thread.sleep(100);
         }
         Thread.sleep(2000);
-        File exec = new File(Sources.path("Desktop" + Sources.sep() + "RunMinecraft.jar"));
+        File exec = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" + Sources.sep()
+                + "RunMinecraft.jar");
         if (exec.exists()){//Si existe el acceso directo, lo borramos
             exec.delete();
         }

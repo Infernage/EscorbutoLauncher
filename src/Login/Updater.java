@@ -26,7 +26,7 @@ public class Updater extends Thread{
         super("Updater");
         data = isData;
         link = host;
-        path = Sources.path("Desktop" + Sources.sep() + "Update");
+        path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
     }
     private String getFileName(URL url) {
         String fileName = url.getFile();
@@ -48,11 +48,11 @@ public class Updater extends Thread{
             System.out.print("...");
             // Conectamos al servidor
             connection.connect();
-            String path = Sources.path("Desktop");
+            name = "Update.zip";
+            String path = Sources.path(Sources.DirData() + Sources.sep() + name);
             System.out.print("...");
             // Abrimos el archivo
-            name = "Update.zip";
-            file = new RandomAccessFile(path + Sources.sep() + name, "rw");
+            file = new RandomAccessFile(path, "rw");
             file.seek(0);
             System.out.print("...");
             //Obtenemos el stream de la URL
@@ -78,7 +78,7 @@ public class Updater extends Thread{
             file.close();
             System.out.println("... OK");
         } catch (Exception e) {
-            System.out.print("... FAILED");
+            System.out.println("... FAILED");
             Sources.fatalException(e, "Download crashed!", 4);
         }
     }
@@ -86,7 +86,7 @@ public class Updater extends Thread{
     private void descomprimir(){
         System.out.print("Decompressing...");
         //Creamos la carpeta donde van a ir los archivos
-        String zipper = Sources.path("Desktop" + Sources.sep() + name);
+        String zipper = Sources.path(Sources.DirData() + Sources.sep() + name);
         File mine = new File(path);
         if (mine.exists()){
             Sources.borrarFichero(mine);
@@ -140,22 +140,22 @@ public class Updater extends Thread{
                 zip.closeEntry();
             }
             zip.close();
-            System.out.print("... OK");
-        } catch (IOException ex) {
-            System.out.print("... FAILED");
+            System.out.println("... OK");
+        } catch (Exception ex) {
+            System.out.println("... FAILED");
             Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
         }
-        File delete = new File(zipper);
-        delete.delete();
+        new File(zipper).delete();
+        Sources.borrarFichero(mine);
     }
     //Método de ejecución de Main Instalador
     private void exec(){
         System.out.print("Openning new filesystem... ");
             //Por último ejecutamos el nuevo login
         if (!data){
-            File old = new File(Sources.path("Desktop" + Sources.sep() + "Update" + Sources.sep() 
+            File old = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep() 
                     + Sources.jar));
-            File oldlib = new File(Sources.path("Desktop" + Sources.sep() + "Update" + Sources.sep()
+            File oldlib = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
                     + Sources.Dirlibs));
             File next = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
             File nextlib = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.Dirlibs));

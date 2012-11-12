@@ -189,7 +189,6 @@ public class Sources {
      * </ul>
      */
     public static String path(String name){
-        System.err.println(name);
         String Wtmp = System.getProperty("user.home") + "\\AppData\\Roaming";
         String Ltmp = System.getProperty("user.home");
         if (OS.equals("windows") && (name != null)){

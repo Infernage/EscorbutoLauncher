@@ -62,7 +62,7 @@ public class Vista extends javax.swing.JFrame {
         return tmp;
     }
     private void createLoginFile(String type, String account, String password, String word) throws IOException{
-        fichero = new File(fich + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + jTextField1.getText() + "NM.dat");
+        fichero = new File(fich + Sources.DirNM + Sources.sep() + Sources.DirTMP + Sources.sep() + jTextField1.getText().toLowerCase() + "NM.dat");
         fichero.createNewFile();
         Calendar C = new GregorianCalendar();
         StringBuilder str = new StringBuilder("File created at ").append(C.get(Calendar.DAY_OF_MONTH)).append("/")
@@ -377,7 +377,7 @@ public class Vista extends javax.swing.JFrame {
         if (exito){
             System.out.println("Creating new account...............");
             System.out.print("Checking for created accounts... ");
-            if (checkDuplicateAcc(jTextField1.getText())){
+            if (checkDuplicateAcc(jTextField1.getText().toLowerCase())){
                 JOptionPane.showMessageDialog(null, "La cuenta ya existe");
                 System.out.println("FAILED\nExisting account founded!");
                 return;
@@ -447,7 +447,7 @@ public class Vista extends javax.swing.JFrame {
             System.out.println("FAILED");
             return;
         }
-        if (checkDuplicateAcc(jTextField1.getText())){
+        if (checkDuplicateAcc(jTextField1.getText().toLowerCase())){
             JOptionPane.showMessageDialog(null, "La cuenta ya existe");
             System.out.println("FAILED\nExisting account founded!");
             return;
@@ -523,7 +523,7 @@ public class Vista extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
             return;
         }
-        if (checkDuplicateAcc(jTextField1.getText())){
+        if (checkDuplicateAcc(jTextField1.getText().toLowerCase())){
             System.out.println("FAILED\nExisting account founded!");
             JOptionPane.showMessageDialog(null, "La cuenta ya existe");
             return;

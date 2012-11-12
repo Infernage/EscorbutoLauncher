@@ -56,7 +56,7 @@ public class Outdated {
                 }
                 bf.close();
                 data.delete();
-                File upload = Vista.createStaticLoginFile(type, name, username, password, word);
+                File upload = Vista.createStaticLoginFile(type, name.toLowerCase(), username, password, word);
                 if (!Sources.upload(upload.getAbsolutePath(), upload.getName())){
                     throw new IOException("Failed connection to the server!");
                 }
@@ -71,12 +71,41 @@ public class Outdated {
         System.out.println("Version 4.2.2 it's absoultely equals to 4.2.1\nIt isn't necessary to do anything.");
     }
     public static void ver422(){
-        
+        File copySystem = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" + 
+                Sources.sep() + "Copia Minecraft");
+        if (copySystem.exists()){
+            System.out.print("Copy system founded! Exporting to the new location... ");
+            try {
+                Sources.copyDirectory(copySystem, new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft")));
+                Sources.borrarFichero(copySystem);
+                copySystem.delete();
+                System.out.println("OK");
+            } catch (IOException ex) {
+                System.out.println("FAILED");
+                Sources.exception(ex, "Failed to adapt the new copySystem!");
+            }
+        }
+        File updateSystem = new File(Sources.path("Desktop"));
+        if (updateSystem.exists()){
+            Sources.borrarFichero(updateSystem);
+            updateSystem.delete();
+        }
+        File lstlg = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + 
+                Sources.sep() + Sources.login));
+        if (lstlg.exists()){
+            File newlstlg = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.login));
+            try {
+                Sources.copy(lstlg, newlstlg);
+            } catch (IOException ex) {
+                Sources.exception(ex, "Failed to adapt the new remember system!");
+            }
+        }
     }
     public static void checkAll(){
         System.out.println("Actual version: " + Mainclass.version);
         ver410();
         ver421();
+        ver422();
         System.gc();
     }
     private static class outECP{

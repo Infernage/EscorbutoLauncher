@@ -25,7 +25,8 @@ public class Cliente extends Thread{
     private JButton play, installer;//Botón jugar e instalar
     private JFrame fr;//Ventana
     private boolean isData, write = false;
-    private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com";
+    private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com", 
+            hostTerciario = "dropbox.com";
     //Creamos el cliente
     public Cliente(JLabel A, JLabel B, JButton C, JButton D, URL url, JFrame fra){
         super("Cliente");
@@ -40,14 +41,21 @@ public class Cliente extends Thread{
         links = new HashMap<String, String>();
         try {
             input = new BufferedReader(new InputStreamReader(url.openStream()));
-        } catch (IOException ex) {
-            state.setForeground(Color.red);
-            state.setText("ERROR!");
-            info.setForeground(Color.red);
-            info.setText(ex.getMessage());
+        } catch (Exception ex) {
+            if (ex.toString().contains("Connection timed out: connect")){
+                state.setForeground(Color.red);
+                state.setText("No connection!");
+                info.setForeground(Color.red);
+                info.setText("Conexión fallida, imposible detectar actualizaciones.");
+            } else{
+                state.setForeground(Color.red);
+                state.setText("ERROR!");
+                info.setForeground(Color.red);
+                info.setText(ex.getMessage());
+                Sources.exception(ex, ex.getMessage());
+            }
             salir();
             error = true;
-            Sources.exception(ex, ex.getMessage());
         }
     }
     //Método para salir del bucle
@@ -94,6 +102,8 @@ public class Cliente extends Thread{
                     }
                 }
                 in.close();
+            } else if (link.contains(hostTerciario)){
+                exit = true;
             }
             System.out.println("OK");
         } catch (Exception ex) {
@@ -122,10 +132,12 @@ public class Cliente extends Thread{
             StringTokenizer toke = new StringTokenizer(data.get(i), "<>\"");
             while (toke.hasMoreTokens()){
                 String temp = toke.nextToken();
-                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario)){
+                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario) || 
+                        temp.contains(hostTerciario)){
                     lin = temp;
                 }
-                if (temp.contains(".") && !temp.contains(hostPrincipal) && !temp.contains(hostSecundario)){
+                if (temp.contains(".") && !temp.contains(hostPrincipal) && 
+                        !temp.contains(hostSecundario) && !temp.contains(hostTerciario)){
                     ver = temp;
                 }
             }
@@ -137,10 +149,12 @@ public class Cliente extends Thread{
             StringTokenizer toke = new StringTokenizer(login.get(i), "<>\"");
             while (toke.hasMoreTokens()){
                 String temp = toke.nextToken();
-                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario)){
+                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario) || 
+                        temp.contains(hostTerciario)){
                     lin = temp;
                 }
-                if (temp.contains(".") && !temp.contains(hostPrincipal) && !temp.contains(hostSecundario)){
+                if (temp.contains(".") && !temp.contains(hostPrincipal) && 
+                        !temp.contains(hostSecundario) && !temp.contains(hostTerciario)){
                     ver = temp;
                 }
             }
@@ -247,7 +261,8 @@ public class Cliente extends Thread{
                         List<String> temp = lista;
                         mapa.put("Login", temp);
                     }
-                    if ((msg.contains(hostPrincipal) || msg.contains(hostSecundario)) && write){
+                    if ((msg.contains(hostPrincipal) || msg.contains(hostSecundario) || 
+                            msg.contains(hostTerciario)) && write){
                         lista.add(msg);
                     }
                 }
@@ -265,7 +280,9 @@ public class Cliente extends Thread{
             }
         }
         try {
-            input.close();
+            if (input != null){
+                input.close();
+            }
         } catch (Exception ex) {
             if (!error){
                 state.setForeground(Color.red);
