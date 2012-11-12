@@ -3,12 +3,17 @@ package Login;
 
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.*;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.skin.SubstanceSkin;
 
 /*
  * To change this template, choose Tools | Templates
@@ -20,12 +25,14 @@ import javax.swing.*;
  * @author Reed
  */
 public class Vista2 extends javax.swing.JFrame {
+    private JPopupMenu menu;
     private String args;
     private LogMine logeoMC;
     private LogShafter logeoMS;
     //private static Systray sys;
     public static Vista2 see;
     private boolean offline = false, connect = true;
+    public static boolean defaultSkin = true;;
     /**
      * Creates new form Vista2
      */
@@ -563,6 +570,11 @@ public class Vista2 extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(900, 489));
         setResizable(false);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                formMouseReleased(evt);
+            }
+        });
 
         jTextField1.setBackground(new java.awt.Color(174, 108, 17));
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -608,7 +620,7 @@ public class Vista2 extends javax.swing.JFrame {
         jButton7.setFont(new java.awt.Font("Gulim", 1, 12)); // NOI18N
         jButton7.setForeground(new java.awt.Color(255, 0, 255));
         jButton7.setText("FAQ");
-        jButton7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 51), 2));
+        jButton7.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
@@ -618,7 +630,7 @@ public class Vista2 extends javax.swing.JFrame {
         jButton8.setFont(new java.awt.Font("Gulim", 1, 12)); // NOI18N
         jButton8.setForeground(new java.awt.Color(0, 255, 238));
         jButton8.setText("Acerca de...");
-        jButton8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 255, 102), 2));
+        jButton8.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jButton8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton8ActionPerformed(evt);
@@ -664,7 +676,7 @@ public class Vista2 extends javax.swing.JFrame {
         jButton6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jButton6.setForeground(new java.awt.Color(0, 204, 255));
         jButton6.setText("Instalador");
-        jButton6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 3));
+        jButton6.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jButton6.setContentAreaFilled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -675,7 +687,7 @@ public class Vista2 extends javax.swing.JFrame {
         statusConn.setFont(new java.awt.Font("Tahoma", 0, 8)); // NOI18N
 
         jButton3.setBackground(new java.awt.Color(255, 51, 51));
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
+        jButton3.setForeground(new java.awt.Color(255, 51, 51));
         jButton3.setText("Enviar error");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -720,9 +732,9 @@ public class Vista2 extends javax.swing.JFrame {
                                     .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(statusConn, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton1)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -732,9 +744,9 @@ public class Vista2 extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jCheckBox1))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(52, 52, 52)
+                        .addGap(47, 47, 47)
                         .addComponent(jButton4)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(32, 32, 32)
                 .addComponent(jScrollPane1)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -748,7 +760,7 @@ public class Vista2 extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(174, 174, 174)
+                .addGap(261, 261, 261)
                 .addComponent(jButton9))
         );
         layout.setVerticalGroup(
@@ -759,10 +771,10 @@ public class Vista2 extends javax.swing.JFrame {
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton3))
-                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton3)))
                 .addGap(235, 235, 235)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
@@ -931,7 +943,9 @@ public class Vista2 extends javax.swing.JFrame {
         System.out.println("Changing to installer mode...............");
         this.setVisible(false);
         see = this;
-        Installer.Vista.main(null);
+        Installer.Vista vist = new Installer.Vista();
+        vist.setLocationRelativeTo(null);
+        vist.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -946,11 +960,45 @@ public class Vista2 extends javax.swing.JFrame {
         // TODO add your handling code here:
         System.out.println("[Openning Register file]");
         this.setVisible(false);
-        Vista vis = Vista.main(Sources.path(Sources.DirData() + Sources.sep()), Sources.path(Sources.DirData() 
+        Vista vis = new Vista(Sources.path(Sources.DirData() + Sources.sep()), Sources.path(Sources.DirData() 
                 + Sources.sep() + Sources.bool), true);
         vis.setNew(this);
         vis.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
+        // TODO add your handling code here:
+        if (evt.getButton() == MouseEvent.BUTTON2){
+            if (menu == null){
+                menu = new JPopupMenu();
+                ActionListener black = new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent evt){
+                        if (!Vista2.defaultSkin) return;
+                        Vista2.defaultSkin = false;
+                        SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.RavenGraphiteGlassSkin");
+                    }
+                };
+                ActionListener white = new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent evt){
+                        if (Vista2.defaultSkin) return;
+                        Vista2.defaultSkin = true;
+                        SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.NebulaBrickWallSkin");
+                    }
+                };
+                JMenuItem iBlack = new JMenuItem("Negro");
+                iBlack.addActionListener(black);
+                JMenuItem iWhite = new JMenuItem("Blanco");
+                iWhite.addActionListener(white);
+                menu.add(iBlack);
+                menu.add(iWhite);
+            }
+            menu.setLocation(evt.getXOnScreen(), evt.getYOnScreen());
+            menu.setInvoker(menu);
+            menu.setVisible(true);
+        }
+    }//GEN-LAST:event_formMouseReleased
 
     /**
      * @param args the command line arguments

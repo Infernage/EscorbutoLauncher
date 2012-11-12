@@ -9,6 +9,7 @@ package Login;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import org.jvnet.substance.*;
 /**
  *
  * @author Reed
@@ -178,6 +179,9 @@ public class Mainclass {
     public static void main(String[] args) {
         // TODO code application logic here
         System.setProperty("java.net.useSystemProxies", "true");
+        //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.NebulaBrickWallSkin");
+        //SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.RavenGraphiteGlassSkin");
         init = new Splash();
         Thread t = new Thread(init, "Splash");
         t.start();
@@ -227,27 +231,35 @@ public class Mainclass {
              */
                 System.out.println("FAILED");
                 System.out.println("[Openning Installer]");
-                Installer.Vista.main(args);
+                Installer.Vista vist = new Installer.Vista();
+                vist.setLocationRelativeTo(null);
+                vist.setVisible(true);
                 return;
             }
         } else{ //Si el minecraft no está instalado
             System.out.println("FAILED");
             System.out.println("[Openning Installer]");
-            Installer.Vista.main(args);
+            Installer.Vista vist = new Installer.Vista();
+            vist.setLocationRelativeTo(null);
+            vist.setVisible(true);
             return;
         }
         File dat = new File(Sources.path(Sources.DirData()));
         if (!dat.exists()){ //Si los datos no existen
             System.out.println("FAILED");
             System.out.println("[Openning Installer]");
-            Installer.Vista.main(args);
+            Installer.Vista vist = new Installer.Vista();
+            vist.setLocationRelativeTo(null);
+            vist.setVisible(true);
             return;
         } else{
             File[] datas = dat.listFiles();
             if (datas.length < 1){ //Si los datos creados están corruptos
                 System.out.println("FAILED");
                 System.out.println("[Openning Installer]");
-                Installer.Vista.main(args);
+                Installer.Vista vist = new Installer.Vista();
+                vist.setLocationRelativeTo(null);
+                vist.setVisible(true);
                 return;
             }
         }
@@ -321,7 +333,8 @@ public class Mainclass {
             } else{
                 //Sino, no se ha registrado, y abrimos la Vista
                 System.out.println("[Openning Register file]");
-                Vista.main(Sources.path(Sources.DirData() + Sources.sep()), fichero.getAbsolutePath(), false);
+                Vista vista = new Vista(Sources.path(Sources.DirData() + Sources.sep()), fichero.getAbsolutePath(), false);
+                vista.setVisible(true);
             }
         } else{
             //Si no existe el fichero, lo creamos y escribimos en él false
@@ -334,7 +347,8 @@ public class Mainclass {
                 ex.printStackTrace(err);
             }
             System.out.println("[Openning Register file]");
-            Vista.main(Sources.path(Sources.DirData()), fichero.getAbsolutePath(), false);
+            Vista vista = new Vista(Sources.path(Sources.DirData()), fichero.getAbsolutePath(), false);
+            vista.setVisible(true);
         }
     }
 }
