@@ -4,7 +4,6 @@ package Installer;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-import Login.Mainclass;
 import Login.Sources;
 import java.awt.Color;
 import java.io.*;
@@ -451,6 +450,60 @@ public class Worker extends SwingWorker <String, Integer>{
             beta.close();
         } catch (Exception ex) {
             Sources.exception(ex, "Error al comprobar los archivos!");
+        }
+        return res;
+    }
+    /**
+     * This method checks if a directory is equals to another one.
+     * @param srcDir The source directory.
+     * @param dstDir The destination directory.
+     * @return {@code true} if the two directories are equals, and {@code false} in otherwise
+     */
+    public static boolean checkDirectory(File srcDir, File dstDir){
+        boolean res = true;
+        try{
+            long A = srcDir.length();
+            long B = dstDir.length();
+            String one = srcDir.getName();
+            String two = dstDir.getName();
+            if (A == B && one.equals(two)){
+                if (srcDir.isDirectory() && dstDir.isDirectory()){
+                    File[] tmp = srcDir.listFiles();
+                    File[] temp = dstDir.listFiles();
+                    if (tmp.length == temp.length){
+                        int i = 0;
+                        while((i < tmp.length) && res){
+                            res = checkDirectory(tmp[i], temp[i]);
+                            i++;
+                        }
+                    } else{
+                        res = false;
+                    }
+                } else if (srcDir.isFile() && dstDir.isFile()){
+                    res = check(srcDir, dstDir);
+                } else{
+                    res = false;
+                }
+            } else{
+                res = false;
+            }
+        } catch (Exception ex) {
+            Sources.exception(ex, "Error al comprobar los archivos!");
+        }
+        return res;
+    }
+    /**
+     * Equals to the other {@code checkDirectory}, but this method doesn't compare the names and the length.
+     */
+    public static boolean checkDirectory(File[] srcList, File[] dstList){
+        boolean res = true;
+        int i = 0;
+        if (srcList.length != dstList.length){
+            return false;
+        }
+        while((i < srcList.length) && res){
+            res = checkDirectory(srcList[i], dstList[i]);
+            i++;
         }
         return res;
     }

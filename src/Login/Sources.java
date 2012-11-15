@@ -50,6 +50,10 @@ public class Sources {
         return null;
     }
     /**
+     * This gets the configuration file name of the instance
+     */
+    public static String infoInst = "Instance.config";
+    /**
      * This gets the configuration file name of the server
      */
     public static String lsNM = "ALLNM-MC.cfg";
@@ -73,10 +77,6 @@ public class Sources {
      * This gets the name of directory and file of installation
      */
     public static String Dirsrc = "inst";
-    /**
-     * This gets the directory name of libraries used by this jar
-     */
-    public static String Dirlibs = "lib";
     /**
      * This gets the directory name of data files stored in this PC
      */
@@ -105,6 +105,10 @@ public class Sources {
      * This gets the directory name used to store temporally files from the server
      */
     public static String DirTMP = "TMP";
+    /**
+     * This gets the directory name used to store all minecraft instances
+     */
+    public static String DirInstance = "Instances";
     /** 
      * This method asigns the OS name
      */ 

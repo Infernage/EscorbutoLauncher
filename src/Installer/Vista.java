@@ -137,6 +137,7 @@ public class Vista extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Instalador Minecraft");
@@ -201,6 +202,13 @@ public class Vista extends javax.swing.JFrame {
         jLabel2.setBounds(0, 10, 385, 22);
         jLayeredPane1.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
+        jButton3.setText("Gestionar");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -218,6 +226,10 @@ public class Vista extends javax.swing.JFrame {
                                 .add(jLabel1)
                                 .add(123, 123, 123)))))
                 .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .add(170, 170, 170)
+                .add(jButton3)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -230,6 +242,8 @@ public class Vista extends javax.swing.JFrame {
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLayeredPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jButton3)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -306,6 +320,28 @@ public class Vista extends javax.swing.JFrame {
         restauring();
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        jButton3.setText("Abriendo...");
+        jButton3.setEnabled(false);
+        final Vista vis = this;
+        Thread t = new Thread("MultiMine"){
+            @Override
+            public void interrupt(){
+                Installer.Vista.jButton3.setEnabled(true);
+                Installer.Vista.jButton3.setText("Gestionar");
+            }
+            @Override
+            public void run(){
+                MultiMine mn = new MultiMine(vis, true);
+                Installer.Vista.jButton3.setText("Abierto");
+                mn.setVisible(true);
+            }
+        };
+        t.start();
+        Login.Mainclass.hilos.put("MultiMine", t);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -345,6 +381,7 @@ public class Vista extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    public static javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;

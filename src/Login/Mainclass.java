@@ -17,7 +17,7 @@ import org.jvnet.substance.*;
 public class Mainclass {
     //Versión
     public final static String title = "MineLogin";
-    public final static String version = "V4.2.2";
+    public final static String version = "V5.0.0 ALPHA";
     public static Map<String, Thread> hilos;
     public static Splash init;
     public static PrintStream err;
@@ -264,48 +264,29 @@ public class Mainclass {
             }
         }
         //Comprobamos el estado de los jars
-        System.out.println("OK");
-        System.out.print("Checking source files... ");
+        System.out.print("OK\nChecking instances... ");
+        File instance = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance));
+        if (!instance.exists()){
+            instance.mkdirs();
+        }
+        System.out.print("OK\nChecking source files... ");
         File runner = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
-        File runnerlib = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
-                + Sources.sep() + Sources.Dirlibs));
         File actual = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
-        File actuallib = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
-                + Sources.sep() + Sources.Dirlibs));
-        if (!runner.exists() && !runnerlib.exists()){
+        if (!runner.exists()){
             System.out.print("FAILED\nExporting source files... ");
             File dir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
             dir.mkdirs();
             try{
                 Sources.copy(actual, runner);
-                Sources.copyDirectory(actuallib, runnerlib);
                 System.out.println("OK");
             } catch (IOException ex){
                 System.out.println("FAILED");
                 ex.printStackTrace(err);
             }
-        } else if (runner.exists() && runnerlib.exists()){
+        } else if (runner.exists()){
             System.out.println("OK");
-        } else if (!runner.exists() && runnerlib.exists()){
-            System.out.print("FAILED\nExporting source files... ");
-            try{
-                Sources.copy(actual, runner);
-                System.out.println("OK");
-            } catch (IOException ex){
-                System.out.println("FAILED");
-                ex.printStackTrace(err);
-            }
-        } else if (runner.exists() && !runnerlib.exists()){
-            System.out.print("FAILED\nExporting source files...");
-            try{
-                Sources.copyDirectory(actuallib, runnerlib);
-                System.out.println("OK");
-            } catch (IOException ex){
-                System.out.println("FAILED");
-                ex.printStackTrace(err);
-            }
         }
         File fich = new File(Sources.path(Sources.DirData()));
         fich.mkdirs();

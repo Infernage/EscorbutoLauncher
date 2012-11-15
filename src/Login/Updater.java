@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.zip.*;
+import javax.swing.JProgressBar;
 /**
  *
  * @author Reed
@@ -21,6 +22,7 @@ public class Updater extends Thread{
     private String path;
     private String name;
     public Installer.Worker work;
+    public JProgressBar prog;
     //Creamos el actualizador con el link de la nueva versión como parámetro
     public Updater (String host, boolean isData){
         super("Updater");
@@ -28,12 +30,28 @@ public class Updater extends Thread{
         link = host;
         path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
     }
+    public Updater (String host, JProgressBar bar){
+        super("Updater");
+        link = host;
+        prog = bar;
+        path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
+    }
     private String getFileName(URL url) {
         String fileName = url.getFile();
         return fileName.substring(fileName.lastIndexOf('/') + 1);
     }
+    private void per (int size, int downloaded){
+        size = size/1048576;
+        downloaded = downloaded/1048576;
+        String temp = downloaded + "MBytes/" + size + "MBytes";
+        prog.setString(temp);
+    }
+    private void descargar(JProgressBar bar){
+        prog = bar;
+        descargar();
+    }
     //Método de descarga
-    private void descargar(){
+    public void descargar(){
         RandomAccessFile file = null;
         InputStream stream = null;
         try {
@@ -58,7 +76,7 @@ public class Updater extends Thread{
             //Obtenemos el stream de la URL
             stream = connection.getInputStream();
             int size = connection.getContentLength();
-            Vista2.jProgressBar1.setMaximum(size);
+            prog.setMaximum(size);
             //Creamos un array de bytes
             byte buffer[] = new byte[size];
             //Indicamos cuantos se van a leer cada vez
@@ -67,8 +85,8 @@ public class Updater extends Thread{
             System.out.print("...");
             while (read > 0) {
                 offset += read;
-                Vista2.per(size, offset);
-                Vista2.jProgressBar1.setValue(offset);
+                per(size, offset);
+                prog.setValue(offset);
                 // Escribimos los bytes en el fichero
                 file.write(buffer, 0, read);
                 read = stream.read(buffer);
@@ -155,24 +173,16 @@ public class Updater extends Thread{
         if (!data){
             File old = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep() 
                     + Sources.jar));
-            File oldlib = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
-                    + Sources.Dirlibs));
             File next = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
-            File nextlib = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.Dirlibs));
             File minejar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles
                     + Sources.sep() + "minecraft.jar"));
             minejar.delete();
             if (next.exists()){
                 next.delete();
             }
-            if (nextlib.exists()){
-                Sources.borrarFichero(nextlib);
-            }
             try{
                 Sources.copy(old, next);
-                Sources.copyDirectory(oldlib, nextlib);
                 old.delete();
-                Sources.borrarFichero(oldlib);
             } catch (Exception ex){
                 ex.printStackTrace(Mainclass.err);
             }
@@ -181,13 +191,13 @@ public class Updater extends Thread{
             return;
         }
         System.out.println("OK");
-        Vista2.jProgressBar1.setVisible(true);
-        Vista2.jProgressBar1.setString("Aplicando actualización...");
-        Vista2.jProgressBar1.setMaximum(100);
-        Vista2.jProgressBar1.setMinimum(0);
-        Vista2.jProgressBar1.setValue(0);
-        System.out.println("Applying update...............");
-        work = new Installer.Worker(Vista2.jProgressBar1);
+        prog.setVisible(true);
+        prog.setString("Aplicando instalación...");
+        prog.setMaximum(100);
+        prog.setMinimum(0);
+        prog.setValue(0);
+        System.out.println("Applying installation...............");
+        work = new Installer.Worker(prog);
         work.execute();
         File dst = new File(Sources.path(Sources.DirMC));
         Executer exe = new Executer(dst);
@@ -201,9 +211,6 @@ public class Updater extends Thread{
             }
         }
         exe.out();
-        if (!work.isCancelled()){
-            this.temp();
-        }
     }
     public void temp(){
         try {
@@ -220,7 +227,11 @@ public class Updater extends Thread{
     //Método de ejecución
     @Override
     public void run(){
-        descargar();//Descargamos los archivos necesarios
+        if (prog == null){
+            descargar(Vista2.jProgressBar1);//Descargamos los archivos necesarios
+        } else{
+            descargar();
+        }
         descomprimir();//Los descomprimimos
         exec();//Ejecutamos el main
     }
