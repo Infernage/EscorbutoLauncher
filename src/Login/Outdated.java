@@ -62,7 +62,7 @@ public class Outdated {
                 }
                 upload.delete();
             } catch (IOException ex){
-                Sources.fatalException(ex, "[FATAL ERROR]\nNo se pudo sincronizar con el servidor", 3);
+                Sources.fatalException(ex, "No se pudo sincronizar con el servidor", 3);
             }
         }
         data = null;

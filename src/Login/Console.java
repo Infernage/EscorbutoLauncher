@@ -5,11 +5,8 @@
 package Login;
 
 import java.awt.Cursor;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
@@ -26,12 +23,14 @@ public class Console extends javax.swing.JFrame {
         setExtendedState(Cursor.CROSSHAIR_CURSOR);
         initComponents();
         Systemout = System.out;
-        text = new Text();
-        text.start();
-        Mainclass.hilos.put("Console", text);
+        text = new Text(new ByteArrayOutputStream());
+        System.setOut(text);
     }
-    public void salir(){
+    private void salir(){
         text.salir();
+    }
+    public void exit(){
+        this.jButton1ActionPerformed(null);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -138,46 +137,30 @@ public class Console extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
-    private class Text extends Thread{
-        private boolean exit = false;
+    private class Text extends PrintStream{
         private PrintStream out;
-        public Text(){
-            super("Console");
+        private ByteArrayOutputStream output;
+        public Text(OutputStream out){
+            super(out);
         }
         public void salir(){
-            exit = true;
+            this.close();
         }
         @Override
-        public void run(){
-            String msg;
-            PipedOutputStream pipeOut = new PipedOutputStream();
-            PipedInputStream pipeIn = null;
-            try {
-                pipeIn = new PipedInputStream(pipeOut);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            out = new PrintStream(pipeOut);
-            System.setOut(out);
-            BufferedReader output = new BufferedReader(new InputStreamReader(pipeIn));
-            while(!exit){
-                try {
-                    msg = output.readLine() + "\n";
-                    if ((msg != null) && !(msg.equals(""))){
-                        jTextArea1.append(msg);
-                        jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            try {
-                output.close();
-                pipeIn.close();
-                pipeOut.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        public void println(String msg){
+            jTextArea1.append(msg);
+            jTextArea1.append("\n");
+            jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+        }
+        @Override
+        public void println(){
+            jTextArea1.append("\n");
+            jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+        }
+        @Override
+        public void print(String msg){
+            jTextArea1.append(msg);
+            jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
         }
     }
 }

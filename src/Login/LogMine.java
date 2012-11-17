@@ -8,18 +8,19 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -87,6 +88,31 @@ public class LogMine extends Thread{
                 connection.disconnect();
         }
     }
+    public void play(String user, String pass){
+        try {
+            String[] args = new String[]{ user, pass };
+            URL u = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar")).toURI().toURL();
+            URLClassLoader cl = new URLClassLoader(new URL[]{u});
+            Class launcherFrame = cl.loadClass("net.minecraft.LauncherFrame");
+            Method[] test = launcherFrame.getMethods();
+            int i = 0;
+            while(i < test.length){
+                if (test[i].getName().equals("main")){
+                    Method loader = test[i];
+                    loader.setAccessible(true);
+                    Vista2.see.setVisible(false);
+                    loader.invoke(launcherFrame, new Object[]{ args });
+                    i = test.length;
+                    Mainclass.consola.exit();
+                } else{
+                    i++;
+                }
+            }
+        } catch (Exception ex) {
+            Sources.fatalException(ex, "Error al inicializar minecraft.", 2);
+        }
+        Vista2.see.dispose();
+    }
     @Override
     public void run(){
         try {
@@ -113,18 +139,8 @@ public class LogMine extends Thread{
                 }
                 return;
             }
-            RAM ram = new RAM(Vista2.see, true);
-            ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            ram.setLocationRelativeTo(null);
-            ram.setVisible(true);
-            int ind = ram.devolver() + 1;
-            ram.dispose();
-            if (ind == 0){
-                ind = 2;
-                JOptionPane.showMessageDialog(null, "No ha elegido ninguna opción. Se ejecutará la opción por defecto (1GB)");
-            }
             System.out.println("Initializing minecraft...");
-            Vista2.playMC(userName, password, ind);
+            play(userName, password);
         } catch (UnsupportedEncodingException ex) {
             Sources.fatalException(ex, "Error inicializando minecraft.", 1);
         }

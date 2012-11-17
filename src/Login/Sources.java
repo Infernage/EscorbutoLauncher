@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -132,8 +133,10 @@ public class Sources {
      */
     public static boolean upload(String pathFile, String name){
         try{
-            OutputStream out = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
-                    + name + ";type=i").openConnection().getOutputStream();
+            URLConnection url = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                    + name + ";type=i").openConnection();
+            url.setDoOutput(true);
+            OutputStream out = url.getOutputStream();
             BufferedReader br = new BufferedReader(new FileReader(pathFile));
             int c;
             while((c = br.read()) != -1){
@@ -157,8 +160,10 @@ public class Sources {
      */
     public static boolean download(String pathFile, String name){
         try{
-            InputStream is = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
-                    + name + ";type=i").openConnection().getInputStream();
+            URLConnection url = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                    + name + ";type=i").openConnection();
+            url.setDoInput(true);
+            InputStream is = url.getInputStream();
             BufferedWriter bw = new BufferedWriter(new FileWriter(pathFile));
             int c;
             while((c = is.read()) != -1){

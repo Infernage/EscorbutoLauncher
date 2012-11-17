@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.*;
 import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.skin.SubstanceSkin;
 
 /*
  * To change this template, choose Tools | Templates
@@ -200,14 +199,14 @@ public class Vista2 extends javax.swing.JFrame {
             try {
                 bat.createNewFile();
             } catch (IOException ex) {
-                Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 9);
+                Sources.fatalException(ex, "Error en la ejecución del minecraft.", 9);
             }
         }
         PrintWriter pw = null;
         try{
             pw = new PrintWriter(bat);
         } catch (IOException ex){
-            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 9);
+            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 9);
         }
         statusConn.setText("");
         Process minecraft = null;
@@ -239,14 +238,14 @@ public class Vista2 extends javax.swing.JFrame {
             System.out.println(comand);
             minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
         } catch (IOException ex){
-            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 1);
+            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 1);
         }
         try {
             if (minecraft == null){
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            Sources.fatalException(ex, "FATAL ERROR\nError en la ejecución del minecraft.", 1);
+            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 1);
         }
         System.exit(0);
     }
@@ -255,6 +254,7 @@ public class Vista2 extends javax.swing.JFrame {
      * @param text The username.
      */
     private void inputLog(String text){
+        text = text.toLowerCase();
         File log = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
                 + getFile(text + "NM")));
         Calendar C = new GregorianCalendar();
@@ -292,6 +292,7 @@ public class Vista2 extends javax.swing.JFrame {
         return tam;
     }
     private void Play(){
+        String name = jTextField1.getText().toLowerCase();
         statusConn.setForeground(Color.white);
         statusConn.setText("");
         //Método del botón ¡Jugar!
@@ -342,19 +343,19 @@ public class Vista2 extends javax.swing.JFrame {
         }
         try{
             File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
-                    + getFile(jTextField1.getText().toLowerCase() + "NM")));
+                    + getFile(name + "NM")));
             BufferedReader bf = null;
             String temp = null;
             if (!tmp.exists()){
                 System.out.println("Local file not found! Looking for existing file at the server...");
                 if (!Sources.download(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
                         + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + jTextField1.getText().toLowerCase() + "NM.dat"), jTextField1.getText().toLowerCase()
+                        + name + "NM.dat"), name
                         + "NM.dat")){
                         System.out.println("Error downloading the file!");
                         try{
                             bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
-                                + jTextField1.getText().toLowerCase() + "NM.dat;type=i").openConnection().getInputStream()));
+                                + name + "NM.dat;type=i").openConnection().getInputStream()));
                             System.out.println(bf.readLine());
                             temp = bf.readLine();
                     } catch (Exception ex){
@@ -370,13 +371,13 @@ public class Vista2 extends javax.swing.JFrame {
                 } else{
                     File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
                         + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + jTextField1.getText().toLowerCase() + "NM.dat"));
+                        + name + "NM.dat"));
                     File B = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
                         + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + getFile(jTextField1.getText().toLowerCase() + "NM")));
+                        + getFile(name + "NM")));
                     A.renameTo(B);
                     A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
-                        + Sources.sep() + getFile(jTextField1.getText().toLowerCase() + "NM")));
+                        + Sources.sep() + getFile(name + "NM")));
                     Sources.copy(B, A);
                     B.delete();
                     A = null;
@@ -432,17 +433,10 @@ public class Vista2 extends javax.swing.JFrame {
                 Mainclass.hilos.put("LogMine", logeoMC);
                 inputLog(jTextField1.getText());
             } else if (temp.equals("MS")){
-                final int ram = selectRAM();
-                final String user = jTextField1.getText();
-                final String pss = new String(jPasswordField1.getPassword());
-                Thread thr = new Thread("LogShafter"){
-                    @Override
-                    public void run(){
-                        Vista2.playMS(user, pss, ram);
-                    }
-                };
-                thr.start();
-                Mainclass.hilos.put("LogShafter", thr);
+                see = this;
+                logeoMS = new LogShafter(jTextField1.getText(), new String(jPasswordField1.getPassword()));
+                logeoMS.start();
+                Mainclass.hilos.put("LogShafter", logeoMC);
                 inputLog(jTextField1.getText());
             } else if (temp.equals("DEL")){
                 JOptionPane.showMessageDialog(null, "La cuenta no existe.");
@@ -450,68 +444,8 @@ public class Vista2 extends javax.swing.JFrame {
             }
             bf.close();
         } catch (Exception ex){
-            Sources.fatalException(ex, "FATAL ERROR\nError al comprobar los datos.", 2);
+            Sources.fatalException(ex, "Error al comprobar los datos.", 2);
         }
-    }
-    public static void playMS (String user, String pass, int opt){
-        String command = "java ";
-        switch(opt){
-            case 1: command = command + " -Xmx512m -Xms512m";
-                break;
-            case 2: command = command + " -Xmx1024m -Xms1024m";
-                break;
-            case 3: command = command + " -Xmx2048m -Xms2048m";
-                break;
-            case 4: command = command + " -Xmx4096m -Xms4096m";
-                break;
-        }
-        command = command + " -jar " + Sources.path(Sources.DirMC + Sources.sep() + "Mineshafter-proxy.jar");
-        File temporal = new File(Sources.path(Sources.DirData() + Sources.sep() + "sys.tpl"));
-        try{
-            temporal.createNewFile();
-        } catch (IOException ex){
-            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar mineshafter.", 2);
-            return;
-        }
-        try {
-            PrintWriter pw = new PrintWriter(temporal);
-            pw.println(user);
-            pw.println(pass);
-            pw.close();
-        } catch (FileNotFoundException ex) {
-            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar mineshafter.", 2);
-            return;
-        }
-        execMCS(command);
-    }
-    public static void playMC (String user, String pass, int opt){
-        String command = "java ";
-        switch(opt){
-            case 1: command = command + "-Xmx512m -Xms512m";
-                break;
-            case 2: command = command + "-Xmx1024m -Xms1024m";
-                break;
-            case 3: command = command + "-Xmx2048m -Xms2048m";
-                break;
-            case 4: command = command + "-Xmx4096m -Xms4096m";
-                break;
-        }
-        command = command + " -jar " + Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar");
-        File temporal = new File(Sources.path(Sources.DirData() + Sources.sep() + "sys.tpl"));
-        try{
-            temporal.createNewFile();
-        } catch(IOException ex){
-            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar minecraft.", 2);
-        }
-        try {
-            PrintWriter pw = new PrintWriter(temporal);
-            pw.println(user);
-            pw.println(pass);
-            pw.close();
-        } catch (FileNotFoundException ex) {
-            Sources.fatalException(ex, "FATAL ERROR\nError al inicializar minecraft.", 2);
-        }
-        execMCS(command);
     }
     private static void execMCS(String com){
         see.setVisible(false);
@@ -522,7 +456,7 @@ public class Vista2 extends javax.swing.JFrame {
                 throw new Exception("[ERROR]Minecraft execution was incorrect!");
             }
         } catch (Exception ex) {
-            Sources.fatalException(ex, "FATAL ERROR\nError al ejecutar minecraft.", 1);
+            Sources.fatalException(ex, "Error al ejecutar minecraft.", 1);
         }
         System.exit(0);
     }

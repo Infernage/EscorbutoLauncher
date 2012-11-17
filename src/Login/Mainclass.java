@@ -272,8 +272,7 @@ public class Mainclass {
         System.out.print("OK\nChecking source files... ");
         File runner = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
-        File actual = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
-                + Sources.sep() + Sources.jar));
+        File actual = new File(System.getProperty("user.dir") + Sources.sep() + Sources.jar);
         if (!runner.exists()){
             System.out.print("FAILED\nExporting source files... ");
             File dir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));

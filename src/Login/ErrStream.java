@@ -4,11 +4,8 @@
  */
 package Login;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
@@ -16,42 +13,38 @@ import java.io.PrintStream;
  * @author Reed
  */
 public class ErrStream extends Thread{
-     public boolean exit = false;
      public StringBuilder err;
+     private Stream out;
      public ErrStream(String name){
          super(name);
+     }
+     public void exit(){
+         out.close();
      }
      @Override
      public void run(){
          err = new StringBuilder();
-         PipedOutputStream pipeOut = new PipedOutputStream();
-         PipedInputStream pipeIn = null;
-         try {
-             pipeIn = new PipedInputStream(pipeOut);
-         } catch (IOException ex) {
-             ex.printStackTrace();
-         }
-         Mainclass.err = new PrintStream(pipeOut);
+         out = new Stream(new ByteArrayOutputStream());
+         Mainclass.err = out;
          System.setErr(Mainclass.err);
-         BufferedReader errors = new BufferedReader(new InputStreamReader(pipeIn));
-         String temp = null;
-         while (!exit){
-             try {
-                 temp = errors.readLine();
-                 if ((temp != null) && !temp.equals("")){
-                    err.append(temp).append("\n");
-                 }
-             } catch (IOException ex) {
-                 ex.printStackTrace();
-                        
-             }
+     }
+     private class Stream extends PrintStream{
+         private OutputStream output;
+         public Stream(OutputStream stream){
+             super(stream);
+             output = stream;
          }
-         try {
-             errors.close();
-             pipeIn.close();
-             pipeOut.close();
-         } catch (IOException ex) {
-             ex.printStackTrace();
+         @Override
+         public void println(String msg){
+             err.append(msg).append("\n");
+         }
+         @Override
+         public void println(){
+             err.append("\n");
+         }
+         @Override
+         public void print(String msg){
+             err.append(msg);
          }
      }
 }
