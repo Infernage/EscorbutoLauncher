@@ -25,9 +25,9 @@ import org.jvnet.substance.SubstanceLookAndFeel;
  */
 public class Vista2 extends javax.swing.JFrame {
     private JPopupMenu menu;
-    private String args;
     private LogMine logeoMC;
     private LogShafter logeoMS;
+    private LogOff logeoOFF;
     //private static Systray sys;
     public static Vista2 see;
     private boolean offline = false, connect = true;
@@ -39,6 +39,7 @@ public class Vista2 extends javax.swing.JFrame {
         try{
             System.out.print("Checking this minecraft.jar... ");
             File jar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "minecraft.jar"));
+            File mc = new File(Sources.path(Sources.DirMC));
             if (!jar.exists()){
                 System.out.print("FAILED\nExporting new one now... ");
                 InputStream in = getClass().getResourceAsStream("/Resources/minecraft.jar");
@@ -54,9 +55,13 @@ public class Vista2 extends javax.swing.JFrame {
             System.out.println("OK");
             File mine = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
             System.out.print("Checking MC minecraft.jar... ");
-            if (!Installer.Worker.check(jar, mine)){
-                mine.delete();
+            if (!mine.exists() && mc.exists()){
                 Sources.copy(jar, mine);
+            } else if (mine.exists() && mc.exists()){
+                if (!Installer.Worker.check(jar, mine)){
+                    mine.delete();
+                    Sources.copy(jar, mine);
+                }
             }
             System.out.println("OK");
         } catch (Exception ex){
@@ -138,11 +143,11 @@ public class Vista2 extends javax.swing.JFrame {
                         jPasswordField1.setText(tmp);
                     }
                 }
-                System.out.println("OK");
             } catch (Exception ex){
                 Sources.exception(ex, "Error en la lectura del fichero.");
             }
         }
+        System.out.println("OK");
         //Creamos el cliente del actualizador
         try{
             System.out.print("Initialiting updater... ");
@@ -164,12 +169,6 @@ public class Vista2 extends javax.swing.JFrame {
     /*public void res(){
         sys.salir();
     }*/
-    public static void per (int size, int downloaded){
-        size = size/1048576;
-        downloaded = downloaded/1048576;
-        String temp = downloaded + "MBytes/" + size + "MBytes";
-        jProgressBar1.setString(temp);
-    }
     /**
      * This method gets the file name crypted.
      * @param txt The username given.
@@ -191,63 +190,6 @@ public class Vista2 extends javax.swing.JFrame {
         text.start();
         Mainclass.hilos.put("ChangeLog", text);
         System.out.println("OK");
-    }
-    private void mineOff(){
-        File bat = new File(Sources.path(Sources.DirMC + Sources.sep() + "bin" + Sources.sep()
-            + "com.bat"));
-        if (!bat.exists()){
-            try {
-                bat.createNewFile();
-            } catch (IOException ex) {
-                Sources.fatalException(ex, "Error en la ejecución del minecraft.", 9);
-            }
-        }
-        PrintWriter pw = null;
-        try{
-            pw = new PrintWriter(bat);
-        } catch (IOException ex){
-            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 9);
-        }
-        statusConn.setText("");
-        Process minecraft = null;
-        final String cmd = "-cp \"%APPDATA%/.minecraft/bin/minecraft.jar;%APPDATA%/.minecraft/bin/lwjgl.jar;%APPDATA%/.minecraft/bin/lwjgl_util.jar;%APPDATA%/.minecraft/bin/jinput.jar\" -Djava.library.path=\"%APPDATA%/.minecraft/bin/natives\" net.minecraft.client.Minecraft ";
-        String comand = "java ";
-        //Si todo está correcto, se abre la ventana de elección de RAM
-        int tam = selectRAM();
-        switch(tam){
-            case 1:
-                comand = comand + "-Xmx512m -Xms512m " + cmd + args;
-                pw.print(comand);
-                break;
-            case 2:
-                comand = comand + "-Xmx1024m -Xms1024m " + cmd + args;
-                pw.print(comand);
-                break;
-            case 3:
-                comand = comand + "-Xmx2048m -Xms2048m " + cmd + args;
-                pw.print(comand);
-                break;
-            case 4:
-                comand = comand + "-Xmx4096m -Xms4096m " + cmd + args;
-                pw.print(comand);
-                break;
-        }
-        pw.close();
-        inputLog(jTextField1.getText());
-        try{
-            System.out.println(comand);
-            minecraft = Runtime.getRuntime().exec(bat.getAbsolutePath());
-        } catch (IOException ex){
-            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 1);
-        }
-        try {
-            if (minecraft == null){
-                throw new Exception("[ERROR]Minecraft execution was incorrect!");
-            }
-        } catch (Exception ex) {
-            Sources.fatalException(ex, "Error en la ejecución del minecraft.", 1);
-        }
-        System.exit(0);
     }
     /**
      * This method adds a log to a file on the server.
@@ -274,22 +216,6 @@ public class Vista2 extends javax.swing.JFrame {
         } catch (IOException ex){
             Sources.exception(ex, "Error al sincronizar log con el server.");
         }
-    }
-    private int selectRAM(){
-        RAM ram = new RAM(this, true);
-        ram.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        ram.setLocationRelativeTo(this);
-        ram.setVisible(true);
-        int tam = ram.devolver() + 1;
-        if (ram.isActive()){
-            ram.dispose();
-        }
-        //Si no se elige ninguna opción, se toma la Default
-        if (tam == 0){
-            tam = 2;
-            JOptionPane.showMessageDialog(null, "Aplicando parámetros por defecto.");
-        }
-        return tam;
     }
     private void Play(){
         String name = jTextField1.getText().toLowerCase();
@@ -335,130 +261,8 @@ public class Vista2 extends javax.swing.JFrame {
             Sources.exception(ex, "Error al crear el fichero lastlogin.");
         }
         System.out.println("OK");
-        if (offline){
-            System.out.println("Setting parameter: OFFLINE");
-            args = jTextField1.getText();
-            mineOff();
-            return;
-        }
-        try{
-            File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
-                    + getFile(name + "NM")));
-            BufferedReader bf = null;
-            String temp = null;
-            if (!tmp.exists()){
-                System.out.println("Local file not found! Looking for existing file at the server...");
-                if (!Sources.download(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
-                        + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + name + "NM.dat"), name
-                        + "NM.dat")){
-                        System.out.println("Error downloading the file!");
-                        try{
-                            bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
-                                + name + "NM.dat;type=i").openConnection().getInputStream()));
-                            System.out.println(bf.readLine());
-                            temp = bf.readLine();
-                    } catch (Exception ex){
-                        if (ex.toString().contains("FileNotFound")){
-                            statusConn.setText("");
-                            JOptionPane.showMessageDialog(null, "La cuenta no existe.");
-                            back();
-                            return;
-                        } else{
-                            ex.printStackTrace(Mainclass.err);
-                        }
-                    }
-                } else{
-                    File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
-                        + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + name + "NM.dat"));
-                    File B = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
-                        + Sources.sep() + Sources.DirTMP + Sources.sep()
-                        + getFile(name + "NM")));
-                    A.renameTo(B);
-                    A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
-                        + Sources.sep() + getFile(name + "NM")));
-                    Sources.copy(B, A);
-                    B.delete();
-                    A = null;
-                    B = null;
-                    System.gc();
-                    try{
-                        bf = new BufferedReader(new FileReader(tmp));
-                        System.out.println(bf.readLine());
-                        temp = bf.readLine();
-                    } catch (IOException ex){
-                        Sources.exception(ex, "Error al comparar datos.");
-                    }
-                }
-            } else{
-                try{
-                    bf = new BufferedReader(new FileReader(tmp));
-                    System.out.println(bf.readLine());
-                    temp = bf.readLine();
-                } catch (IOException ex){
-                    Sources.exception(ex, "Error al comparar datos.");
-                }
-            }
-            if (temp.equals("OFF")){
-                String temp1 = bf.readLine(), temp2 = bf.readLine();
-                boolean open = false;
-                AES cry = new AES(Sources.pss);
-                String A = cry.decryptData(temp1);
-                String B = cry.decryptData(temp2);
-                if (A.equals(jTextField1.getText()) && B.equals(new String(jPasswordField1.getPassword()))){
-                    open = true;
-                    args = A;
-                }
-                if (open){
-                    bf.close();
-                    mineOff();
-                } else{
-                    statusConn.setForeground(Color.red);
-                    statusConn.setText("Login failed!");
-                    back();
-                }
-            } else if (temp.equals("MC")){
-                see = this;
-                if (logeoMC != null){
-                    offline = logeoMC.offline;
-                    if (offline){
-                        Play();
-                        return;
-                    }
-                }
-                logeoMC = new LogMine(jTextField1.getText(), new String(jPasswordField1.getPassword()),
-                        statusConn, jButton5, this);
-                logeoMC.start();
-                Mainclass.hilos.put("LogMine", logeoMC);
-                inputLog(jTextField1.getText());
-            } else if (temp.equals("MS")){
-                see = this;
-                logeoMS = new LogShafter(jTextField1.getText(), new String(jPasswordField1.getPassword()));
-                logeoMS.start();
-                Mainclass.hilos.put("LogShafter", logeoMC);
-                inputLog(jTextField1.getText());
-            } else if (temp.equals("DEL")){
-                JOptionPane.showMessageDialog(null, "La cuenta no existe.");
-                back();
-            }
-            bf.close();
-        } catch (Exception ex){
-            Sources.fatalException(ex, "Error al comprobar los datos.", 2);
-        }
-    }
-    private static void execMCS(String com){
-        see.setVisible(false);
-        Process minecraft = null;
-        try {
-            minecraft = Runtime.getRuntime().exec(com);
-            if (minecraft == null){
-                throw new Exception("[ERROR]Minecraft execution was incorrect!");
-            }
-        } catch (Exception ex) {
-            Sources.fatalException(ex, "Error al ejecutar minecraft.", 1);
-        }
-        System.exit(0);
+        PlayButton play = new PlayButton(this, name);
+        play.start();
     }
     public void visible(){
         this.setVisible(true);
@@ -902,7 +706,7 @@ public class Vista2 extends javax.swing.JFrame {
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         // TODO add your handling code here:
-        if (evt.getButton() == MouseEvent.BUTTON2){
+        if (evt.getButton() == MouseEvent.BUTTON3){
             if (menu == null){
                 menu = new JPopupMenu();
                 ActionListener black = new ActionListener(){
@@ -974,6 +778,141 @@ public class Vista2 extends javax.swing.JFrame {
                 new Vista2().setVisible(true);
             }
         });
+    }
+    private class PlayButton extends Thread{
+        private Vista2 gui;
+        private String name;
+        public PlayButton(Vista2 V, String name){
+            gui = V;
+            this.name = name;
+        }
+        private void initialite(){
+            if (offline){
+                System.out.println("Setting parameter: OFFLINE");
+                inputLog(jTextField1.getText());
+                logeoOFF = new LogOff(jTextField1.getText(), see, statusConn);
+                logeoOFF.start();
+                return;
+            }
+            try{
+                File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
+                        + getFile(name + "NM")));
+                BufferedReader bf = null;
+                String temp = null;
+                if (!tmp.exists()){
+                    System.out.println("Local file not found! Looking for existing file at the server...");
+                    if (!Sources.download(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                        + Sources.sep() + Sources.DirTMP + Sources.sep()
+                        + name + "NM.dat"), name
+                        + "NM.dat")){
+                            System.out.println("Error downloading the file!");
+                        try{
+                                bf = new BufferedReader (new InputStreamReader(new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                                    + name + "NM.dat;type=i").openConnection().getInputStream()));
+                                System.out.println(bf.readLine());
+                                temp = bf.readLine();
+                        } catch (Exception ex){
+                            if (ex.toString().contains("FileNotFound")){
+                                statusConn.setText("");
+                                JOptionPane.showMessageDialog(null, "La cuenta no existe.");
+                                bf.close();
+                                back();
+                                return;
+                            } else{
+                                statusConn.setText("");
+                                Sources.exception(ex, "No se ha podido conectar con el servidor.");
+                                jButton5.setText("Jugar offline");
+                                offline = true;
+                                bf.close();
+                                return;
+                            }
+                        }
+                    } else{
+                        File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                            + Sources.sep() + Sources.DirTMP + Sources.sep()
+                            + name + "NM.dat"));
+                        File B = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                            + Sources.sep() + Sources.DirTMP + Sources.sep()
+                            + getFile(name + "NM")));
+                        A.renameTo(B);
+                        A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM
+                            + Sources.sep() + getFile(name + "NM")));
+                        Sources.copy(B, A);
+                        B.delete();
+                        A = null;
+                        B = null;
+                        System.gc();
+                        try{
+                            bf = new BufferedReader(new FileReader(tmp));
+                            System.out.println(bf.readLine());
+                            temp = bf.readLine();
+                        } catch (IOException ex){
+                            Sources.exception(ex, "Error al comparar datos.");
+                            bf.close();
+                            return;
+                        }
+                    }
+                } else{
+                    try{
+                        bf = new BufferedReader(new FileReader(tmp));
+                        System.out.println(bf.readLine());
+                        temp = bf.readLine();
+                    } catch (IOException ex){
+                        Sources.exception(ex, "Error al comparar datos.");
+                        bf.close();
+                        return;
+                    }
+                }
+                if (temp.equals("OFF")){
+                    String temp1 = bf.readLine(), temp2 = bf.readLine();
+                    boolean open = false;
+                    AES cry = new AES(Sources.pss);
+                    String A = cry.decryptData(temp1);
+                    String B = cry.decryptData(temp2);
+                    if (A.equals(jTextField1.getText()) && B.equals(new String(jPasswordField1.getPassword()))){
+                        open = true;
+                    }
+                    if (open){
+                        bf.close();
+                        inputLog(A);
+                        logeoOFF = new LogOff(A, see, statusConn);
+                        logeoOFF.start();
+                    } else{
+                        statusConn.setForeground(Color.red);
+                        statusConn.setText("Login failed!");
+                        back();
+                    }
+                } else if (temp.equals("MC")){
+                    if (logeoMC != null){
+                        offline = logeoMC.offline;
+                        if (offline){
+                            initialite();
+                            return;
+                        }
+                    }
+                    logeoMC = new LogMine(jTextField1.getText(), new String(jPasswordField1.getPassword()),
+                            statusConn, jButton5, gui);
+                    logeoMC.start();
+                    Mainclass.hilos.put("LogMine", logeoMC);
+                    inputLog(jTextField1.getText());
+                } else if (temp.equals("MS")){
+                    logeoMS = new LogShafter(jTextField1.getText(), new String(jPasswordField1.getPassword()));
+                    logeoMS.start();
+                    Mainclass.hilos.put("LogShafter", logeoMC);
+                    inputLog(jTextField1.getText());
+                } else if (temp.equals("DEL")){
+                    JOptionPane.showMessageDialog(null, "La cuenta no existe.");
+                    back();
+                }
+                bf.close();
+            } catch (Exception ex){
+                Sources.fatalException(ex, "Error al comprobar los datos.", 2);
+            }
+        }
+        @Override
+        public void run(){
+            initialite();
+        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

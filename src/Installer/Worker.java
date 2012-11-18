@@ -212,7 +212,7 @@ public class Worker extends SwingWorker <String, Integer>{
             }
         }
         System.out.println("Installing new version");
-        eti.setText("Instalando Minecraft 1.2.5 ...");
+        eti.setText("Instalando Minecraft...");
         if ((fr != null) && (bot != null)){
             prog.setValue(20);
             Thread.sleep(3000);
@@ -300,14 +300,14 @@ public class Worker extends SwingWorker <String, Integer>{
             System.out.println("Adding source files and libraries...");
             File logger = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
             logger.mkdirs();
-            File DA = new File(Sources.path(Sources.DirMC + Sources.sep() + "RunMinecraft.jar"));
-            File DAtemp = new File(logger.getAbsolutePath() + Sources.sep() + "RunMinecraft.jar");
+            BufferedInputStream is = new BufferedInputStream(getClass().getResourceAsStream("/"
+                    + "Resources/RunMinecraft.jar"));
             prog.setValue(90);
             if (direct){
                 System.out.println("Creating direct access");
                 eti.setText("Creando accesos directos del sistema...");
                 File desk = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" 
-                        + Sources.sep() + "RunMinecraft.jar");
+                        + Sources.sep() + Sources.access);
                 Thread.sleep(1500);
                 for (int i = prog.getValue(); i < 99; i++){
                     prog.setValue(i+1);
@@ -315,14 +315,11 @@ public class Worker extends SwingWorker <String, Integer>{
                 }
                 Thread.sleep(1000);
                 if (!desk.exists()){
-                    Sources.installation(eti, DA, desk);
+                    BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(desk));
+                    Sources.copy(is, output);
                 }
                 System.out.println("Done!");
             }
-            if (!DAtemp.exists()){
-                Sources.installation(eti, DA, DAtemp);
-            }
-            DA.delete();
         } catch (IOException e){
             Sources.exception(e, "Error en la instalación. Comprueba que no has borrado "
                     + "ningún archivo de la carpeta.\n" + e.getMessage());
@@ -330,25 +327,12 @@ public class Worker extends SwingWorker <String, Integer>{
             this.back();
         }
         System.out.print("Checking source files... ");
-        File temporal = new File(Sources.path(Sources.DirMC + Sources.sep() + "Temporal.jar"));
-        File temp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles
-                + Sources.sep() + "Temporal.jar"));
-        if (!temp.exists() && temporal.exists()){
-            System.out.print("FAILED\nTrying to add... ");
-            Sources.installation(eti, temporal, temp);
-            temporal.delete();
-            System.out.println("OK");
-        } else if (temp.exists() && !temporal.exists()){
-            System.out.println("OK");
-        } else if (temp.exists() && temporal.exists()){
-            System.out.println("OK");
-            temporal.delete();
-        } else{
-            System.out.println("FAILED");
-            JOptionPane.showMessageDialog(null, "[ERROR] File not found!");
-            System.err.println("[ERROR] Temporal not found!\n");
-            exito = false;
-        }
+        File temp = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
+        Sources.copy(new BufferedInputStream(getClass().getResourceAsStream("/Resources/minecraft.jar")),
+                new BufferedOutputStream(new FileOutputStream(temp)));
+        temp = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS));
+        Sources.copy(new BufferedInputStream(getClass().getResourceAsStream("/Resources/Mineshafter-proxy.jar")),
+                new BufferedOutputStream(new FileOutputStream(temp)));
         if (exito){
             res = "Done!";
         } else{
@@ -419,7 +403,7 @@ public class Worker extends SwingWorker <String, Integer>{
         }
     }
     /**
-     * Method to check if a file is equals to other one.
+     * Method to check if a file is equal to other one.
      * @param src The source file
      * @param dst The destiny file
      * @return {@code true} if the two files are equals, and {@code false} in otherwise
@@ -431,30 +415,51 @@ public class Worker extends SwingWorker <String, Integer>{
             long B = dst.length();
             String one = src.getName();
             String two = dst.getName();
-            BufferedReader alpha = new BufferedReader(new FileReader(src));
-            BufferedReader beta = new BufferedReader(new FileReader(dst));
-            String cadenA = alpha.readLine();
-            String cadenB = beta.readLine();
-            boolean temp = true;
-            while ((cadenA != null) && (cadenB != null) && temp){
-                if (!cadenA.equals(cadenB)){
-                    temp = false;
-                }
-                cadenA = alpha.readLine();
-                cadenB = beta.readLine();
-            }
+            BufferedInputStream alpha = new BufferedInputStream(new FileInputStream(src));
+            BufferedInputStream beta = new BufferedInputStream(new FileInputStream(dst));
+            boolean temp = check(alpha, beta);
             if (A == B && one.equals(two) && temp){
                 res = true;
             }
             alpha.close();
             beta.close();
         } catch (Exception ex) {
-            Sources.exception(ex, "Error al comprobar los archivos!");
+            Sources.exception(ex, "Error al comprobar los archivos.");
         }
         return res;
     }
     /**
-     * This method checks if a directory is equals to another one.
+     * Method to check if an inputstream is equal to another one.
+     * @param alpha The source inputstream
+     * @param beta The destiny inputstream
+     * @return {@code true} if the two inputstream are equals, and {@code false} in otherwise
+     */
+    public static boolean check (BufferedInputStream alpha, BufferedInputStream beta){
+        boolean res = true;
+        try{
+            int A = alpha.read();
+            int B = beta.read();
+            while ((A != -1) && (B != -1) && res){
+                if (A != B){
+                    res = false;
+                }
+                A = alpha.read();
+                B = beta.read();
+            }
+        } catch (Exception ex){
+            Sources.exception(ex, "Error al comprobar los archivos.");
+            res = false;
+        }
+        try {
+            alpha.close();
+            beta.close();
+        } catch (IOException ex) {
+            
+        }
+        return res;
+    }
+    /**
+     * This method checks if a directory is equal to another one.
      * @param srcDir The source directory.
      * @param dstDir The destination directory.
      * @return {@code true} if the two directories are equals, and {@code false} in otherwise
@@ -488,7 +493,7 @@ public class Worker extends SwingWorker <String, Integer>{
                 res = false;
             }
         } catch (Exception ex) {
-            Sources.exception(ex, "Error al comprobar los archivos!");
+            Sources.exception(ex, "Error al comprobar los archivos.");
         }
         return res;
     }

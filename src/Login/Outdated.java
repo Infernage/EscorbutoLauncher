@@ -82,8 +82,13 @@ public class Outdated {
                 Sources.exception(ex, "Failed to adapt the new copySystem!");
             }
         }
-        File updateSystem = new File(Sources.path("Desktop"));
+        File updateSystem = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"));
         if (updateSystem.exists()){
+            try {
+                Sources.copyDirectory(updateSystem, new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft")));
+            } catch (IOException ex) {
+                Sources.exception(ex, "Failed to adapt the new copySystem!");
+            }
             Sources.borrarFichero(updateSystem);
             updateSystem.delete();
         }
@@ -95,6 +100,9 @@ public class Outdated {
                 Sources.copy(lstlg, newlstlg);
             } catch (IOException ex) {
                 Sources.exception(ex, "Failed to adapt the new remember system!");
+            }
+            if (!lstlg.delete()){
+                lstlg.deleteOnExit();
             }
         }
     }

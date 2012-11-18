@@ -352,35 +352,9 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void ejecutarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ejecutarBActionPerformed
         // TODO add your handling code here:
-        File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-        File mc = new File(Sources.path(Sources.DirMC));
-        int i = checkInstance(mcs);
-        File src = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                    + Sources.sep() + (String) jList1.getSelectedValue() + Sources.sep() + Sources.DirMC));
-        if (mcs[i].getName().equals((String) jList1.getSelectedValue())){
-            this.setVisible(false);
-            vis.dispose();
-            this.dispose();
-            Login.Vista2.see.setVisible(true);
-            return;
-        }
-        File dst = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
-        if (!dst.exists()){
-            dst.mkdirs();
-        }
-        try {
-            Sources.copyDirectory(mc, dst);
-            Sources.borrarFichero(mc);
-            Sources.copyDirectory(src, mc);
-            Sources.borrarFichero(src);
-            src.delete();
-            this.setVisible(false);
-            vis.dispose();
-            this.dispose();
-            Login.Vista2.see.setVisible(true);
-        } catch (IOException ex) {
-            Sources.exception(ex, "No se pudo iniciar la instancia.");
-        }
+        ejecutarB.setEnabled(false);
+        Exec execute = new Exec(this);
+        execute.start();
     }//GEN-LAST:event_ejecutarBActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -551,7 +525,8 @@ public class MultiMine extends javax.swing.JDialog {
         public void run(){
             if (object.equals("SinglePlayer")){
                 jTextArea1.setText("Instancia de Minecraft versión 1.4.4\nEsta instancia tiene los componentes"
-                    + " pertenecientes al uso individual.\n\nLas mods incluidas en este pack son:\n");
+                    + " pertenecientes al uso individual.\n\nLas mods incluidas en este pack son:\nNinguna"
+                        + " por ahora.");
             } else if (object.equals("MultiPlayer")){
                 jTextArea1.setText("Instancia de Minecraft versión 1.2.5\nEsta instancia tiene los componentes"
                     + " pertenecientes al uso de multijugador.\nLas mods incluidas aquí están también"
@@ -589,6 +564,43 @@ public class MultiMine extends javax.swing.JDialog {
             jProgressBar1.setString("");
             initModel();
             checkMC();
+        }
+    }
+    private class Exec extends Thread{
+        private MultiMine gui;
+        public Exec(MultiMine V){
+            gui = V;
+        }
+        public void run(){
+            File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
+            File mc = new File(Sources.path(Sources.DirMC));
+            int i = checkInstance(mcs);
+            File src = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
+                        + Sources.sep() + (String) jList1.getSelectedValue() + Sources.sep() + Sources.DirMC));
+            if (mcs[i].getName().equals((String) jList1.getSelectedValue())){
+                gui.setVisible(false);
+                vis.dispose();
+                gui.dispose();
+                Login.Vista2.see.setVisible(true);
+                return;
+            }
+            File dst = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
+            if (!dst.exists()){
+                dst.mkdirs();
+            }
+            try {
+                Sources.copyDirectory(mc, dst);
+                Sources.borrarFichero(mc);
+                Sources.copyDirectory(src, mc);
+                Sources.borrarFichero(src);
+                src.delete();
+                gui.setVisible(false);
+                vis.dispose();
+                gui.dispose();
+                Login.Vista2.see.setVisible(true);
+            } catch (IOException ex) {
+                Sources.exception(ex, "No se pudo iniciar la instancia.");
+            }
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
