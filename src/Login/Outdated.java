@@ -67,9 +67,6 @@ public class Outdated {
         }
         data = null;
     }
-    public static void ver421(){
-        System.out.println("Version 4.2.2 it's absoultely equals to 4.2.1\nIt isn't necessary to do anything.");
-    }
     public static void ver422(){
         File copySystem = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" + 
                 Sources.sep() + "Copia Minecraft");
@@ -104,7 +101,6 @@ public class Outdated {
     public static void checkAll(){
         System.out.println("Actual version: " + Mainclass.version);
         ver410();
-        ver421();
         ver422();
         System.gc();
     }

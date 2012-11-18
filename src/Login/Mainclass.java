@@ -17,7 +17,7 @@ import org.jvnet.substance.*;
 public class Mainclass {
     //Versión
     public final static String title = "MineLogin";
-    public final static String version = "V5.0.0 ALPHA";
+    public final static String version = "V5.0.0 BETA";
     public static Map<String, Thread> hilos;
     public static Splash init;
     public static PrintStream err;
@@ -221,50 +221,8 @@ public class Mainclass {
         }
         System.out.println("Checking for outdated config versions..............");
         Outdated.checkAll();
-        File mine = new File(Sources.path(Sources.DirMC));
-        System.out.print("Checking minecraft state... ");
-        if (mine.exists()){
-            File[] mines = mine.listFiles();
-            File infer = new File(mine.getAbsolutePath() + Sources.sep() + Sources.infernage());
-            if ((mines.length < 7) || !infer.exists()){ /*Si la instalación del minecraft está fallida
-             * o si no es la instalación de este login
-             */
-                System.out.println("FAILED");
-                System.out.println("[Openning Installer]");
-                Installer.Vista vist = new Installer.Vista();
-                vist.setLocationRelativeTo(null);
-                vist.setVisible(true);
-                return;
-            }
-        } else{ //Si el minecraft no está instalado
-            System.out.println("FAILED");
-            System.out.println("[Openning Installer]");
-            Installer.Vista vist = new Installer.Vista();
-            vist.setLocationRelativeTo(null);
-            vist.setVisible(true);
-            return;
-        }
-        File dat = new File(Sources.path(Sources.DirData()));
-        if (!dat.exists()){ //Si los datos no existen
-            System.out.println("FAILED");
-            System.out.println("[Openning Installer]");
-            Installer.Vista vist = new Installer.Vista();
-            vist.setLocationRelativeTo(null);
-            vist.setVisible(true);
-            return;
-        } else{
-            File[] datas = dat.listFiles();
-            if (datas.length < 1){ //Si los datos creados están corruptos
-                System.out.println("FAILED");
-                System.out.println("[Openning Installer]");
-                Installer.Vista vist = new Installer.Vista();
-                vist.setLocationRelativeTo(null);
-                vist.setVisible(true);
-                return;
-            }
-        }
         //Comprobamos el estado de los jars
-        System.out.print("OK\nChecking instances... ");
+        System.out.print("Checking instances... ");
         File instance = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance));
         if (!instance.exists()){
             instance.mkdirs();
@@ -285,6 +243,75 @@ public class Mainclass {
                 ex.printStackTrace(err);
             }
         } else if (runner.exists()){
+            System.out.println("OK");
+        }
+        File mc = new File(Sources.path(Sources.DirMC));
+        if (mc.exists()){
+            System.out.print("Checking jar files... ");
+            Mainclass tmp = new Mainclass();
+            File dest = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS));
+            BufferedInputStream src = null;
+            BufferedInputStream dst = null;
+            boolean res = false;
+            try{
+                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Mineshafter-proxy.jar"));
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.check(src, dst);
+                }
+            } catch (Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            }
+            if (!res || !dest.exists()){
+                try {
+                    dest.delete();
+                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
+                } catch (IOException ex) {
+                    Sources.exception(ex, ex.getMessage());
+                }
+            }
+            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
+                    + Sources.access));
+            try{           
+                src =  new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/RunMinecraft.jar"));
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.check(src, dst);
+                }
+            } catch (Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            }
+            if (!res || !dest.exists()){
+            File temp = new File(System.getProperty("user.home") + Sources.sep() + "Desktop"
+                        + Sources.sep() + Sources.access);
+                try{
+                        dest.delete();
+                Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
+                    temp.delete();
+                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(temp)));
+                } catch (IOException ex){
+                    Sources.exception(ex, ex.getMessage());
+                }
+            }
+            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
+                    + Sources.temporal));
+            try {
+                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Temporal.jar"));  
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.check(src, dst);
+                }
+            } catch (Exception ex) {
+                Sources.exception(ex, ex.getMessage());
+            }
+            if (!res || !dest.exists()){
+                try{
+                    dest.delete();
+                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
+                } catch (IOException ex){
+                    Sources.exception(ex, ex.getMessage());
+                }
+            }
             System.out.println("OK");
         }
         File fich = new File(Sources.path(Sources.DirData()));

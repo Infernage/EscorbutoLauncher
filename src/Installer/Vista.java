@@ -79,11 +79,6 @@ public class Vista extends javax.swing.JFrame {
         work = this.install(direct);
         work.execute();
     }
-    private void installSSP(boolean direct){
-        work = this.install(direct);
-        work.setInstallPath(Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + "SP.dat");
-        work.execute();
-    }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
         System.out.println("Creating new uninstall thread");
@@ -154,7 +149,7 @@ public class Vista extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jButton1.setBounds(330, 80, 60, 23);
+        jButton1.setBounds(330, 120, 60, 23);
         jLayeredPane1.add(jButton1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton4.setText("Finalizar");
@@ -164,7 +159,7 @@ public class Vista extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        jButton4.setBounds(310, 80, 80, 23);
+        jButton4.setBounds(310, 120, 80, 23);
         jLayeredPane1.add(jButton4, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton5.setText("Desinstalar");
@@ -182,7 +177,7 @@ public class Vista extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jButton2.setBounds(0, 0, 69, 23);
+        jButton2.setBounds(0, 0, 100, 23);
         jLayeredPane1.add(jButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton6.setText("Restaurar");
@@ -191,13 +186,13 @@ public class Vista extends javax.swing.JFrame {
                 jButton6ActionPerformed(evt);
             }
         });
-        jButton6.setBounds(0, 80, 90, 23);
+        jButton6.setBounds(0, 80, 100, 23);
         jLayeredPane1.add(jButton6, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jProgressBar1.setForeground(new java.awt.Color(0, 204, 0));
         jProgressBar1.setBounds(0, 30, 393, 25);
         jLayeredPane1.add(jProgressBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLabel3.setBounds(80, 4, 300, 20);
+        jLabel3.setBounds(110, 0, 280, 20);
         jLayeredPane1.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLabel2.setBounds(0, 10, 385, 22);
         jLayeredPane1.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -208,6 +203,8 @@ public class Vista extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
+        jButton3.setBounds(0, 120, 100, 23);
+        jLayeredPane1.add(jButton3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -226,10 +223,6 @@ public class Vista extends javax.swing.JFrame {
                                 .add(jLabel1)
                                 .add(123, 123, 123)))))
                 .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .add(170, 170, 170)
-                .add(jButton3)
-                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -241,10 +234,7 @@ public class Vista extends javax.swing.JFrame {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLayeredPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jButton3)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jLayeredPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
         );
 
         pack();
@@ -257,19 +247,6 @@ public class Vista extends javax.swing.JFrame {
         if (i == 0){
             boolean direct = jCheckBox1.isSelected();
             System.out.println("Installing...");
-            /*Election ele = new Election(this, true);
-            ele.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-            ele.setLocationRelativeTo(this);
-            ele.setVisible(true);
-            if (ele.SMP){
-                ele.removeAll();
-                ele = null;
-                installSMP(direct);
-            } else if (ele.SSP){
-                ele.removeAll();
-                ele = null;
-                installSSP(direct);
-            }*/
             installSMP(direct);
         }
     }//GEN-LAST:event_jButton2ActionPerformed

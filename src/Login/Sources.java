@@ -35,6 +35,18 @@ public class Sources {
      */
     public static String MS = "Mineshafter-proxy.jar";
     /**
+     * This gets this jar name
+     */
+    public static String jar = "RUN.jar";
+    /**
+     * This gets the direct access name jar
+     */
+    public static String access = "RunMinecraft.jar";
+    /**
+     * This gets the temporal jar
+     */
+    public static String temporal = "Temporal.jar";
+    /**
      * This gets the password
      */
     public static String pss = "MineClient";
@@ -62,10 +74,6 @@ public class Sources {
      * This gets the file name which check if it's the first time that is oppened
      */
     public static String bool = "boolean.txt";
-    /**
-     * This gets this jar name
-     */
-    public static String jar = "RUN.jar";
     /**
      * This gets the file name which check if the remember option was used
      */
@@ -161,6 +169,40 @@ public class Sources {
     public static boolean download(String pathFile, String name){
         try{
             URLConnection url = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/Base/"
+                    + name + ";type=i").openConnection();
+            url.setDoInput(true);
+            InputStream is = url.getInputStream();
+            BufferedWriter bw = new BufferedWriter(new FileWriter(pathFile));
+            int c;
+            while((c = is.read()) != -1){
+                bw.write(c);
+            }
+            is.close();
+            bw.flush();
+            bw.close();
+            duplicate = true;
+            return duplicate;
+        } catch (Exception ex){
+            duplicate = false;
+            if (ex.toString().contains("FileNotFound")){
+                System.err.println("[ERROR]The requested file doesn't exist!");
+                ex.printStackTrace(Mainclass.err);
+            } else{
+                System.err.println("[ERROR]Connection failed!");
+                ex.printStackTrace(Mainclass.err);
+            }
+            return false;
+        }
+    }
+    /**
+     * This method download the file which stores the update.
+     * @param pathFile The local path name of the file.
+     * @param name The name of the file at the server
+     * @return {@code true} If the file was download correctly; {@code false} If there was a problem.
+     */
+    public static boolean downloadMC(String pathFile, String name){
+        try{
+            URLConnection url = new URL("ftp://minechinchas_zxq:MC-1597328460@minechinchas.zxq.net/"
                     + name + ";type=i").openConnection();
             url.setDoInput(true);
             InputStream is = url.getInputStream();
@@ -299,6 +341,14 @@ public class Sources {
     public static void copy(File src, File dst) throws IOException { 
         BufferedInputStream input = new BufferedInputStream(new FileInputStream(src));
         BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dst));
+        copy(input, output);
+    }
+    /**
+     * This method copies a source inputstream to a destiny outputstream
+     * @param input The source inputstream
+     * @param output The destiny outputstream
+     */
+    public static void copy(BufferedInputStream input, BufferedOutputStream output) throws IOException{
         byte[] buffer = new byte[input.available()];
         input.read(buffer, 0, buffer.length);
         output.write(buffer);
@@ -335,6 +385,6 @@ public class Sources {
         }
     }
     public static void main (String[] args){
-        exception(new Exception(), "TESTING");
+        download(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\asd.txt", "asd.txt");
     }
 }

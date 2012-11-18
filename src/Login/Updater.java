@@ -31,10 +31,8 @@ public class Updater extends Thread{
         path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
     }
     public Updater (String host, JProgressBar bar){
-        super("Updater");
-        link = host;
+        this(host, true);
         prog = bar;
-        path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
     }
     private String getFileName(URL url) {
         String fileName = url.getFile();
@@ -78,7 +76,7 @@ public class Updater extends Thread{
             int size = connection.getContentLength();
             prog.setMaximum(size);
             //Creamos un array de bytes
-            byte buffer[] = new byte[size];
+            byte[] buffer = new byte[size];
             //Indicamos cuantos se van a leer cada vez
             int read = stream.read(buffer);
             int offset = 0;
@@ -164,7 +162,6 @@ public class Updater extends Thread{
             Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
         }
         new File(zipper).delete();
-        Sources.borrarFichero(mine);
     }
     //Método de ejecución de Main Instalador
     private void exec(){
@@ -211,6 +208,9 @@ public class Updater extends Thread{
             }
         }
         exe.out();
+        File tmp = new File(path);
+        Sources.borrarFichero(tmp);
+        tmp.delete();
     }
     public void temp(){
         try {
