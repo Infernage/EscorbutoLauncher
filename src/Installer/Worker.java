@@ -19,23 +19,22 @@ import net.lingala.zip4j.util.Zip4jConstants;
 public class Worker extends SwingWorker <String, Integer>{
     private JLabel eti;
     private JProgressBar prog;
-    private JButton bot, bot1;
+    private JButton bot1;
     private boolean direct, exito = true;
     private Calendar C;
     private Vista fr;
     private File copyTemp;
     private String installPath;
     //Constructor del SwingWorker
-    public Worker (JLabel lab, JProgressBar pro, JButton boton, JButton boton1, boolean temp){
+    public Worker (JLabel lab, JProgressBar pro, JButton boton1, boolean temp){
         eti = lab;
         prog = pro;
-        bot = boton;
         bot1 = boton1;
         direct = temp;
         C = new GregorianCalendar();
     }
     public Worker (JProgressBar pro){
-        this(new JLabel(), pro, null, null, false);
+        this(new JLabel(), pro, null, false);
     }
     public void setInstallPath(String path){
         installPath = path;
@@ -65,7 +64,7 @@ public class Worker extends SwingWorker <String, Integer>{
         System.out.println("Install thread execution(OK)");
         String res = null;
         File fichsrc = null;
-        if (bot != null){
+        if (bot1 != null){
             if (installPath == null){
                 fichsrc = new File(Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat");
             } else{
@@ -76,37 +75,8 @@ public class Worker extends SwingWorker <String, Integer>{
                     + Sources.sep() + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
         }
         File fichdst = new File(Sources.path(Sources.DirMC));
-        File fti = new File(Sources.path("opt.cfg"));
         eti.setText("Comprobando instalaciones anteriores...");
         Thread.sleep(2500);
-        if (!fti.exists()){
-            System.out.println("Setting new Data");
-            fti.createNewFile();
-            PrintWriter pw = new PrintWriter (fti);
-            pw.println(true);
-            pw.print(true);
-            pw.close();
-            File del = new File(Sources.path(Sources.DirData()));
-            if (del.exists()){
-                borrarData(del);
-            }
-        } else{
-            System.out.println("Reading Data document");
-            BufferedReader bf = new BufferedReader(new FileReader(fti));
-            String A = bf.readLine(), B = bf.readLine();;
-            bf.close();
-            if ((A == null) || (B == null)){
-                System.out.println("Setting new Data");
-                PrintWriter pw = new PrintWriter(fti);
-                pw.println(true);
-                pw.print(true);
-                pw.close();
-                File del = new File(Sources.path(Sources.DirData()));
-                if (del.exists()){
-                    borrarData(del);
-                }
-            }
-        }
         System.out.print("Checking for other installation... ");
         if (fichdst.isDirectory() && fichdst.exists()){
             System.out.println("OK");
@@ -118,7 +88,7 @@ public class Worker extends SwingWorker <String, Integer>{
             File copiaDel = new File(Sources.path(Sources.DirMC));
             Sources.copyDirectory(copiaDel, copyTemp);
             String say = null;
-            if (bot != null){
+            if (bot1 != null){
                 say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
             } else{
                 say = "¿Desea realizar copia de seguridad de su Minecraft?";
@@ -202,18 +172,18 @@ public class Worker extends SwingWorker <String, Integer>{
                             + "usando la carpeta de Minecraft.");
                     return null;
                 }
-            } else if ((i == 2) && (bot != null)){
+            } else if ((i == 2) && (bot1 != null)){
                 System.out.println("Installation canceled!");
                 this.cancel(true);
                 return null;
-            } else if ((i == 2) && (bot == null)){
+            } else if ((i == 2) && (bot1 == null)){
                 System.out.println("Aborting!");
                 System.exit(0);
             }
         }
         System.out.println("Installing new version");
         eti.setText("Instalando Minecraft...");
-        if ((fr != null) && (bot != null)){
+        if ((fr != null) && (bot1 != null)){
             prog.setValue(20);
             Thread.sleep(3000);
             for (int i = 20; i < 70; i++){
@@ -235,7 +205,7 @@ public class Worker extends SwingWorker <String, Integer>{
             System.out.print("Extracting installation files... ");
             dat.extractAll(Sources.path(Sources.DirData()));
             System.out.println("OK");
-            if ((fr == null) && (bot == null)){
+            if ((fr == null) && (bot1 == null)){
                 Login.Mainclass.hilos.get("Installer").start();
                 Thread.sleep(3000);
             }
@@ -353,12 +323,11 @@ public class Worker extends SwingWorker <String, Integer>{
         }
         if (exito && !this.isCancelled()){
             try{
-                if ((bot != null) && (bot1 != null) && (eti != null)){
+                if ((bot1 != null) && (bot1 != null) && (eti != null)){
                     eti.setText("Minecraft instalado con éxito en " + Sources.path(Sources.DirMC));
                     Thread.sleep(500);
-                    bot.setVisible(true);
-                    bot.setEnabled(true);
-                    bot1.setVisible(false);
+                    bot1.setEnabled(true);
+                    bot1.setVisible(true);
                 }
                 prog.setValue(100);
             } catch (Exception ex){

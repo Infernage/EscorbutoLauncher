@@ -218,6 +218,12 @@ public class Vista2 extends javax.swing.JFrame {
         }
     }
     private void Play(){
+        File minecraft = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
+        File bin = new File(Sources.path(Sources.DirMC + Sources.sep() + "bin" + Sources.sep() + "minecraft.jar"));
+        if (!bin.exists() || !minecraft.exists()){
+            JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft", "Minecraft not found!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         String name = jTextField1.getText().toLowerCase();
         statusConn.setForeground(Color.white);
         statusConn.setText("");

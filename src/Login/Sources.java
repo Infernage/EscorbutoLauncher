@@ -157,6 +157,9 @@ public class Sources {
         } catch (Exception ex){
             ex.printStackTrace(Mainclass.err);
             System.err.println("[ERROR] Connection failed!");
+            if (ex.toString().contains("501 for URL")){
+                return true;
+            }
             return false;
         }
     }
@@ -290,7 +293,7 @@ public class Sources {
      */
     public static void exception(Exception ex, String msg){
         int i = JOptionPane.showConfirmDialog(null, msg + "\n¿Quieres enviar el error?", 
-                "Oops! Ha ocurrido un error.", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Oops! Ha ocurrido un error.", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
         ex.printStackTrace(Mainclass.err);
         if (i == 0){
             Debug de = new Debug(null, true);
@@ -383,6 +386,37 @@ public class Sources {
             input.close();
             output.close();
         }
+    }
+    /**
+     * This method gets the host of the download.
+     * @param msg The file name
+     * @return The host of the download
+     */
+    public static String connect(String msg){
+        String host = null, local = Sources.path(Sources.DirData() + Sources.sep());
+        if (!Sources.downloadMC(local + msg, msg)){
+            Sources.exception(new Exception("Error connection"), "No se ha podido conectar con el servidor.");
+        } else{
+            File tmp = new File(local + msg);
+            BufferedReader bf = null;
+            try {
+                bf = new BufferedReader(new FileReader(tmp));
+                if (bf != null){
+                    host = bf.readLine();
+                    bf.close();
+                }
+            } catch (Exception ex) {
+                Sources.exception(ex, "Error leyendo los datos.");
+                try {
+                    bf.close();
+                } catch (IOException ex1) {
+                }
+            }
+            if (!tmp.delete()){
+                tmp.deleteOnExit();
+            }
+        }
+        return host;
     }
     public static void main (String[] args){
         download(System.getProperty("user.home") + "\\AppData\\Roaming\\Data\\asd.txt", "asd.txt");

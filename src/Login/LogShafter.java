@@ -22,18 +22,21 @@ public class LogShafter extends Thread{
     }
     private void startLog(){
         try {
-            URL u = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS)).toURI().toURL();
+            Mineshafter.mineshafter.MineClient.open(user, pass);
+            Mainclass.consola.exit();
+            /*URL u = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS)).toURI().toURL();
             URLClassLoader cl = new URLClassLoader(new URL[]{u});
             Class MineClient = cl.loadClass("mineshafter.MineClient");
             Method[] methods = MineClient.getMethods();
             int i = 0;
             while(i < methods.length){
                 if (methods[i].getName().equals("open")){
+                    System.out.println("Catched!");
                     Method loader = methods[i];
                     loader.invoke(MineClient, user, pass);
-                    Mainclass.consola.exit();
                     i = methods.length;
                 } else{
+                    System.out.println("Not catched!");
                     i++;
                 }
             }
@@ -42,9 +45,7 @@ public class LogShafter extends Thread{
             loader.invoke(MineClient, user, pass);*/
             Vista2.see.dispose();
         } catch (Exception ex) {
-            //Sources.exception(ex, "Login failed!");
-            JOptionPane.showMessageDialog(null, "Login failed!");
-            ex.printStackTrace();
+            Sources.exception(ex, "Login failed!");
         }
     }
     @Override

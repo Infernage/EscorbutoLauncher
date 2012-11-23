@@ -15,13 +15,12 @@ public class Unworker extends SwingWorker<Integer, Integer>{
     //Clase de desinstalación
     private JLabel eti;
     private JProgressBar pro;
-    private JButton salir, finalizar;
+    private JButton salir;
     private JFrame fr;
     //Constructor con todas las variables necesarias
-    public Unworker (JLabel A, JProgressBar B, JButton C, JButton D, JFrame G){
+    public Unworker (JLabel A, JProgressBar B, JButton D, JFrame G){
         eti = A;
         pro = B;
-        finalizar = C;
         salir = D;
         fr = G;
         pro.setValue(0);
@@ -61,10 +60,9 @@ public class Unworker extends SwingWorker<Integer, Integer>{
     }
     @Override
     protected void done(){
-        finalizar.setEnabled(true);
-        finalizar.setVisible(true);
         pro.setValue(100);
-        salir.setVisible(false);
+        salir.setVisible(true);
+        salir.setEnabled(true);
         fr.setVisible(true);
     }
     //Borrar fichero o directorio

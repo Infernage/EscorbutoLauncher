@@ -34,6 +34,16 @@ public class Updater extends Thread{
         this(host, true);
         prog = bar;
     }
+    /**
+     * Constructor doing specially to install for the first time.
+     * @param host The download link
+     * @param bar The progressbar
+     * @param worker The installation thread
+     */
+    public Updater (String host, JProgressBar bar, Installer.Worker worker){
+        this(host, bar);
+        work = worker;
+    }
     private String getFileName(URL url) {
         String fileName = url.getFile();
         return fileName.substring(fileName.lastIndexOf('/') + 1);
@@ -194,7 +204,9 @@ public class Updater extends Thread{
         prog.setMinimum(0);
         prog.setValue(0);
         System.out.println("Applying installation...............");
-        work = new Installer.Worker(prog);
+        if (work == null){
+            work = new Installer.Worker(prog);
+        }
         work.execute();
         File dst = new File(Sources.path(Sources.DirMC));
         Executer exe = new Executer(dst);

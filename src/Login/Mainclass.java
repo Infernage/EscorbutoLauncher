@@ -131,10 +131,12 @@ public class Mainclass {
         }
         File tmp = new File(tmpDir.getAbsolutePath() + Sources.sep() + nameFiles(sync.getName()));
         System.out.print("Creating temp file to synchronize... ");
+        PrintWriter pw = null;
+        BufferedReader bf = null;
         try{
             tmp.createNewFile();
-            PrintWriter pw = new PrintWriter(tmp);
-            BufferedReader bf = new BufferedReader(new FileReader(sync));
+            pw = new PrintWriter(tmp);
+            bf = new BufferedReader(new FileReader(sync));
             String temp = null;
             while((temp = bf.readLine()) != null){
                 pw.println(temp);
@@ -143,6 +145,11 @@ public class Mainclass {
             bf.close();
             System.out.println("OK");
         } catch (IOException ex){
+            try {
+                pw.close();
+                bf.close();
+            } catch (IOException ex1) {
+            }
             System.out.println("FAILED");
             ex.printStackTrace(err);
             System.err.println("[ERROR]Failed to synchronize with the server!");
@@ -260,7 +267,9 @@ public class Mainclass {
                     res = Installer.Worker.check(src, dst);
                 }
             } catch (Exception ex){
-                Sources.exception(ex, ex.getMessage());
+                if(!ex.toString().toLowerCase().contains("print closed")){
+                    Sources.exception(ex, ex.getMessage());
+                }
             }
             if (!res || !dest.exists()){
                 try {

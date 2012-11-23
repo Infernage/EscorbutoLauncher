@@ -4,70 +4,23 @@
  */
 package Login;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.KeySpec;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
-import javax.swing.JOptionPane;
 
 /**
  * Clase para hacer soporte a versiones antiguas.
  * @author Reed
  */
 public class Outdated {
-    public static void ver410(){
-        File RMB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.rmb));
-        if (RMB.exists()){
-            RMB.delete();
-        }
-        File data = new File(Sources.path(Sources.DirData() + Sources.sep()) + "data.cfg");
-        String type = null, username = null, password = null, word = null, name = null;
-        if (data.exists()){
-            try{
-                BufferedReader bf = new BufferedReader(new FileReader(data));
-                String A = bf.readLine();
-                if (A.contains("said_/&/JT&^*$/&(/*Ç_said")){
-                    type = "MC";
-                    username = JOptionPane.showInputDialog(null, "Introduce tu nombre de usuario para "
-                            + "confirmar tu identidad:");
-                    password = "said_/&/;JT&^_said";
-                    word = "said_/*$/&;(/*Ç_said";
-                } else if (A.contains("said_/HT&)$^)/%(¨¨Ç_said")){
-                    type = "MS";
-                    username = JOptionPane.showInputDialog(null, "Introduce tu nombre de usuario para "
-                            + "confirmar tu identidad:");
-                    password = "\"said_/HT;&)$^)_said";
-                    word = "said_/%*;^(¨¨Ç_said";
-                } else{
-                    type = "OFF";
-                    outECP B = new outECP();
-                    AES C = new AES(Sources.pss);
-                    name = B.decrypt(A);
-                    username = C.encryptData(B.decrypt(A));
-                    password = C.encryptData(B.decrypt(bf.readLine()));
-                    word = C.encryptData(B.decrypt(bf.readLine()));
-                }
-                bf.close();
-                data.delete();
-                File upload = Vista.createStaticLoginFile(type, name.toLowerCase(), username, password, word);
-                if (!Sources.upload(upload.getAbsolutePath(), upload.getName())){
-                    throw new IOException("Failed connection to the server!");
-                }
-                upload.delete();
-            } catch (IOException ex){
-                Sources.fatalException(ex, "No se pudo sincronizar con el servidor", 3);
+    public static void ver4xx(){
+        File opt = new File(Sources.path("opt.cfg"));
+        if (opt.exists()){
+            if (!opt.delete()){
+                opt.deleteOnExit();
             }
+            File data = new File(Sources.path(Sources.DirData()));
+            Sources.borrarFichero(data);
         }
-        data = null;
-    }
-    public static void ver422(){
         File copySystem = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" + 
                 Sources.sep() + "Copia Minecraft");
         if (copySystem.exists()){
@@ -92,27 +45,13 @@ public class Outdated {
             Sources.borrarFichero(updateSystem);
             updateSystem.delete();
         }
-        File lstlg = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + 
-                Sources.sep() + Sources.login));
-        if (lstlg.exists()){
-            File newlstlg = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.login));
-            try {
-                Sources.copy(lstlg, newlstlg);
-            } catch (IOException ex) {
-                Sources.exception(ex, "Failed to adapt the new remember system!");
-            }
-            if (!lstlg.delete()){
-                lstlg.deleteOnExit();
-            }
-        }
     }
     public static void checkAll(){
         System.out.println("Actual version: " + Mainclass.version);
-        ver410();
-        ver422();
+        ver4xx();
         System.gc();
     }
-    private static class outECP{
+    /*private static class outECP{
         private String key = "My secret key";
         private Cipher ecipher;
         private Cipher dcipher;
@@ -151,5 +90,5 @@ public class Outdated {
                 return null;
             }
         }
-    }
+    }*/
 }

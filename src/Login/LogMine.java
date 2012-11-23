@@ -103,7 +103,7 @@ public class LogMine extends Thread{
                     Vista2.see.setVisible(false);
                     loader.invoke(launcherFrame, new Object[]{ args });
                     i = test.length;
-                    //Mainclass.consola.exit();
+                    Mainclass.consola.exit();
                 } else{
                     i++;
                 }

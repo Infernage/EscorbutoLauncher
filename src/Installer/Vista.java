@@ -1,8 +1,8 @@
 package Installer;
 
 
+import Login.Mainclass;
 import Login.Sources;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.io.*;
 import javax.swing.*;
@@ -20,21 +20,18 @@ public class Vista extends javax.swing.JFrame {
     private Worker work;//Installer
     private Unworker unwork;//Uninstaller
     private Restore restau;//Restorer
+    private Login.Updater updater;
+    private Connection initialite;
     /**
      * Creates new form Vista
      */
     public Vista() {
         initComponents();
-        File instalation = new File(System.getProperty("user.dir") + Sources.sep() + Sources.Dirsrc
-                + Sources.sep() + Sources.Dirsrc + ".dat");
-        if (!instalation.exists()){
-            System.out.println("Installation files not found! Disabling option of install");
-            jButton2.setEnabled(false);
-            jLabel3.setForeground(Color.red);
-            jLabel3.setText("Archivos de instalación no encontrados");
+        File mc = new File(Sources.path(Sources.DirMC));
+        File data = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance));
+        if (!mc.exists() && (data.listFiles().length == 0)){
+            jButton3.setEnabled(false);
         }
-        Login.Mainclass.init.exit();
-        jButton4.setVisible(false);
         jProgressBar1.setVisible(false);
     }
     //Método de cancelación
@@ -43,68 +40,90 @@ public class Vista extends javax.swing.JFrame {
         jProgressBar1.setVisible(false);
         jButton1.setVisible(true);
         jButton1.setEnabled(true);
-        if (jButton2.isEnabled()){
-            jButton2.setEnabled(true);
-        } else{
-            jButton2.setEnabled(false);
-            jLabel3.setForeground(Color.red);
-            jLabel3.setText("Archivos de instalación no encontrados");
-        }
+        jButton2.setEnabled(true);
         jButton2.setVisible(true);
-        jButton4.setVisible(false);
-        jButton4.setEnabled(false);
+        jButton3.setEnabled(true);
+        jButton3.setVisible(true);
         jButton5.setEnabled(true);
         jButton5.setVisible(true);
         jButton6.setEnabled(true);
         jButton6.setVisible(true);
         jLabel2.setText("");
     }
-    //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
-    private Worker install(boolean direct){
+    private void installSSP(boolean direct, String host){
         System.out.println("Creating new install thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        Worker worker = new Worker (jLabel2, jProgressBar1, jButton4, jButton1, direct);
-        worker.add(this);
+        work = new Worker (jLabel2, jProgressBar1, jButton1, direct);
+        work.add(this);
+        work.setInstallPath(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
+                + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
+        jButton3.setEnabled(false);
+        jButton3.setVisible(false);
         jButton5.setEnabled(false);
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
         jButton6.setVisible(false);
-        return worker;
+        updater = new Login.Updater(host, jProgressBar1, work);
+        updater.start();
+        Mainclass.hilos.put("Updater", updater);
+        jLabel2.setText("Descargando archivos...");
     }
-    private void installSMP(boolean direct){
-        work = this.install(direct);
-        work.execute();
+    //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
+    private void installSMP(boolean direct, String host){
+        System.out.println("Creating new install thread");
+        jLabel3.setText("");
+        jProgressBar1.setVisible(true);
+        work = new Worker (jLabel2, jProgressBar1, jButton1, direct);
+        work.add(this);
+        work.setInstallPath(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
+                + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
+        jButton1.setEnabled(false);
+        jButton2.setEnabled(false);
+        jButton2.setVisible(false);
+        jButton3.setEnabled(false);
+        jButton3.setVisible(false);
+        jButton5.setEnabled(false);
+        jButton5.setVisible(false);
+        jButton6.setEnabled(false);
+        jButton6.setVisible(false);
+        updater = new Login.Updater(host, jProgressBar1, work);
+        updater.start();
+        Mainclass.hilos.put("Updater", updater);
+        jLabel2.setText("Descargando archivos...");
     }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
         System.out.println("Creating new uninstall thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        unwork = new Unworker(jLabel2, jProgressBar1, jButton4, jButton1, this);
+        unwork = new Unworker(jLabel2, jProgressBar1, jButton1, this);
         unwork.execute();
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
+        jButton3.setEnabled(false);
+        jButton3.setVisible(false);
         jButton5.setEnabled(false);
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
         jButton6.setVisible(false);
     }
-    
     //Botón restaurar que ejecuta el restaurador
     private void restauring(){
         System.out.println("Creating new restorer thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        restau = new Restore(this, jLabel2, jProgressBar1, jButton4, jButton1);
+        restau = new Restore(this, jLabel2, jProgressBar1, jButton1);
         restau.execute();
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
+        jButton3.setEnabled(false);
+        jButton3.setVisible(false);
         jButton5.setEnabled(false);
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
@@ -125,7 +144,6 @@ public class Vista extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLayeredPane1 = new javax.swing.JLayeredPane();
         jButton1 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
@@ -151,16 +169,6 @@ public class Vista extends javax.swing.JFrame {
         });
         jButton1.setBounds(330, 120, 60, 23);
         jLayeredPane1.add(jButton1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jButton4.setText("Finalizar");
-        jButton4.setEnabled(false);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        jButton4.setBounds(310, 120, 80, 23);
-        jLayeredPane1.add(jButton4, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton5.setText("Desinstalar");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -190,6 +198,9 @@ public class Vista extends javax.swing.JFrame {
         jLayeredPane1.add(jButton6, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jProgressBar1.setForeground(new java.awt.Color(0, 204, 0));
+        jProgressBar1.setOpaque(true);
+        jProgressBar1.setString("");
+        jProgressBar1.setStringPainted(true);
         jProgressBar1.setBounds(0, 30, 393, 25);
         jLayeredPane1.add(jProgressBar1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLabel3.setBounds(110, 0, 280, 20);
@@ -239,33 +250,6 @@ public class Vista extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        //Ejecutar instalación
-        int i = JOptionPane.showConfirmDialog(null, "¿Quiere instalar Minecraft en su ordenador?");
-        if (i == 0){
-            boolean direct = jCheckBox1.isSelected();
-            System.out.println("Installing...");
-            installSMP(direct);
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-        //Botón Finalizar
-        System.out.println("Exiting");
-        File run = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
-        if (run.exists() && work.isDone()){
-            try {
-                Desktop d = Desktop.getDesktop();
-                d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep() + "Temporal.jar")));
-            } catch (Exception ex) {
-                Sources.fatalException(ex, "No se ha podido inicializar el login!", 1);
-            }
-        }
-        System.exit(0);
-    }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
@@ -319,6 +303,18 @@ public class Vista extends javax.swing.JFrame {
         Login.Mainclass.hilos.put("MultiMine", t);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        //Ejecutar instalación
+        int i = JOptionPane.showConfirmDialog(null, "¿Quiere instalar Minecraft en su ordenador?");
+        if (i == 0){
+            boolean direct = jCheckBox1.isSelected();
+            System.out.println("Installing...");
+            initialite = new Connection(direct);
+            initialite.start();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -355,11 +351,34 @@ public class Vista extends javax.swing.JFrame {
             }
         });
     }
+    private class Connection extends Thread{
+        private boolean access;
+        public Connection(boolean direct){
+            access = direct;
+        }
+        @Override
+        public void run(){
+            String[] options = new String[]{ "Singleplayer", "Multiplayer" };
+            int i = JOptionPane.showOptionDialog(null, "¿Qué Minecraft desea instalar?", 
+                    "Elección de Minecraft", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
+                    null, options, "Multiplayer");
+            if (i == 0){
+                String host = Sources.connect(MultiMine.SP);
+                installSSP(access, host);
+            } else if (i == 1){
+                String host = Sources.connect(MultiMine.MP);
+                installSMP(access, host);
+            } else if (i == -1){
+                System.out.println("Cancelling...");
+            } else{
+                JOptionPane.showMessageDialog(null, "Opción no encontrada.", null, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     public static javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JCheckBox jCheckBox1;

@@ -7,6 +7,7 @@ package Installer;
 import Login.Mainclass;
 import Login.Sources;
 import Login.Updater;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -26,9 +28,10 @@ import javax.swing.JOptionPane;
  */
 public class MultiMine extends javax.swing.JDialog {
     private JFrame vis;
-    private String SP = "SSP.txt", MP = "SMP.txt";
+    public static String SP = "SSP.txt", MP = "SMP.txt";
     private TextThread text;
     private Awake initialite;
+    private String selectTemp;
     /**
      * Creates new form MultiMine
      */
@@ -40,6 +43,9 @@ public class MultiMine extends javax.swing.JDialog {
         initModel();
         System.out.println("OK");
         checkMC();
+    }
+    private void defaultOperation(){
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     }
     private void initModel(){
         DefaultListModel modelo = new DefaultListModel();
@@ -96,7 +102,7 @@ public class MultiMine extends javax.swing.JDialog {
         String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance);
         File[] mcs = new File(tmp).listFiles();
         File mc = new File(Sources.path(Sources.DirMC));
-        if (!mc.exists() || (mc.listFiles().length < 7)){
+        if (!mc.exists() && (mcs.length == 0)){
             JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft.", "Not found", JOptionPane.WARNING_MESSAGE);
         } else{
             int i = 0;
@@ -160,6 +166,11 @@ public class MultiMine extends javax.swing.JDialog {
                 jList1MouseClicked(evt);
             }
         });
+        jList1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jList1KeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(jList1);
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -172,7 +183,7 @@ public class MultiMine extends javax.swing.JDialog {
         jScrollPane2.setViewportView(jTextArea1);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Informarción");
+        jLabel1.setText("Información");
 
         instalarB.setText("Instalar");
         instalarB.setEnabled(false);
@@ -261,6 +272,11 @@ public class MultiMine extends javax.swing.JDialog {
         if (element == null){
             return;
         }
+        if (initialite != null){
+            if (initialite.isAlive()){
+                return;
+            }
+        }
         if (evt.getClickCount() == 2){
             String newTitle = JOptionPane.showInputDialog("Introduce el nuevo título:");
             DefaultListModel model = (DefaultListModel) jList1.getModel();
@@ -279,6 +295,7 @@ public class MultiMine extends javax.swing.JDialog {
             A.renameTo(B);
             model.set(cont, newTitle);
             jList1.setModel(model);
+            selectTemp = newTitle;
             return;
         }
         jTextArea1.setEditable(false);
@@ -332,10 +349,13 @@ public class MultiMine extends javax.swing.JDialog {
         if (modificarB.getText().contains("info")){
             jTextArea1.setEditable(true);
             modificarB.setText("Terminar");
+            if (jList1.getSelectedValue() != null){
+                selectTemp = (String) jList1.getSelectedValue();
+            }
         } else{
             try{
                 File info = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                        + Sources.sep() + (String) jList1.getSelectedValue() + Sources.sep() + Sources.infoInst));
+                        + Sources.sep() + selectTemp + Sources.sep() + Sources.infoInst));
                 if (!info.exists()){
                     info.createNewFile();
                 }
@@ -347,6 +367,7 @@ public class MultiMine extends javax.swing.JDialog {
             } catch (IOException ex){
                 Sources.exception(ex, "Error al guardar la descripción.");
             }
+            selectTemp = null;
         }
     }//GEN-LAST:event_modificarBActionPerformed
 
@@ -364,113 +385,47 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void instalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_instalarBActionPerformed
         // TODO add your handling code here:
-        String local = Sources.path(Sources.DirData() + Sources.sep());
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         if (((String)jList1.getSelectedValue()).equals("SinglePlayer")){
-            if (!Sources.downloadMC(local + SP, SP)){
-                Sources.exception(new Exception("Error connection"), "No se ha podido conectar con el servidor.");
-            } else{
-                File tmp = new File(local + SP);
-                String host = null;
-                BufferedReader bf = null;
-                try {
-                    bf = new BufferedReader(new FileReader(tmp));
-                    if (bf != null){
-                        host = bf.readLine();
-                        bf.close();
-                    }
-                } catch (Exception ex) {
-                    Sources.exception(ex, "Error leyendo los datos.");
-                    try {
-                        bf.close();
-                    } catch (IOException ex1) {
-                    }
-                }
-                if (!tmp.delete()){
-                    tmp.deleteOnExit();
-                }
-                jList1.setEnabled(false);
-                jTextArea1.setEnabled(false);
-                instalarB.setEnabled(false);
-                ejecutarB.setEnabled(false);
-                modificarB.setEnabled(false);
-                File mc = new File(Sources.path(Sources.DirMC));
-                if (mc.exists() && (mc.listFiles().length > 4)){
-                    File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-                    int i = checkInstance(mcs);
-                    File instance = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
-                    if (!instance.exists()){
-                        instance.mkdirs();
-                    }
-                    try{
-                        Sources.copyDirectory(mc, instance);
-                        Sources.borrarFichero(mc);
-                        mc.delete();
-                    } catch (IOException ex){
-                        Sources.exception(ex, "No se pudo cambiar la instancia.");
-                    }
-                } else if (mc.exists()){
-                    mc.delete();
-                }
-                Updater update = new Updater(host, jProgressBar1);
-                initialite = new Awake(update);
-                update.start();
-                initialite.start();
-                Login.Mainclass.hilos.put("Updater", update);
-            }
+            initialite = new Awake(SP);
+            initialite.start();
         } else if (((String)jList1.getSelectedValue()).equals("MultiPlayer")){
-            if (!Sources.downloadMC(local + MP, MP)){
-                Sources.exception(new Exception("Error connection"), "No se ha podido conectar con el servidor.");
-            } else{
-                File tmp = new File(local + MP);
-                String host = null;
-                BufferedReader bf = null;
-                try {
-                    bf = new BufferedReader(new FileReader(tmp));
-                    if (bf != null){
-                        host = bf.readLine();
-                        bf.close();
-                    }
-                } catch (Exception ex) {
-                    Sources.exception(ex, "Error leyendo los datos.");
-                    try {
-                        bf.close();
-                    } catch (IOException ex1) {
-                    }
-                }
-                if (!tmp.delete()){
-                    tmp.deleteOnExit();
-                }
-                jList1.setEnabled(false);
-                jTextArea1.setEnabled(false);
-                instalarB.setEnabled(false);
-                ejecutarB.setEnabled(false);
-                modificarB.setEnabled(false);
-                File mc = new File(Sources.path(Sources.DirMC));
-                if (mc.exists() && (mc.listFiles().length > 4)){
-                    File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-                    int i = checkInstance(mcs);
-                    File instance = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
-                    if (!instance.exists()){
-                        instance.mkdirs();
-                    }
-                    try{
-                        Sources.copyDirectory(mc, instance);
-                        Sources.borrarFichero(mc);
-                        mc.delete();
-                    } catch (IOException ex){
-                        Sources.exception(ex, "No se pudo cambiar la instancia.");
-                    }
-                } else if (mc.exists()){
-                    mc.delete();
-                }
-                Updater update = new Updater(host, jProgressBar1);
-                initialite = new Awake(update);
-                update.start();
-                initialite.start();
-                Login.Mainclass.hilos.put("Updater", update);
-            }
+            initialite = new Awake(MP);
+            initialite.start();
         }
     }//GEN-LAST:event_instalarBActionPerformed
+
+    private void jList1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jList1KeyPressed
+        // TODO add your handling code here:
+        if (initialite != null){
+            if (initialite.isAlive()){
+                return;
+            }
+        }
+        if (evt.getKeyCode() == KeyEvent.VK_DELETE){
+            String title = (String) jList1.getSelectedValue();
+            if (title.equals("SinglePlayer") || title.equals("MultiPlayer") || title.equals("------------------")){
+                return;
+            }
+            File instance = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
+                    + Sources.sep() + title));
+            if (instance.listFiles().length == 1){
+                File actual = new File(Sources.path(Sources.DirMC));
+                if (actual.exists()){
+                    Sources.borrarFichero(actual);
+                    if (!actual.delete()){
+                        actual.deleteOnExit();
+                    }
+                }
+            }
+            Sources.borrarFichero(instance);
+            if (!instance.delete()){
+                instance.deleteOnExit();
+            }
+            initModel();
+            checkMC();
+        }
+    }//GEN-LAST:event_jList1KeyPressed
 
     /**
      * @param args the command line arguments
@@ -543,11 +498,67 @@ public class MultiMine extends javax.swing.JDialog {
     }
     private class Awake extends Thread{
         private Updater updater;
-        public Awake(Updater update){
-            updater = update;
+        private final String local = Sources.path(Sources.DirData() + Sources.sep());
+        private String msg;
+        public Awake(String text){
+            msg = text;
+        }
+        public String init(){
+            String host = null;
+            if (!Sources.downloadMC(local + msg, msg)){
+                Sources.exception(new Exception("Error connection"), "No se ha podido conectar con el servidor.");
+                defaultOperation();
+            } else{
+                File tmp = new File(local + msg);
+                BufferedReader bf = null;
+                try {
+                    bf = new BufferedReader(new FileReader(tmp));
+                    if (bf != null){
+                        host = bf.readLine();
+                        bf.close();
+                    }
+                } catch (Exception ex) {
+                    Sources.exception(ex, "Error leyendo los datos.");
+                    try {
+                        bf.close();
+                    } catch (IOException ex1) {
+                    }
+                }
+                if (!tmp.delete()){
+                    tmp.deleteOnExit();
+                }
+                jList1.setEnabled(false);
+                jTextArea1.setEnabled(false);
+                instalarB.setEnabled(false);
+                ejecutarB.setEnabled(false);
+                modificarB.setEnabled(false);
+                File mc = new File(Sources.path(Sources.DirMC));
+                if (mc.exists() && (mc.listFiles().length > 4)){
+                    File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
+                    int i = checkInstance(mcs);
+                    File instance = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
+                    if (!instance.exists()){
+                        instance.mkdirs();
+                    }
+                    try{
+                        Sources.copyDirectory(mc, instance);
+                        Sources.borrarFichero(mc);
+                        mc.delete();
+                    } catch (IOException ex){
+                        Sources.exception(ex, "No se pudo cambiar la instancia.");
+                    }
+                } else if (mc.exists()){
+                    mc.delete();
+                }
+            }
+            return host;
         }
         @Override
         public void run(){
+            String host = init();
+            updater = new Updater(host, jProgressBar1);
+            updater.start();
+            Login.Mainclass.hilos.put("Updater", updater);
             while(updater.isAlive()){
                 try {
                     Thread.sleep(1000);
@@ -555,15 +566,20 @@ public class MultiMine extends javax.swing.JDialog {
                     
                 }
             }
+            System.out.print("Repainting... ");
             jList1.setEnabled(true);
             jTextArea1.setEnabled(true);
             instalarB.setEnabled(true);
             ejecutarB.setEnabled(true);
             modificarB.setEnabled(true);
             jProgressBar1.setValue(0);
+            jProgressBar1.setMaximum(100);
+            jProgressBar1.setMinimum(0);
             jProgressBar1.setString("");
             initModel();
             checkMC();
+            defaultOperation();
+            System.out.println("OK");
         }
     }
     private class Exec extends Thread{
