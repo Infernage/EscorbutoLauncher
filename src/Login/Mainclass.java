@@ -18,7 +18,7 @@ import org.jvnet.substance.*;
 public class Mainclass {
     //Versión
     public final static String title = "MineLogin";
-    public final static String version = "V5.0.0 BETA";
+    public final static String version = "V5.0.0";
     public static Map<String, Thread> hilos;
     public static Splash init;
     public static PrintStream err;
