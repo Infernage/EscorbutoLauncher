@@ -5,25 +5,40 @@ c)Mods añadidas.
 d)Bugs.
 _________________________________________________________
 
-b) Changelog. (Desde la versión MineLogin 4.2.1)
+b) Changelog. (Desde la versión MineLogin 4.2.2)
 
 ||Instalador||
-Nada
+-Añadido soporte para múltiples minecrafts (Gracias a javixbox!)
+-Añadido instalación para la versión 1.4.4 como Singleplayer. No tiene mods aún.
+-Cambiado sistema de instalación. Ya no depende de tener los archivos de instalación. Ahora los descarga de dropbox.
 
 ||Login||
--Arreglado múltiples errores, entre ellos el tener que reabrir el login si alguien se equivoca escribiendo el nombre o la contraseña.
+-Todo se ha comprimido en un único jar.
+-Cambiado toda la interfaz gráfica y añadido un cambio de tema (Negro o Blanco) con el botón derecho.
+-Añadido sistema de consola. Al iniciarse, está minimizada.
+-Añadido soporte al proxy. Se activa solo.
+-Añadido ejecución nativa para minecraft. (Menos errores)
+-Añadido dropbox como hoster en el sistema de actualización.
 
 ||Minecraft||
-Nada
+-Dos versiones de minecraft para elegir.
 _________________________________________________________
 
-b)Mods eliminadas (Desde la versión MineLogin 4.2.1)
+b)Mods eliminadas (Desde la versión MineLogin 4.2.2) (MP = MultiPlayer, SP = SinglePlayer)
 
+||MP||
+Ninguna
+
+||SP||
 Ninguna
 _________________________________________________________
 
-c)Mods añadidas. (Desde la versión MineLogin 4.2.1)
+c)Mods añadidas. (Desde la versión MineLogin 4.2.2) (MP = MultiPlayer, SP = SinglePlayer)
 
+||MP||
+Ninguna
+
+||SP||
 Ninguna
 _________________________________________________________
 
