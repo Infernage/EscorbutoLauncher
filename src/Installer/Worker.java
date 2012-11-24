@@ -398,6 +398,46 @@ public class Worker extends SwingWorker <String, Integer>{
         return res;
     }
     /**
+     * Compare two input stream
+     * 
+     * @param input1 the first stream
+     * @param input2 the second stream
+     * @return true if the streams contain the same content, or false otherwise
+     * @throws IOException
+     * @throws IllegalArgumentException if the stream is null
+     */
+    public static boolean isSame( InputStream input1,
+                                InputStream input2 ){
+        boolean error = false;
+        try {
+            byte[] buffer1 = new byte[1024];
+            byte[] buffer2 = new byte[1024];
+            int numRead1 = 0;
+            int numRead2 = 0;
+            while (true) {
+                numRead1 = input1.read(buffer1);
+                numRead2 = input2.read(buffer2);
+                if (numRead1 > -1) {
+                    if (numRead2 != numRead1) return false;
+                    // Otherwise same number of bytes read
+                    if (!Arrays.equals(buffer1, buffer2)) return false;
+                    // Otherwise same bytes read, so continue ...
+                } else {
+                    // Nothing more in stream 1 ...
+                    return numRead2 < 0;
+                }
+            }
+        } catch (IOException e) {
+            error = true; // this error should be thrown, even if there is an error closing stream 2
+            Sources.exception(e, e.getMessage());
+        } catch (RuntimeException e) {
+            error = true; // this error should be thrown, even if there is an error closing stream 2
+            Sources.exception(e, e.getMessage());
+        }
+        return false;
+    }
+      
+    /**
      * Method to check if an inputstream is equal to another one.
      * @param alpha The source inputstream
      * @param beta The destiny inputstream

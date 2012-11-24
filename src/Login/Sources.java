@@ -345,6 +345,8 @@ public class Sources {
         BufferedInputStream input = new BufferedInputStream(new FileInputStream(src));
         BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dst));
         copy(input, output);
+        input.close();
+        output.close();
     }
     /**
      * This method copies a source inputstream to a destiny outputstream
@@ -355,8 +357,6 @@ public class Sources {
         byte[] buffer = new byte[input.available()];
         input.read(buffer, 0, buffer.length);
         output.write(buffer);
-        input.close();
-        output.close();
     }
     /**
      * This method installs minecraft

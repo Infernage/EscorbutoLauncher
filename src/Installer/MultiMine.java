@@ -59,7 +59,7 @@ public class MultiMine extends javax.swing.JDialog {
      * @param file The directory of the instance
      * @param msg The title
      */
-    public void addInstance(String msg){
+    public static void addInstance(String msg){
         File dst = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance + Sources.sep()
                 + msg));
         if (!dst.exists()){
@@ -72,7 +72,11 @@ public class MultiMine extends javax.swing.JDialog {
                     i++;
                     addInstance(tmp[0] + "_" + i);
                 } else{
-                    addInstance("Default_1");
+                    if (msg == null){
+                        addInstance("Default_1");
+                    } else{
+                        addInstance(msg + "_1");
+                    }
                 }
                 return;
             }
@@ -85,7 +89,7 @@ public class MultiMine extends javax.swing.JDialog {
             Sources.exception(ex, "No se pudo añadir la instancia.");
         }
     }
-    public int checkInstance(File[] mcs){
+    public static int checkInstance(File[] mcs){
         int res = 0, i = 0;
         while(i < mcs.length){
             if (mcs[i].listFiles().length == 1){
@@ -386,6 +390,11 @@ public class MultiMine extends javax.swing.JDialog {
     private void instalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_instalarBActionPerformed
         // TODO add your handling code here:
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        jList1.setEnabled(false);
+        jTextArea1.setEnabled(false);
+        instalarB.setEnabled(false);
+        ejecutarB.setEnabled(false);
+        modificarB.setEnabled(false);
         if (((String)jList1.getSelectedValue()).equals("SinglePlayer")){
             initialite = new Awake(SP);
             initialite.start();
@@ -527,11 +536,6 @@ public class MultiMine extends javax.swing.JDialog {
                 if (!tmp.delete()){
                     tmp.deleteOnExit();
                 }
-                jList1.setEnabled(false);
-                jTextArea1.setEnabled(false);
-                instalarB.setEnabled(false);
-                ejecutarB.setEnabled(false);
-                modificarB.setEnabled(false);
                 File mc = new File(Sources.path(Sources.DirMC));
                 if (mc.exists() && (mc.listFiles().length > 4)){
                     File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();

@@ -6,6 +6,7 @@ package Login;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+import Installer.Worker;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -62,6 +63,16 @@ public class Mainclass {
         System.out.println(Thread.currentThread().getName() + "  " + Thread.currentThread().isAlive()
                  + "  " + Thread.currentThread().isInterrupted() + "  " + Thread.currentThread().isDaemon());
     }
+    /*public static void killThreads(){
+        Set<String> sort = hilos.keySet();
+        Iterator<String> it = sort.iterator();
+        while(it.hasNext()){
+            String key = it.next();
+            if ((key != null) && !key.equals("LogShafter") && !key.equals("LogMine") && !key.equals("LogOff")){
+                
+            }
+        }
+    }*/
     /**
      * Method to synchronize the local files with the server. ALWAYS the server files have priority.
      */
@@ -180,6 +191,158 @@ public class Mainclass {
         }
         return str.toString();
     }
+    public static void checkSourceFiles(){
+        File mc = new File(Sources.path(Sources.DirMC));
+        if (mc.exists()){
+            System.out.print("Checking jar files... ");
+            Mainclass tmp = new Mainclass();
+            File dest = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
+            BufferedInputStream src = null;
+            BufferedInputStream dst = null;
+            BufferedOutputStream out = null;
+            boolean res = false;
+            try{
+                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/minecraft.jar"));
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.isSame(src, dst);
+                }
+                if (!res || !dest.exists()){
+                    out = new BufferedOutputStream(new FileOutputStream(dest));
+                    dest.delete();
+                    Sources.copy(src, out);
+                }
+            } catch (Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            } finally{
+                if (src != null){
+                    try {
+                        src.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (dst != null){
+                    try {
+                        dst.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (out != null){
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+            dest = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS));
+            try{
+                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Mineshafter-proxy.jar"));
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.isSame(src, dst);
+                }
+                if (!res || !dest.exists()){
+                    out = new BufferedOutputStream(new FileOutputStream(dest));
+                    dest.delete();
+                    Sources.copy(src, out);
+                }
+            } catch (Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            } finally{
+                if (src != null){
+                    try {
+                        src.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (dst != null){
+                    try {
+                        dst.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (out != null){
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
+                    + Sources.access));
+            try{           
+                src =  new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/RunMinecraft.jar"));
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.isSame(src, dst);
+                }
+                if (!res || !dest.exists()){
+                    out = new BufferedOutputStream(new FileOutputStream(dest));
+                    dest.delete();
+                    Sources.copy(src, out);
+                }
+            } catch (Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            } finally{
+                if (src != null){
+                    try {
+                        src.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (dst != null){
+                    try {
+                        dst.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (out != null){
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
+                    + Sources.temporal));
+            try {
+                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Temporal.jar"));  
+                if (dest.exists()){
+                    dst = new BufferedInputStream(new FileInputStream(dest));
+                    res = Installer.Worker.isSame(src, dst);
+                }
+                if (!res || !dest.exists()){
+                    out = new BufferedOutputStream(new FileOutputStream(dest));
+                    dest.delete();
+                    Sources.copy(src, out);
+                }
+            } catch (Exception ex) {
+                Sources.exception(ex, ex.getMessage());
+            } finally{
+                if (src != null){
+                    try {
+                        src.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (dst != null){
+                    try {
+                        dst.close();
+                    } catch (IOException ex) {
+                    }
+                }
+                if (out != null){
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+            tmp = null;
+            System.gc();
+            System.out.println("OK");
+        }
+    }
     /**
      * @param args the command line arguments
      */
@@ -238,7 +401,7 @@ public class Mainclass {
         File runner = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles 
                 + Sources.sep() + Sources.jar));
         File actual = new File(System.getProperty("user.dir") + Sources.sep() + Sources.jar);
-        if (!runner.exists()){
+        if (!runner.exists() && actual.exists()){
             System.out.print("FAILED\nExporting source files... ");
             File dir = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
             dir.mkdirs();
@@ -249,80 +412,22 @@ public class Mainclass {
                 System.out.println("FAILED");
                 ex.printStackTrace(err);
             }
-        } else if (runner.exists()){
-            System.out.println("OK");
-        }
-        File mc = new File(Sources.path(Sources.DirMC));
-        if (mc.exists()){
-            System.out.print("Checking jar files... ");
-            Mainclass tmp = new Mainclass();
-            File dest = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS));
-            BufferedInputStream src = null;
-            BufferedInputStream dst = null;
-            boolean res = false;
-            try{
-                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Mineshafter-proxy.jar"));
-                if (dest.exists()){
-                    dst = new BufferedInputStream(new FileInputStream(dest));
-                    res = Installer.Worker.check(src, dst);
-                }
-            } catch (Exception ex){
-                if(!ex.toString().toLowerCase().contains("print closed")){
-                    Sources.exception(ex, ex.getMessage());
-                }
-            }
-            if (!res || !dest.exists()){
+        } else if (runner.exists() && actual.exists()){
+            if (!Worker.check(actual, runner)){
+                System.out.println("FAILED\nExporting source files... ");
+                runner.delete();
                 try {
-                    dest.delete();
-                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
+                    Sources.copy(actual, runner);
+                    System.out.println("OK");
                 } catch (IOException ex) {
-                    Sources.exception(ex, ex.getMessage());
+                    System.out.println("FAILED");
+                    ex.printStackTrace(err);
                 }
+            } else{
+                System.out.println("OK");
             }
-            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
-                    + Sources.access));
-            try{           
-                src =  new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/RunMinecraft.jar"));
-                if (dest.exists()){
-                    dst = new BufferedInputStream(new FileInputStream(dest));
-                    res = Installer.Worker.check(src, dst);
-                }
-            } catch (Exception ex){
-                Sources.exception(ex, ex.getMessage());
-            }
-            if (!res || !dest.exists()){
-            File temp = new File(System.getProperty("user.home") + Sources.sep() + "Desktop"
-                        + Sources.sep() + Sources.access);
-                try{
-                        dest.delete();
-                Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
-                    temp.delete();
-                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(temp)));
-                } catch (IOException ex){
-                    Sources.exception(ex, ex.getMessage());
-                }
-            }
-            dest = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
-                    + Sources.temporal));
-            try {
-                src = new BufferedInputStream(tmp.getClass().getResourceAsStream("/Resources/Temporal.jar"));  
-                if (dest.exists()){
-                    dst = new BufferedInputStream(new FileInputStream(dest));
-                    res = Installer.Worker.check(src, dst);
-                }
-            } catch (Exception ex) {
-                Sources.exception(ex, ex.getMessage());
-            }
-            if (!res || !dest.exists()){
-                try{
-                    dest.delete();
-                    Sources.copy(src, new BufferedOutputStream(new FileOutputStream(dest)));
-                } catch (IOException ex){
-                    Sources.exception(ex, ex.getMessage());
-                }
-            }
-            System.out.println("OK");
         }
+        checkSourceFiles();
         File fich = new File(Sources.path(Sources.DirData()));
         fich.mkdirs();
         File fichero = new File (Sources.path(Sources.DirData() + Sources.sep() + Sources.bool));

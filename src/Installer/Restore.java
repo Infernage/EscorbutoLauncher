@@ -59,6 +59,10 @@ public class Restore extends SwingWorker<Integer, Integer>{
             this.cancel(true);
             return 0;
         }
+        File mine = new File(Sources.path(Sources.DirMC));
+        File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
+        int cont = MultiMine.checkInstance(mcs);
+        Sources.copyDirectory(mine, new File(mcs[cont].getAbsolutePath() + Sources.sep() + mine.getName()));
         StringTokenizer token = new StringTokenizer(fi, "/");
         String dia = token.nextToken();
         String hora = token.nextToken();
@@ -86,7 +90,6 @@ public class Restore extends SwingWorker<Integer, Integer>{
         }
         eti.setText("Preparando desinstalación...");
         Thread.sleep(3000);
-        File mine = new File(Sources.path(Sources.DirMC));
         if (mine.exists() && mine.isDirectory()){
             System.out.println("Deleting minecraft");
             borrarFichero(mine);//Borramos el Minecraft instalado
@@ -125,6 +128,7 @@ public class Restore extends SwingWorker<Integer, Integer>{
             Sources.exception(ex, "Error: File couldn't be created!");
         }
         eti.setText("Recopilando información adicional...");
+        MultiMine.addInstance("MCRestored");
         Thread.sleep(3000);
         for (int i = 50; i < 90; i++){
             pro.setValue(i+1);

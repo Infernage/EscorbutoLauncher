@@ -821,7 +821,9 @@ public class Vista2 extends javax.swing.JFrame {
                             if (ex.toString().contains("FileNotFound")){
                                 statusConn.setText("");
                                 JOptionPane.showMessageDialog(null, "La cuenta no existe.");
-                                bf.close();
+                                if (bf != null){
+                                    bf.close();
+                                }
                                 back();
                                 return;
                             } else{
@@ -829,7 +831,9 @@ public class Vista2 extends javax.swing.JFrame {
                                 Sources.exception(ex, "No se ha podido conectar con el servidor.");
                                 jButton5.setText("Jugar offline");
                                 offline = true;
-                                bf.close();
+                                if (bf != null){
+                                    bf.close();
+                                }
                                 return;
                             }
                         }
@@ -854,7 +858,9 @@ public class Vista2 extends javax.swing.JFrame {
                             temp = bf.readLine();
                         } catch (IOException ex){
                             Sources.exception(ex, "Error al comparar datos.");
-                            bf.close();
+                            if (bf != null){
+                                bf.close();
+                            }
                             return;
                         }
                     }
@@ -865,7 +871,9 @@ public class Vista2 extends javax.swing.JFrame {
                         temp = bf.readLine();
                     } catch (IOException ex){
                         Sources.exception(ex, "Error al comparar datos.");
-                        bf.close();
+                        if (bf != null){
+                            bf.close();
+                        }
                         return;
                     }
                 }
@@ -879,7 +887,9 @@ public class Vista2 extends javax.swing.JFrame {
                         open = true;
                     }
                     if (open){
-                        bf.close();
+                        if (bf != null){
+                            bf.close();
+                        }
                         inputLog(A);
                         logeoOFF = new LogOff(A, see, statusConn);
                         logeoOFF.start();
@@ -910,7 +920,9 @@ public class Vista2 extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "La cuenta no existe.");
                     back();
                 }
-                bf.close();
+                if (bf != null){
+                    bf.close();
+                }
             } catch (Exception ex){
                 Sources.fatalException(ex, "Error al comprobar los datos.", 2);
             }

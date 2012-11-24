@@ -98,12 +98,15 @@ public class LogMine extends Thread{
             int i = 0;
             while(i < test.length){
                 if (test[i].getName().equals("main")){
+                    if (Mainclass.consola.isVisible()){
+                        Mainclass.consola.exit();
+                    }
+                    Vista2.see.dispose();
                     Method loader = test[i];
                     loader.setAccessible(true);
                     Vista2.see.setVisible(false);
                     loader.invoke(launcherFrame, new Object[]{ args });
                     i = test.length;
-                    Mainclass.consola.exit();
                 } else{
                     i++;
                 }
@@ -111,7 +114,6 @@ public class LogMine extends Thread{
         } catch (Exception ex) {
             Sources.fatalException(ex, "Error al inicializar minecraft.", 2);
         }
-        Vista2.see.dispose();
     }
     @Override
     public void run(){

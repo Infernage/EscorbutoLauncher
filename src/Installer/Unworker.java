@@ -54,6 +54,12 @@ public class Unworker extends SwingWorker<Integer, Integer>{
         if (exec.exists()){//Si existe el acceso directo, lo borramos
             exec.delete();
         }
+        File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
+        int i = MultiMine.checkInstance(mcs);
+        Sources.borrarFichero(mcs[i]);
+        if (!mcs[i].delete()){
+            mcs[i].deleteOnExit();
+        }
         eti.setText("Minecraft desinstalado con éxito!");
         System.out.println("Uninstall complete!");
         return 0;
