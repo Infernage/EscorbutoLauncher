@@ -1,5 +1,7 @@
 package Login;
 
+import javax.swing.JDialog;
+
 
 
 /*
@@ -19,8 +21,10 @@ public class Ventanita extends javax.swing.JDialog {
     public Ventanita(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

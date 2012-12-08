@@ -7,11 +7,9 @@ package Login;
 import java.awt.Desktop;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.zip.*;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import net.lingala.zip4j.core.ZipFile;
 /**
  *
  * @author Reed
@@ -20,30 +18,27 @@ public class Updater extends Thread{
     private boolean data;
     private String link;
     private String path;
-    private String name;
+    private String name = "Update.zip";;
     public Installer.Worker work;
     public JProgressBar prog;
+    public JLabel label;
+    public boolean init = false, started = false, finish = false;
     //Creamos el actualizador con el link de la nueva versión como parámetro
-    public Updater (String host, boolean isData){
+    public Updater (){
         super("Updater");
+        path = Sources.Prop.getProperty("user.data") + File.separator + "Update";
+    }
+    public void init(String host, boolean isData){
         data = isData;
         link = host;
-        path = Sources.path(Sources.DirData() + Sources.sep() + "Update");
+        init = true;
     }
-    public Updater (String host, JProgressBar bar){
-        this(host, true);
+    public void init (String host, JProgressBar bar, JLabel eti){
+        init(host, true);
         prog = bar;
+        label = eti;
     }
-    /**
-     * Constructor doing specially to install for the first time.
-     * @param host The download link
-     * @param bar The progressbar
-     * @param worker The installation thread
-     */
-    public Updater (String host, JProgressBar bar, Installer.Worker worker){
-        this(host, bar);
-        work = worker;
-    }
+    
     private String getFileName(URL url) {
         String fileName = url.getFile();
         return fileName.substring(fileName.lastIndexOf('/') + 1);
@@ -74,8 +69,7 @@ public class Updater extends Thread{
             System.out.print("...");
             // Conectamos al servidor
             connection.connect();
-            name = "Update.zip";
-            String path = Sources.path(Sources.DirData() + Sources.sep() + name);
+            String path = Sources.Prop.getProperty("user.data") + File.separator + name;
             System.out.print("...");
             // Abrimos el archivo
             file = new RandomAccessFile(path, "rw");
@@ -112,16 +106,20 @@ public class Updater extends Thread{
     private void descomprimir(){
         System.out.print("Decompressing...");
         //Creamos la carpeta donde van a ir los archivos
-        String zipper = Sources.path(Sources.DirData() + Sources.sep() + name);
+        String zipper = Sources.Prop.getProperty("user.data") + File.separator + name;
+        File zip = new File(zipper);
+        zip.deleteOnExit();
         File mine = new File(path);
         if (mine.exists()){
-            Sources.borrarFichero(mine);
+            Sources.IO.borrarFichero(mine);
         }
         System.out.print("...");
         mine.mkdirs();
         try {
+            ZipFile file = new ZipFile(new File(zipper));
+            file.extractAll(path);
             //Abrimos el comprimido
-            ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(zipper)));
+            /*ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(zipper)));
             ZipEntry entrada;
             System.out.print("...");
             //Vamos cogiendo cada vez la siguiente entrada
@@ -146,7 +144,7 @@ public class Updater extends Thread{
                 //Cambiamos el tipo de separación de carpetas
                 StringBuilder build = new StringBuilder(path);
                 for (int i = 0; i < lista.size(); i++){
-                    build.append(Sources.sep()).append(lista.get(i));
+                    build.append(File.separator).append(lista.get(i));
                 }
                 String filero = build.toString();
                 File fich = new File(filero);
@@ -165,33 +163,33 @@ public class Updater extends Thread{
                 }
                 zip.closeEntry();
             }
-            zip.close();
+            zip.close();*/
             System.out.println("... OK");
         } catch (Exception ex) {
             System.out.println("... FAILED");
             Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
         }
-        new File(zipper).delete();
+        zip.delete();
     }
     //Método de ejecución de Main Instalador
     private void exec(){
         System.out.print("Openning new filesystem... ");
             //Por último ejecutamos el nuevo login
         if (!data){
-            File old = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep() 
-                    + Sources.jar));
-            File next = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.jar));
-            File minejar = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles
-                    + Sources.sep() + "minecraft.jar"));
+            File old = new File(Sources.Prop.getProperty("user.data") + File.separator + "Update" 
+                    + File.separator + Sources.Files.jar(false));
+            File next = new File(Sources.path(Sources.Directory.DirMC + File.separator + Sources.Files.jar(false)));
+            File minejar = new File(Sources.Prop.getProperty("user.data") + File.separator + 
+                    Sources.Directory.Dirfiles + File.separator + "minecraft.jar");
             minejar.delete();
             if (next.exists()){
                 next.delete();
             }
             try{
-                Sources.copy(old, next);
+                Sources.IO.copy(old, next);
                 old.delete();
             } catch (Exception ex){
-                ex.printStackTrace(Mainclass.err);
+                Sources.Init.error.setError(ex);
             }
             System.out.println("OK");
             temp();
@@ -203,35 +201,36 @@ public class Updater extends Thread{
         prog.setMaximum(100);
         prog.setMinimum(0);
         prog.setValue(0);
-        System.out.println("Applying installation...............");
-        if (work == null){
-            work = new Installer.Worker(prog);
-        }
+        System.out.println("Applying installation...");
+        String instance = Sources.checkInstance("Default");
+        work = Sources.Init.work;
+        work.init(prog, instance, label);
         work.execute();
-        File dst = new File(Sources.path(Sources.DirMC));
+        File dst = new File(Sources.Prop.getProperty("user.instance") + File.separator + instance + 
+                File.separator + ".minecraft");
         Executer exe = new Executer(dst);
         exe.setDaemon(true);
-        Mainclass.hilos.put("Installer", exe);
+        Sources.Init.hilos.put("Installer", exe);
         while(!work.isDone() && !work.isCancelled()){
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                ex.printStackTrace(Mainclass.err);
+                Sources.Init.error.setError(ex);
             }
         }
         exe.out();
         File tmp = new File(path);
-        Sources.borrarFichero(tmp);
+        Sources.IO.borrarFichero(tmp);
         tmp.delete();
     }
     public void temp(){
         try {
             System.out.println("[>Executing new process and exiting<]");
             Desktop d = Desktop.getDesktop();
-            d.open(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles + Sources.sep()
-                    + "Temporal.jar")));
+            d.open(new File(Sources.Prop.getProperty("user.data") + File.separator + 
+                    Sources.Directory.Dirfiles + File.separator + "Temporal.jar"));
         } catch (IOException ex) {
-            ex.printStackTrace(Mainclass.err);
+            Sources.Init.error.setError(ex);
         } finally{
             System.exit(0);
         }
@@ -239,6 +238,7 @@ public class Updater extends Thread{
     //Método de ejecución
     @Override
     public void run(){
+        started = true;
         if (prog == null){
             descargar(Vista2.jProgressBar1);//Descargamos los archivos necesarios
         } else{
@@ -246,5 +246,6 @@ public class Updater extends Thread{
         }
         descomprimir();//Los descomprimimos
         exec();//Ejecutamos el main
+        finish = true;
     }
 }

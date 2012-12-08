@@ -16,6 +16,8 @@ public class Splash extends JFrame implements Runnable {
      * Creates new form Splash
      */
     public Splash() {
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         initComponents();
     }
     public void exit(){
@@ -35,7 +37,6 @@ public class Splash extends JFrame implements Runnable {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Resources/cargando.gif"))); // NOI18N
 
@@ -99,7 +100,7 @@ public class Splash extends JFrame implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                ex.printStackTrace(Mainclass.err);
+                Sources.Init.error.setError(ex);
             }
         }
     }

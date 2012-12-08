@@ -3,7 +3,6 @@ package Installer;
 
 import Login.Sources;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
@@ -26,29 +25,30 @@ public class Restore extends SwingWorker<Integer, Integer>{
     private File rest, newRest; //Minecraft a restaurar
     private JLabel eti;
     private JProgressBar pro;
-    private JButton salir;
-    private Vista fr;
-    public Restore(Vista G, JLabel A, JProgressBar B, JButton D){
+    public boolean init = false, started = false, finish = false;
+    public Restore(){
+        fich = new TreeMap<String,Set<String>>();
+    }
+    public void init(JLabel A, JProgressBar B){
+        init = true;
         eti = A;
         pro = B;
-        salir = D;
-        fr = G;
         pro.setValue(0);
         eti.setText("Recopilando información de instalaciones anteriores...");
-        fich = new TreeMap<String,Set<String>>();
     }
     @Override
     protected Integer doInBackground() throws Exception {
+        started = true;
         System.out.println("Restore thread execution(OK)");
         //Cogemos la base de datos de las copias de seguridad
         System.out.print("Getting backup files... ");
-        File copia = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"));
+        File copia = new File(Sources.Prop.getProperty("user.data") + File.separator + "Copia Minecraft");
         ficheros(copia);//Listamos los ficheros que haya en copia
         System.out.println("OK");
         if (this.isCancelled()){
             return 0;
         }
-        Lista vist = new Lista(fr, true, fich);//Creamos un Dialog para ver por cual restauramos
+        Lista vist = new Lista(Sources.Init.mainGUI, true, fich);//Creamos un Dialog para ver por cual restauramos
         vist.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         vist.setTitle("Minecraft recovery");
         vist.setLocationRelativeTo(null);
@@ -59,25 +59,22 @@ public class Restore extends SwingWorker<Integer, Integer>{
             this.cancel(true);
             return 0;
         }
-        File mine = new File(Sources.path(Sources.DirMC));
-        File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-        int cont = MultiMine.checkInstance(mcs);
-        Sources.copyDirectory(mine, new File(mcs[cont].getAbsolutePath() + Sources.sep() + mine.getName()));
         StringTokenizer token = new StringTokenizer(fi, "/");
         String dia = token.nextToken();
         String hora = token.nextToken();
         token = null;
         System.out.print("Getting backup path... ");
-        rest = new File(copia.getAbsolutePath() + Sources.sep() + dia + Sources.sep() + hora + Sources.sep()
-                + Sources.DirMC);
-        newRest = new File(copia.getAbsolutePath() + Sources.sep() + dia + Sources.sep() + hora
-                + Sources.sep() + Sources.Dirsrc + ".dat");
+        rest = new File(copia.getAbsolutePath() + File.separator + dia + File.separator + hora + 
+                File.separator + Sources.Directory.DirMC);
+        newRest = new File(copia.getAbsolutePath() + File.separator + dia + File.separator + hora
+                + File.separator + Sources.Directory.Dirsrc + ".dat");
         pro.setValue(10);
         int temp = 0;
         System.out.println("OK");
         if (!rest.exists() && !newRest.exists()){//Si las carpetas no existen, saltamos con error
             System.out.println("No files found!");
-            JOptionPane.showMessageDialog(null, "Error, no se ha podido encontrar la restauración.");
+            JOptionPane.showMessageDialog(null, "FATAL ERROR", "Error, no se ha podido encontrar la "
+                    + "restauración.", JOptionPane.ERROR_MESSAGE);
             eti.setText("Error inesperado al recuperar el archivo.");
             this.cancel(true);
             return 0;
@@ -88,22 +85,16 @@ public class Restore extends SwingWorker<Integer, Integer>{
             System.out.println("Crypted data found\nSetting file to restore...");
             temp = 2;
         }
-        eti.setText("Preparando desinstalación...");
-        Thread.sleep(3000);
-        if (mine.exists() && mine.isDirectory()){
-            System.out.println("Deleting minecraft");
-            borrarFichero(mine);//Borramos el Minecraft instalado
-            mine.delete();
-            eti.setText("Minecraft desinstalado con éxito.");
-            pro.setValue(50);
-            Thread.sleep(2000);
-        }
         if (temp == 1){
             System.out.println("Getting no crypted file... OK");
-            mine.mkdirs();
-            Sources.installation(eti, rest, mine);//Instalamos la restauración
+            MultiMine.addInstance("MCRestoredNoCrypted");
+            File mine = new File(Sources.Prop.getProperty("user.instance") + File.separator + 
+                    "MCRestoredNoCrypted" + File.separator + ".minecraft");
+            Sources.IO.installation(eti, rest, mine);//Instalamos la restauración
         } else if (temp == 2){
-            System.out.println("Getting crypted file... OK");
+            System.out.print("Getting crypted file... ");
+            MultiMine.addInstance("MCRestoredCrypted");
+            System.out.println("OK");
             //Instalamos la restauración
             ZipFile dat = new ZipFile(newRest);
             if (dat.isEncrypted()){
@@ -111,42 +102,27 @@ public class Restore extends SwingWorker<Integer, Integer>{
                 dat.setPassword("Minelogin 3.0.0");
                 System.out.println("OK");
             }
-            System.out.print("Extracting files to minecraft directory... ");
-            dat.extractAll(Sources.path(null));
+            System.out.print("Extracting files... ");
+            dat.extractAll(Sources.Prop.getProperty("user.instance") + File.separator + 
+                    "MCRestoredCrypted");
             System.out.println("OK");
         }
-        File infer = new File(mine.getAbsolutePath() + Sources.sep() + Sources.infernage());
-        try{
-            if (!infer.exists()){
-                System.out.println("Creating login files...");
-                infer.createNewFile();
-            }
-            if (Sources.OS.equals("windows")){
-                Process hide = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
-            }
-        } catch (IOException ex){
-            Sources.exception(ex, "Error: File couldn't be created!");
-        }
         eti.setText("Recopilando información adicional...");
-        MultiMine.addInstance("MCRestored");
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         for (int i = 50; i < 90; i++){
             pro.setValue(i+1);
             Thread.sleep(100);
         }
         eti.setText("Minecraft restaurado con éxito!");
         System.out.println("Restoring complete!");
+        finish = true;
         return 0;
     }
     @Override
     protected void done(){
         pro.setValue(100);
-        salir.setVisible(true);
-        salir.setEnabled(true);
-        fr.setVisible(true);
-        if (this.isCancelled()){
-            fr.retry();
-        }
+        finish = true;
+        Sources.Init.multiGUI.reInit();
     }
     //Método para listar los ficheros copia
     private void ficheros (File copia){
@@ -168,17 +144,6 @@ public class Restore extends SwingWorker<Integer, Integer>{
         } else{
             JOptionPane.showMessageDialog(null, "No existen copias realizadas.");
             this.cancel(true);
-        }
-    }
-    //Borrar fichero o directorio
-    private void borrarFichero (File fich){
-        File[] ficheros = fich.listFiles();
-        for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
-                borrarFichero(ficheros[x]);
-            }
-            eti.setText("Borrando... " + ficheros[x].getAbsolutePath());
-            ficheros[x].delete();
         }
     }
 }

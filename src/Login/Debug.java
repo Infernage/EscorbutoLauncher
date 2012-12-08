@@ -10,21 +10,31 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 /**
  *
  * @author Reed
  */
 public class Debug extends javax.swing.JDialog {
-
+    public boolean exited = false;
     /**
      * Creates new form Debug
      */
     public Debug(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
     }
-
+    public void reInit(){
+        this.setLocationRelativeTo(null);
+        jTextField1.setText("");
+        jTextArea1.setText("");
+        jButton1.setText("Send");
+        jButton1.setEnabled(true);
+        exited = false;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -42,6 +52,11 @@ public class Debug extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -118,6 +133,11 @@ public class Debug extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "No has introducido ningún texto.");
             return;
         }
+        if (!Sources.Init.online){
+            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Parameters par = new Parameters();
         Session ses = Session.getDefaultInstance(par.getPs());
         ses.setDebug(true);
@@ -126,7 +146,6 @@ public class Debug extends javax.swing.JDialog {
             msg.setFrom(new InternetAddress(par.getF()));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
             msg.setSubject(jTextField1.getText());
-            msg.setText(jTextArea1.getText() + "\n\n\nErrorStream:\n\n" + Mainclass.error.err.toString());
             Transport t = ses.getTransport(par.getT());
             t.connect(par.getF(), par.getP());
             t.sendMessage(msg, msg.getAllRecipients());
@@ -144,10 +163,16 @@ public class Debug extends javax.swing.JDialog {
         if (evt.getKeyCode() == KeyEvent.VK_CONTROL){
             String a = jTextField1.getText();
             if (a.equals("DEBUGMODE")){
-                jTextArea1.setText("ERRORSTREAM:\n" + Mainclass.error.err.toString());
+                jTextArea1.setText("ERRORSTREAM:\n" + Sources.Init.error.err.toString());
             }
         }
     }//GEN-LAST:event_jTextField1KeyPressed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        exited = true;
+        reInit();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

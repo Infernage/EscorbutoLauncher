@@ -7,20 +7,31 @@ package Login;
  * and open the template in the editor.
  */
 import java.io.*;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 /**
  *
  * @author Reed
  */
 public class PassConfirm extends javax.swing.JDialog {
+    public boolean exited = false;
     /**
      * Creates new form PassConfirm
      */
     public PassConfirm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Cambiar contraseña");
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
     }
-
+    public void reInit(){
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jPasswordField1.setText("");
+        jPasswordField2.setText("");
+        exited = false;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -42,6 +53,11 @@ public class PassConfirm extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setText("Nueva contraseña:");
 
@@ -117,15 +133,15 @@ public class PassConfirm extends javax.swing.JDialog {
         }
         boolean change = false;
         try{
-            File tmp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirNM + Sources.sep()
-                    + Vista2.getFile(jTextField2.getText() + "NM")));
-            if (!tmp.exists()){
-                if (!Sources.download(tmp.getAbsolutePath(), jTextField2.getText() + "NM.dat")){
-                    JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar"
-                            + " con el servidor.");
-                    return;
-                }
+            if (!Sources.Connection.checkDuplicated(jTextField2.getText())){
+                JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar"
+                        + " con el servidor.");
+                return;
             }
+            File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + 
+                    jTextField2.getText().toLowerCase() + "NM.dat");
+            tmp.deleteOnExit();
+            Sources.Connection.download(tmp, "Base/" + jTextField2.getText().toLowerCase() + "NM.dat");
             BufferedReader bf = new BufferedReader(new FileReader(tmp));
             System.out.println(bf.readLine());
             String temp = bf.readLine();
@@ -135,25 +151,17 @@ public class PassConfirm extends javax.swing.JDialog {
                 bf.close();
                 tmp.delete();
                 return;
-            } else if (temp.equals("MC") || temp.equals("MS")){
-                String A = null;
-                if (temp.equals("MS")){
-                    A = "Mineshafter";
-                } else if (temp.equals("MC")){
-                    A = "Minecraft oficial";
-                }
+            } else if (temp.equals("MC")){
                 JOptionPane.showMessageDialog(null, "Tu tipo de cuenta no permite cambiar la contraseña desde aquí.\n"
-                        + "Tipo de cuenta: " + A);
+                        + "Tipo de cuenta: Minecraft oficial");
                 bf.close();
                 return;
             }
-            String A = null, B = null;
+            String A = null;
             bf.readLine();
             bf.readLine();
             //Nos quitamos de encima el nombre de usuario y la contraseña y vamos directamente a la palabra secreta
-            AES crypt = new AES(Sources.pss);
-            B = bf.readLine();
-            A = crypt.decryptData(B);
+            A = Sources.Init.crypt.decryptData(bf.readLine());
             //Desencriptamos la palabra y comprobamos si es la escrita en el área de texto
             if (A.equals(jTextField1.getText())){
                 change = true;
@@ -166,7 +174,7 @@ public class PassConfirm extends javax.swing.JDialog {
                     //Si coincide, obtenemos el nombre de usuario y lo desencriptamos
                     bf = new BufferedReader(new FileReader(tmp));
                     StringBuilder str = new StringBuilder(bf.readLine()).append("\n").append(bf.readLine()).append("\n");
-                    str.append(bf.readLine()).append("\n").append(crypt.encryptData(pass1)).append("\n");
+                    str.append(bf.readLine()).append("\n").append(Sources.Init.crypt.encryptData(pass1)).append("\n");
                     bf.readLine();
                     String tem;
                     while ((tem = bf.readLine()) != null){
@@ -176,7 +184,7 @@ public class PassConfirm extends javax.swing.JDialog {
                     pw.print(str.toString());
                     pw.close();
                     bf.close();
-                    Mainclass.synch(tmp);
+                    Sources.Connection.upload(tmp, "Base/" + jTextField2.getText().toLowerCase() + "NM.dat");
                     JOptionPane.showMessageDialog(null, "La contraseña ha sido cambiada satisfactoriamente. Recuerda tu contraseña siempre.");
                     this.dispose();
                 } else{
@@ -189,6 +197,12 @@ public class PassConfirm extends javax.swing.JDialog {
             Sources.exception(e, "Error en el cambio de contraseña.");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        exited = true;
+        reInit();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

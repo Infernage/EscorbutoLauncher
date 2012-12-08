@@ -15,18 +15,32 @@ import java.io.PrintStream;
 public class ErrStream extends Thread{
      public StringBuilder err;
      private Stream out;
-     public ErrStream(String name){
-         super(name);
+     private PrintStream backup;
+     public boolean init = false, started = false, finish = false;
+     public ErrStream(){
+         super("Errors");
+         init = true;
+         out = new Stream(new ByteArrayOutputStream());
+     }
+     public void reInit(){
+         this.exit();
+         Sources.Init.error = new ErrStream();
      }
      public void exit(){
+         System.out.print("Setting back the default ErrStream... ");
+         System.setErr(backup);
          out.close();
+         finish = true;
+     }
+     public void setError(Exception ex){
+         ex.printStackTrace(out);
      }
      @Override
      public void run(){
+         started = true;
          err = new StringBuilder();
-         out = new Stream(new ByteArrayOutputStream());
-         Mainclass.err = out;
-         System.setErr(Mainclass.err);
+         backup = System.err;
+         System.setErr(out);
      }
      private class Stream extends PrintStream{
          private OutputStream output;

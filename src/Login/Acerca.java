@@ -8,6 +8,8 @@ package Login;
  */
 import java.awt.Desktop;
 import java.net.URI;
+import javax.swing.JDialog;
+import javax.swing.JRootPane;
 /**
  *
  * @author Reed
@@ -19,9 +21,12 @@ public class Acerca extends javax.swing.JDialog {
      */
     public Acerca(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         initComponents();
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -77,7 +82,7 @@ public class Acerca extends javax.swing.JDialog {
             }
         });
 
-        jLabel6.setText("Minecraft Login " + Mainclass.version);
+        jLabel6.setText("Minecraft Login " + Sources.Init.version);
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Agradecimientos");
@@ -163,7 +168,7 @@ public class Acerca extends javax.swing.JDialog {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 // TODO add your handling code here:
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

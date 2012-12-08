@@ -86,8 +86,8 @@ public class Lista extends javax.swing.JDialog {
             StringTokenizer token = new StringTokenizer (temp, "¬"); //Separamos la carpeta fecha de la carpeta hora
             String dia = token.nextToken();
             String hora = token.nextToken();
-            File mine = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"
-                        + Sources.sep() + dia + Sources.sep() + hora + Sources.sep() + Sources.DirMC));
+            File mine = new File(Sources.Prop.getProperty("user.data") + File.separator + "Copia Minecraft"
+                        + File.separator + dia + File.separator + hora + File.separator + Sources.Directory.DirMC);
             if (mine.exists()){
                 decriptada.add(ordenada.get(i));
             } else {
@@ -379,7 +379,7 @@ public class Lista extends javax.swing.JDialog {
                 par.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
                 par.setPassword("Minelogin 3.0.0");
                 zip.createZipFileFromFolder(mine, par, false, 0);
-                Sources.borrarFichero(mine);
+                Sources.IO.borrarFichero(mine);
                 mine.delete();
                 decriptada.remove(fec);
                 int i = 0;
@@ -457,7 +457,7 @@ public class Lista extends javax.swing.JDialog {
             File mine = new File(install + "\\.minecraft");
             File crypt = new File(install + "\\data.dat");
             if (mine.exists()){
-                Sources.borrarFichero(mine);
+                Sources.IO.borrarFichero(mine);
                 mine.delete();
             }
             if (crypt.exists()){
@@ -488,7 +488,7 @@ public class Lista extends javax.swing.JDialog {
         int i = JOptionPane.showConfirmDialog(null, "¿Está seguro de que quiere eliminar TODAS las copias de seguridad? (La operación es irreversible)");
         if (i == 0){
             String install = System.getProperty("user.home") + "\\Desktop\\Copia Minecraft";
-            Sources.borrarFichero(new File(install));
+            Sources.IO.borrarFichero(new File(install));
         }
     }//GEN-LAST:event_jButton7ActionPerformed
 

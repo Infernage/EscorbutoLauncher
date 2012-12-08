@@ -4,7 +4,6 @@
  */
 package Installer;
 
-import Login.Mainclass;
 import Login.Sources;
 import Login.Updater;
 import java.awt.event.KeyEvent;
@@ -27,22 +26,39 @@ import javax.swing.JOptionPane;
  * @author Reed
  */
 public class MultiMine extends javax.swing.JDialog {
-    private JFrame vis;
     public static String SP = "SSP.txt", MP = "SMP.txt";
     private TextThread text;
     private Awake initialite;
     private String selectTemp;
+    public boolean exited = false;
+    private boolean working = false;
     /**
      * Creates new form MultiMine
      */
     public MultiMine(JFrame parent, boolean modal) {
         super(parent, modal);
-        vis = parent;
         initComponents();
         System.out.print("Initialiting... ");
         initModel();
         System.out.println("OK");
         checkMC();
+        try{
+            jTabbedPane1.setSelectedIndex(0);
+            ejecutarB.setEnabled(false);
+            modificarB.setEnabled(false);
+            restoreB.setEnabled(true);
+            portB.setEnabled(true);
+            jLabel4.setText("");
+            jLabel2.setText("");
+            jProgressBar1.setValue(0);
+            jProgressBar1.setMinimum(0);
+            jProgressBar1.setMaximum(100);
+            instalarB.setEnabled(false);
+            desinstalarB.setEnabled(false);
+            jList1.setEnabled(true);
+        } catch (Exception ex){
+            Sources.exception(ex, ex.getMessage());
+        }
     }
     private void defaultOperation(){
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -60,76 +76,98 @@ public class MultiMine extends javax.swing.JDialog {
      * @param msg The title
      */
     public static void addInstance(String msg){
-        File dst = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance + Sources.sep()
-                + msg));
+        File dst = new File(Sources.Prop.getProperty("user.instance") + File.separator + msg);
         if (!dst.exists()){
             dst.mkdirs();
         } else{
-            if (dst.listFiles().length > 1){
-                if (msg.contains("_")){
-                    String[] tmp = msg.split("_");
-                    int i = Integer.parseInt(tmp[1]);
-                    i++;
-                    addInstance(tmp[0] + "_" + i);
+            if (msg.contains("_")){
+                String[] tmp = msg.split("_");
+                int i = Integer.parseInt(tmp[1]);
+                i++;
+                addInstance(tmp[0] + "_" + i);
+            } else{
+                if (msg == null){
+                    addInstance("Default_1");
                 } else{
-                    if (msg == null){
-                        addInstance("Default_1");
-                    } else{
-                        addInstance(msg + "_1");
-                    }
+                    addInstance(msg + "_1");
                 }
-                return;
             }
+            return;
         }
         try {
-            File fich = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                    + Sources.sep() + msg + Sources.sep() + Sources.infoInst));
+            File fich = new File(Sources.Prop.getProperty("user.instance") + File.separator + msg + File.separator + 
+                    Sources.Files.infoInst);
             fich.createNewFile();
         } catch (IOException ex) {
             Sources.exception(ex, "No se pudo añadir la instancia.");
         }
     }
-    public static int checkInstance(File[] mcs){
-        int res = 0, i = 0;
-        while(i < mcs.length){
-            if (mcs[i].listFiles().length == 1){
-                res = i;
-                i = mcs.length;
-            } else{
-                i++;
-            }
-        }
-        return res;
-    }
     public void checkMC(){
         System.out.print("Checking instances... ");
-        String tmp = Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance);
+        String tmp = Sources.path(Sources.Directory.DirData() + File.separator + Sources.Directory.DirInstance);
         File[] mcs = new File(tmp).listFiles();
-        File mc = new File(Sources.path(Sources.DirMC));
-        if (!mc.exists() && (mcs.length == 0)){
+        if (mcs.length == 0){
             JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft.", "Not found", JOptionPane.WARNING_MESSAGE);
-        } else{
-            int i = 0;
-            boolean temp = false;
-            while (i < mcs.length){
-                if (mcs[i].listFiles().length == 1){
-                    temp = true;
-                    i = mcs.length;
-                }
-                i++;
-            }
-            if ((mcs.length == 0) || !temp){
-                addInstance("Default");
-                mcs = new File(tmp).listFiles();
+        }
+        DefaultListModel modelo = (DefaultListModel) jList1.getModel();
+        for (int i = 0; i < mcs.length; i++){
+            if (mcs[i].isDirectory()){
+                String title = mcs[i].getName();
+                modelo.addElement(title);
             }
         }
         System.out.println("OK");
-        DefaultListModel modelo = (DefaultListModel) jList1.getModel();
-        for (int i = 0; i < mcs.length; i++){
-            String title = mcs[i].getName();
-            modelo.addElement(title);
-        }
         jList1.setModel(modelo);
+    }
+    public void reInit(){
+        initModel();
+        checkMC();
+        jTabbedPane1.setSelectedIndex(0);
+        ejecutarB.setEnabled(false);
+        modificarB.setEnabled(false);
+        restoreB.setEnabled(true);
+        portB.setEnabled(true);
+        jLabel4.setText("");
+        jLabel2.setText("");
+        jProgressBar1.setValue(0);
+        jProgressBar1.setMinimum(0);
+        jProgressBar1.setMaximum(100);
+        instalarB.setEnabled(false);
+        desinstalarB.setEnabled(false);
+        jList1.setEnabled(true);
+        exited = false;
+        working = false;
+    }
+    /**
+     * Ports the saves. If the names are equals, the method doesn't override anything, only changes the name.
+     * @param source The source saves.
+     * @param dest The destiny saves.
+     */
+    private void porter(String source, String dest) throws IOException{
+        File[] savesSource = new File(source).listFiles();
+        File[] savesDest = new File(dest).listFiles();
+        for (int i = 0; i < savesSource.length; i++){
+            int cont = 0;
+            File tmp = savesSource[i];
+            while (cont < savesDest.length){
+                int name = 0;
+                String destiny = savesDest[cont].getName();
+                while(tmp.getName().equals(destiny)){
+                    name++;
+                    destiny = savesDest[cont].getName() + "_" + name;
+                }
+                File temp = new File(dest + File.separator + destiny);
+                try {
+                    Sources.IO.copyDirectory(tmp, temp);
+                    Sources.IO.borrarFichero(tmp);
+                    tmp.delete();
+                } finally{
+                    Sources.IO.borrarFichero(temp);
+                    temp.delete();
+                }
+                cont++;
+            }
+        }
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -143,15 +181,31 @@ public class MultiMine extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
         jSeparator1 = new javax.swing.JSeparator();
+        ejecutarB = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jLabel1 = new javax.swing.JLabel();
-        instalarB = new javax.swing.JButton();
         modificarB = new javax.swing.JButton();
-        ejecutarB = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        restoreB = new javax.swing.JButton();
+        portB = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        textSource = new javax.swing.JTextField();
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        textDest = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
         jProgressBar1 = new javax.swing.JProgressBar();
+        instalarB = new javax.swing.JButton();
+        desinstalarB = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("MultiMine");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -179,23 +233,20 @@ public class MultiMine extends javax.swing.JDialog {
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
+        ejecutarB.setText("Ejecutar");
+        ejecutarB.setEnabled(false);
+        ejecutarB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ejecutarBActionPerformed(evt);
+            }
+        });
+
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setWrapStyleWord(true);
         jScrollPane2.setViewportView(jTextArea1);
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Información");
-
-        instalarB.setText("Instalar");
-        instalarB.setEnabled(false);
-        instalarB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                instalarBActionPerformed(evt);
-            }
-        });
 
         modificarB.setText("Modificar info");
         modificarB.setEnabled(false);
@@ -205,17 +256,172 @@ public class MultiMine extends javax.swing.JDialog {
             }
         });
 
-        ejecutarB.setText("Ejecutar");
-        ejecutarB.setEnabled(false);
-        ejecutarB.addActionListener(new java.awt.event.ActionListener() {
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 3, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(modificarB, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(89, 89, 89))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(modificarB)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Información", jPanel1);
+
+        jPanel2.setEnabled(false);
+
+        restoreB.setText("Restaurador");
+        restoreB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ejecutarBActionPerformed(evt);
+                restoreBActionPerformed(evt);
             }
         });
+
+        portB.setText("Portear");
+        portB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                portBActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Traspasar configuraciones y mundos");
+
+        textSource.setText("Fuente");
+
+        jLabel3.setText("Restaurar partida guardada:");
+
+        jLabel4.setForeground(new java.awt.Color(255, 0, 0));
+
+        textDest.setText("Destino");
+
+        jLabel5.setText("De:");
+
+        jLabel6.setText("a");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(63, Short.MAX_VALUE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(49, 49, 49))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textSource, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textDest, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(109, 109, 109)
+                        .addComponent(portB))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(restoreB))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(jLabel1)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(restoreB))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textSource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textDest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(portB)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Administración", jPanel2);
+
+        jPanel3.setEnabled(false);
 
         jProgressBar1.setOpaque(true);
         jProgressBar1.setString("");
         jProgressBar1.setStringPainted(true);
+
+        instalarB.setText("Instalar");
+        instalarB.setEnabled(false);
+        instalarB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                instalarBActionPerformed(evt);
+            }
+        });
+
+        desinstalarB.setText("Desinstalar");
+        desinstalarB.setEnabled(false);
+        desinstalarB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                desinstalarBActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(instalarB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(desinstalarB))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 11, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(45, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(instalarB)
+                    .addComponent(desinstalarB))
+                .addGap(71, 71, 71))
+        );
+
+        jTabbedPane1.addTab("Instalador", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -224,26 +430,15 @@ public class MultiMine extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(102, 102, 102)
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(instalarB)
-                        .addGap(22, 22, 22)
-                        .addComponent(modificarB)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                        .addGap(117, 117, 117)
                         .addComponent(ejecutarB)))
-                .addContainerGap())
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,20 +446,16 @@ public class MultiMine extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(17, 17, 17)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(instalarB)
-                            .addComponent(modificarB)
-                            .addComponent(ejecutarB))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 12, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1)
-                    .addComponent(jSeparator1))
-                .addContainerGap())
+                        .addComponent(ejecutarB)
+                        .addGap(13, 13, 13))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                            .addComponent(jSeparator1))
+                        .addContainerGap())))
         );
 
         pack();
@@ -292,10 +483,8 @@ public class MultiMine extends javax.swing.JDialog {
                 }
                 i++;
             }
-            File A = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance + Sources.sep()
-                    + element));
-            File B = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                    + Sources.sep() + newTitle));
+            File A = new File(Sources.Prop.getProperty("user.instance") + File.separator + element);
+            File B = new File(Sources.Prop.getProperty("user.instance") + File.separator + newTitle);
             A.renameTo(B);
             model.set(cont, newTitle);
             jList1.setModel(model);
@@ -313,17 +502,20 @@ public class MultiMine extends javax.swing.JDialog {
             if (element.equals("SinglePlayer")){
                 modificarB.setEnabled(false);
                 instalarB.setEnabled(true);
+                desinstalarB.setEnabled(false);
                 ejecutarB.setEnabled(false);
             } else if (element.equals("MultiPlayer")){
                 modificarB.setEnabled(false);
                 instalarB.setEnabled(true);
+                desinstalarB.setEnabled(false);
                 ejecutarB.setEnabled(false);
             } else{
                 modificarB.setEnabled(true);
                 instalarB.setEnabled(false);
                 ejecutarB.setEnabled(true);
-                File info = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                        + Sources.sep() + element + Sources.sep() + Sources.infoInst));
+                desinstalarB.setEnabled(true);
+                File info = new File(Sources.Prop.getProperty("user.instance") + File.separator + element + File.separator + 
+                        Sources.Files.infoInst);
                 if (info.exists()){
                     try {
                         BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(
@@ -344,6 +536,7 @@ public class MultiMine extends javax.swing.JDialog {
             modificarB.setEnabled(false);
             instalarB.setEnabled(false);
             ejecutarB.setEnabled(false);
+            desinstalarB.setEnabled(false);
         }
         System.gc();
     }//GEN-LAST:event_jList1MouseClicked
@@ -351,15 +544,17 @@ public class MultiMine extends javax.swing.JDialog {
     private void modificarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modificarBActionPerformed
         // TODO add your handling code here:
         if (modificarB.getText().contains("info")){
+            working = true;
             jTextArea1.setEditable(true);
             modificarB.setText("Terminar");
             if (jList1.getSelectedValue() != null){
                 selectTemp = (String) jList1.getSelectedValue();
             }
         } else{
+            working = false;
             try{
-                File info = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                        + Sources.sep() + selectTemp + Sources.sep() + Sources.infoInst));
+                File info = new File(Sources.Prop.getProperty("user.instance") + File.separator + 
+                        selectTemp + File.separator + Sources.Files.infoInst);
                 if (!info.exists()){
                     info.createNewFile();
                 }
@@ -378,20 +573,24 @@ public class MultiMine extends javax.swing.JDialog {
     private void ejecutarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ejecutarBActionPerformed
         // TODO add your handling code here:
         ejecutarB.setEnabled(false);
-        Exec execute = new Exec(this);
-        execute.start();
+        new Exec().start();
     }//GEN-LAST:event_ejecutarBActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        Mainclass.hilos.get("MultiMine").interrupt();
+        if (Sources.Init.work.started || Sources.Init.rest.started || Sources.Init.unwork.started || working){
+            return;
+        }
+        exited = true;
+        this.setVisible(false);
+        reInit();
+        Sources.Init.mainGUI.setVisible(true);
     }//GEN-LAST:event_formWindowClosing
 
     private void instalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_instalarBActionPerformed
         // TODO add your handling code here:
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         jList1.setEnabled(false);
-        jTextArea1.setEnabled(false);
         instalarB.setEnabled(false);
         ejecutarB.setEnabled(false);
         modificarB.setEnabled(false);
@@ -412,29 +611,91 @@ public class MultiMine extends javax.swing.JDialog {
             }
         }
         if (evt.getKeyCode() == KeyEvent.VK_DELETE){
+            int i = JOptionPane.showConfirmDialog(null, "¿Quiere borrar la instancia?", "Delete instance",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (i != 0){
+                return;
+            }
             String title = (String) jList1.getSelectedValue();
             if (title.equals("SinglePlayer") || title.equals("MultiPlayer") || title.equals("------------------")){
                 return;
             }
-            File instance = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                    + Sources.sep() + title));
-            if (instance.listFiles().length == 1){
-                File actual = new File(Sources.path(Sources.DirMC));
-                if (actual.exists()){
-                    Sources.borrarFichero(actual);
-                    if (!actual.delete()){
-                        actual.deleteOnExit();
-                    }
-                }
-            }
-            Sources.borrarFichero(instance);
+            File instance = new File(Sources.Prop.getProperty("user.instance") + File.separator + title);
+            Sources.IO.borrarFichero(instance);
             if (!instance.delete()){
                 instance.deleteOnExit();
             }
-            initModel();
-            checkMC();
+            reInit();
         }
     }//GEN-LAST:event_jList1KeyPressed
+
+    private void desinstalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_desinstalarBActionPerformed
+        // TODO add your handling code here:
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        System.out.println("Creating new uninstall thread");
+        jList1.setEnabled(false);
+        modificarB.setEnabled(false);
+        restoreB.setEnabled(false);
+        portB.setEnabled(false);
+        instalarB.setEnabled(false);
+        desinstalarB.setEnabled(false);
+        ejecutarB.setEnabled(false);
+        Sources.Init.unwork.init(jLabel2, jProgressBar1, (String) jList1.getSelectedValue());
+        Sources.Init.unwork.execute();
+    }//GEN-LAST:event_desinstalarBActionPerformed
+
+    private void restoreBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restoreBActionPerformed
+        // TODO add your handling code here:
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        System.out.println("Creating new restorer thread");
+        jList1.setEnabled(false);
+        instalarB.setEnabled(false);
+        desinstalarB.setEnabled(false);
+        ejecutarB.setEnabled(false);
+        modificarB.setEnabled(false);
+        restoreB.setEnabled(false);
+        portB.setEnabled(false);
+        jTabbedPane1.setSelectedIndex(2);
+        Sources.Init.rest.init(jLabel2, jProgressBar1);
+        Sources.Init.rest.execute();
+    }//GEN-LAST:event_restoreBActionPerformed
+
+    private void portBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portBActionPerformed
+        // TODO add your handling code here:
+        working = true;
+        Thread t = new Thread("Porter"){
+            @Override
+            public void run(){
+                String source = Sources.Prop.getProperty("user.instance") + File.separator + 
+                        textSource.getText() + File.separator + ".minecraft";
+                String destiny = Sources.Prop.getProperty("user.instance") + File.separator + 
+                        textDest.getText() + File.separator + ".minecraft";
+                File statsSource = new File(source + File.separator + "stats");
+                File statsDest = new File(destiny + File.separator + "stats");
+                File optionsSource = new File(source + File.separator + "options.txt");
+                File optionsDest = new File(destiny + File.separator + "options.txt");
+                File serverSource = new File(source + File.separator + "servers.dat");
+                File serverDest = new File(destiny + File.separator + "servers.dat");
+                try{
+                    porter(source + File.separator + "saves", destiny + File.separator + "saves");
+                    Sources.IO.borrarFichero(statsDest);
+                    Sources.IO.copyDirectory(statsSource, statsDest);
+                    optionsDest.delete();
+                    Sources.IO.copy(optionsSource, optionsDest);
+                    serverDest.delete();
+                    Sources.IO.copy(serverSource, serverDest);
+                    jLabel4.setText("Port done");
+                } catch (IOException ex){
+                    Sources.exception(ex, "Error al portear los archivos.");
+                    Sources.IO.borrarFichero(statsDest);
+                    jLabel4.setText("Port failed");
+                }
+                working = false;
+            }
+        };
+        t.start();
+        Sources.Init.hilos.put("Porter", t);
+    }//GEN-LAST:event_portBActionPerformed
 
     /**
      * @param args the command line arguments
@@ -507,62 +768,32 @@ public class MultiMine extends javax.swing.JDialog {
     }
     private class Awake extends Thread{
         private Updater updater;
-        private final String local = Sources.path(Sources.DirData() + Sources.sep());
         private String msg;
         public Awake(String text){
             msg = text;
         }
         public String init(){
-            String host = null;
-            if (!Sources.downloadMC(local + msg, msg)){
-                Sources.exception(new Exception("Error connection"), "No se ha podido conectar con el servidor.");
+            String host = "";
+            File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + msg);
+            tmp.deleteOnExit();
+            Sources.Connection.download(tmp, msg);
+            try {
+                BufferedReader bf = new BufferedReader(new FileReader(tmp));
+                host = bf.readLine();
+                bf.close();
+            } catch (Exception ex) {
+                Sources.exception(ex, "Host not found");
                 defaultOperation();
-            } else{
-                File tmp = new File(local + msg);
-                BufferedReader bf = null;
-                try {
-                    bf = new BufferedReader(new FileReader(tmp));
-                    if (bf != null){
-                        host = bf.readLine();
-                        bf.close();
-                    }
-                } catch (Exception ex) {
-                    Sources.exception(ex, "Error leyendo los datos.");
-                    try {
-                        bf.close();
-                    } catch (IOException ex1) {
-                    }
-                }
-                if (!tmp.delete()){
-                    tmp.deleteOnExit();
-                }
-                File mc = new File(Sources.path(Sources.DirMC));
-                if (mc.exists() && (mc.listFiles().length > 4)){
-                    File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-                    int i = checkInstance(mcs);
-                    File instance = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
-                    if (!instance.exists()){
-                        instance.mkdirs();
-                    }
-                    try{
-                        Sources.copyDirectory(mc, instance);
-                        Sources.borrarFichero(mc);
-                        mc.delete();
-                    } catch (IOException ex){
-                        Sources.exception(ex, "No se pudo cambiar la instancia.");
-                    }
-                } else if (mc.exists()){
-                    mc.delete();
-                }
             }
             return host;
         }
         @Override
         public void run(){
             String host = init();
-            updater = new Updater(host, jProgressBar1);
+            updater = new Updater();
+            updater.init(host, jProgressBar1, jLabel2);
             updater.start();
-            Login.Mainclass.hilos.put("Updater", updater);
+            Sources.Init.hilos.put("Updater", updater);
             while(updater.isAlive()){
                 try {
                     Thread.sleep(1000);
@@ -571,68 +802,57 @@ public class MultiMine extends javax.swing.JDialog {
                 }
             }
             System.out.print("Repainting... ");
-            jList1.setEnabled(true);
-            jTextArea1.setEnabled(true);
-            instalarB.setEnabled(true);
-            ejecutarB.setEnabled(true);
-            modificarB.setEnabled(true);
-            jProgressBar1.setValue(0);
-            jProgressBar1.setMaximum(100);
-            jProgressBar1.setMinimum(0);
-            jProgressBar1.setString("");
-            initModel();
-            checkMC();
+            reInit();
             defaultOperation();
             System.out.println("OK");
         }
     }
     private class Exec extends Thread{
-        private MultiMine gui;
-        public Exec(MultiMine V){
-            gui = V;
-        }
+        public Exec(){}
         public void run(){
-            File[] mcs = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance)).listFiles();
-            File mc = new File(Sources.path(Sources.DirMC));
-            int i = checkInstance(mcs);
-            File src = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance
-                        + Sources.sep() + (String) jList1.getSelectedValue() + Sources.sep() + Sources.DirMC));
-            if (mcs[i].getName().equals((String) jList1.getSelectedValue())){
-                gui.setVisible(false);
-                vis.dispose();
-                gui.dispose();
-                Login.Vista2.see.setVisible(true);
-                return;
-            }
-            File dst = new File(mcs[i].getAbsolutePath() + Sources.sep() + Sources.DirMC);
-            if (!dst.exists()){
-                dst.mkdirs();
-            }
+            String data = (String) jList1.getSelectedValue();
             try {
-                Sources.copyDirectory(mc, dst);
-                Sources.borrarFichero(mc);
-                Sources.copyDirectory(src, mc);
-                Sources.borrarFichero(src);
-                src.delete();
-                gui.setVisible(false);
-                vis.dispose();
-                gui.dispose();
-                Login.Vista2.see.setVisible(true);
+                PrintWriter pw = new PrintWriter(new File(Sources.Files.Instance(true)));
+                pw.print(data);
+                pw.close();
+                Sources.Prop.setProperty("user.dir", Sources.path(Sources.Directory.DirData() + File.separator + 
+                    Sources.Directory.DirInstance + File.separator + data + File.separator + 
+                    ".minecraft"));
+                Sources.Prop.setProperty("user.home", Sources.path(Sources.Directory.DirData() + File.separator + 
+                    Sources.Directory.DirInstance + File.separator + data));
+                Sources.Init.multiGUI.setVisible(false);
+                Sources.Init.multiGUI.reInit();
+                Sources.Init.mainGUI.setVisible(true);
             } catch (IOException ex) {
                 Sources.exception(ex, "No se pudo iniciar la instancia.");
             }
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton desinstalarB;
     private javax.swing.JButton ejecutarB;
     private javax.swing.JButton instalarB;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JList jList1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JButton modificarB;
+    private javax.swing.JButton portB;
+    private javax.swing.JButton restoreB;
+    private javax.swing.JTextField textDest;
+    private javax.swing.JTextField textSource;
     // End of variables declaration//GEN-END:variables
 }

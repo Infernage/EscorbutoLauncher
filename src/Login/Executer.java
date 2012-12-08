@@ -41,7 +41,7 @@ public class Executer extends Thread{
     public void run(){
         double inst = 0;
         double perc = 0;
-        buscar(new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC)));
+        buscar(new File(Sources.Prop.getProperty("user.data") + File.separator + Sources.Directory.DirMC));
         size = tam/1048576;
         tam = 0;
         while(!exit){

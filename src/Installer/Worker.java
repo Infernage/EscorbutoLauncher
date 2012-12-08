@@ -10,8 +10,6 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 /**
  *
  * @author Reed
@@ -19,177 +17,39 @@ import net.lingala.zip4j.util.Zip4jConstants;
 public class Worker extends SwingWorker <String, Integer>{
     private JLabel eti;
     private JProgressBar prog;
-    private JButton bot1;
-    private boolean direct, exito = true;
-    private Calendar C;
-    private Vista fr;
-    private File copyTemp;
-    private String installPath;
-    //Constructor del SwingWorker
-    public Worker (JLabel lab, JProgressBar pro, JButton boton1, boolean temp){
-        eti = lab;
+    private boolean exito = true;
+    private String instance;
+    public boolean init = false, started = false, finish = false;
+    public void init (JProgressBar pro, String name, JLabel lab){
+        init = true;
         prog = pro;
-        bot1 = boton1;
-        direct = temp;
-        C = new GregorianCalendar();
+        eti = lab;
+        instance = name;
     }
-    public Worker (JProgressBar pro){
-        this(new JLabel(), pro, null, false);
-    }
-    public void setInstallPath(String path){
-        installPath = path;
-    }
-    public void back(){
-        System.out.println("Reversing installation...");
-        File mineTemp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC));
-        if (mineTemp.exists()){
-            borrarData(mineTemp);
-            mineTemp.delete();
-        }
-        File minecraft = new File(Sources.path(Sources.DirMC));
-        if (!minecraft.exists()){
-            minecraft.mkdirs();
-        } else{
-            borrarData(minecraft);
-        }
-        try{
-            Sources.installation(eti, copyTemp, minecraft);
-        } catch (IOException ex){
-            Sources.exception(ex, ex.getMessage());
-        }
+    private void back(){
+        File tmp = new File(Sources.Prop.getProperty("user.instance") + File.separator + instance);
+        borrarFichero(tmp);
+        tmp.delete();
     }
     //Método cuando se produce el this.execute()
     @Override
     protected String doInBackground() throws Exception {
+        started = true;
         System.out.println("Install thread execution(OK)");
         String res = null;
-        File fichsrc = null;
-        if (bot1 != null){
-            if (installPath == null){
-                fichsrc = new File(Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat");
-            } else{
-                fichsrc = new File(installPath);
-            }
-        } else{
-            fichsrc = new File(Sources.path(Sources.DirData() + Sources.sep() + "Update"
-                    + Sources.sep() + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
-        }
-        File fichdst = new File(Sources.path(Sources.DirMC));
-        eti.setText("Comprobando instalaciones anteriores...");
-        Thread.sleep(2500);
-        System.out.print("Checking for other installation... ");
-        if (fichdst.isDirectory() && fichdst.exists()){
-            System.out.println("OK");
-            System.out.print("Creating temp file for reverse... ");
-            copyTemp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirTMP));
-            copyTemp.mkdirs();
-            copyTemp.deleteOnExit();
-            System.out.println("OK");
-            File copiaDel = new File(Sources.path(Sources.DirMC));
-            Sources.copyDirectory(copiaDel, copyTemp);
-            String say = null;
-            if (bot1 != null){
-                say = "Minecraft ya está instalado en su sistema. ¿Desea realizar una copia de seguridad?";
-            } else{
-                say = "¿Desea realizar copia de seguridad de su Minecraft?";
-            }
-            int i = JOptionPane.showConfirmDialog(null, say);
-            if (i == 0){
-                System.out.println("Creating crypted copy...");
-                StringBuilder str = new StringBuilder().append(C.get(Calendar.DAY_OF_MONTH)).append("_")
-                        .append(C.get(Calendar.MONTH) + 1).append("_").append(C.get(Calendar.YEAR));
-                StringBuilder sts = new StringBuilder().append(C.get(Calendar.HOUR_OF_DAY)).append(";")
-                        .append(C.get(Calendar.MINUTE)).append(";").append(C.get(Calendar.SECOND))
-                        .append("-").append(C.get(Calendar.MILLISECOND));
-                File copia = new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft"
-                        + Sources.sep() + str.toString() + Sources.sep() + sts.toString()));
-                File zip = new File(copia.getAbsolutePath() + Sources.sep() + "data.dat");
-                if (copia.exists()){
-                    System.err.println("[ERROR] This copy is already done!");
-                    int j = JOptionPane.showConfirmDialog(null, "Ya existe una copia hecha, ¿desea borrarla?");
-                    if (j == 0){
-                        borrarFichero(copia);
-                        copia.mkdirs();
-                        try{
-                            ZipFile data = new ZipFile(zip);
-                            ZipParameters par = new ZipParameters();
-                            par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-                            par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
-                            par.setEncryptFiles(true);
-                            par.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
-                            par.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-                            par.setPassword("Minelogin 3.0.0");
-                            data.createZipFileFromFolder(copiaDel, par, false, 0);
-                        } catch (Exception ex) {
-                            Sources.exception(ex, ex.getMessage());
-                            this.back();
-                        }
-                    }
-                } else{
-                    System.out.println("Creating new copy...");
-                    copia.mkdirs();
-                    try{
-                        eti.setText("Realizando copia de seguridad...");
-                        ZipFile data = new ZipFile(zip);
-                        ZipParameters par = new ZipParameters();
-                        par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-                        par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
-                        par.setEncryptFiles(true);
-                        par.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
-                        par.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-                        par.setPassword("Minelogin 3.0.0");
-                        data.createZipFileFromFolder(copiaDel, par, false, 0);
-                    } catch (Exception ex){
-                        Sources.exception(ex, ex.getMessage());
-                        this.back();
-                    }
-                    System.out.println("Copy done!");
-                }
-                copia = null;
-                borrarFichero (copiaDel);
-                eti.setText("Minecraft desinstalado con éxito.");
-                Thread.sleep(1000);
-                File bin = new File(fichdst.getAbsolutePath() + Sources.sep() + "bin");
-                if (bin.exists()){
-                    eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
-                    this.cancel(true);
-                    JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté "
-                            + "usando la carpeta de Minecraft.");
-                    return null;
-                }
-                copiaDel = null;
-                System.out.println("Copy created sucessfully!");
-            } else if (i == 1){
-                System.out.println("Deleting minecraft");
-                borrarFichero(copiaDel);
-                eti.setText("Minecraft desinstalado con éxito.");
-                Thread.sleep(1000);
-                File bin = new File(fichdst.getAbsolutePath() + Sources.sep() + "bin");
-                if (bin.exists()){
-                    eti.setText("No se ha podido desinstalar Minecraft. Cancelando...");
-                    this.cancel(true);
-                    JOptionPane.showMessageDialog(null, "Asegúrate de no tener ningún proceso que esté "
-                            + "usando la carpeta de Minecraft.");
-                    return null;
-                }
-            } else if ((i == 2) && (bot1 != null)){
-                System.out.println("Installation canceled!");
-                this.cancel(true);
-                return null;
-            } else if ((i == 2) && (bot1 == null)){
-                System.out.println("Aborting!");
-                System.exit(0);
-            }
+        File fichsrc = new File(Sources.Prop.getProperty("user.data") + File.separator + "Update" + 
+                Sources.Directory.Dirsrc + File.separator + Sources.Directory.Dirsrc + ".dat");
+        File fichdst = new File(Sources.Prop.getProperty("user.instance") + File.separator + instance);
+        if (!fichdst.exists()){
+            fichdst.mkdirs();
         }
         System.out.println("Installing new version");
         eti.setText("Instalando Minecraft...");
-        if ((fr != null) && (bot1 != null)){
-            prog.setValue(20);
-            Thread.sleep(3000);
-            for (int i = 20; i < 70; i++){
-                prog.setValue(i+1);
-                Thread.sleep(100);
-            }
+        prog.setValue(20);
+        Thread.sleep(3000);
+        for (int i = 20; i < 70; i++){
+            prog.setValue(i+1);
+            Thread.sleep(100);
         }
         try{
             ZipFile dat = new ZipFile(fichsrc);
@@ -203,92 +63,10 @@ public class Worker extends SwingWorker <String, Integer>{
                 System.out.println("OK");
             }
             System.out.print("Extracting installation files... ");
-            dat.extractAll(Sources.path(Sources.DirData()));
+            dat.extractAll(fichdst.getAbsolutePath());
             System.out.println("OK");
-            if ((fr == null) && (bot1 == null)){
-                Login.Mainclass.hilos.get("Installer").start();
-                Thread.sleep(3000);
-            }
-            if (Sources.OS.equals("windows")){
-                Process hidden = Runtime.getRuntime().exec("ATTRIB +H " + Sources.path(Sources.DirData()));
-            }
-            System.out.println("Checking for save files...");
-            File config = new File(Sources.path(Sources.DirMC + Sources.sep() + "options.txt"));
-            File configB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC
-                    + Sources.sep() + "options.txt"));
-            if (config.exists()){
-                System.out.print("Personalized options found! Saving... ");
-                configB.delete();
-                System.out.println("OK");
-            }
-            config = new File(Sources.path(Sources.DirMC + Sources.sep() + "servers.dat"));
-            configB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC + Sources.sep()
-                    + "servers.dat"));
-            if (config.exists()){
-                System.out.print("Server files found! Saving... ");
-                configB.delete();
-                System.out.println("OK");
-            }
-            config = new File(Sources.path(Sources.DirMC + Sources.sep() + "stats"));
-            configB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC + Sources.sep()
-                    + "stats"));
-            if (config.exists()){
-                System.out.println("Stats account files found! Saving... OK");
-                borrarData(configB);
-                configB.delete();
-            }
-            config = new File(Sources.path(Sources.DirMC + "saves"));
-            configB = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC + Sources.sep()
-                    + "saves"));
-            if (config.exists()){
-                System.out.println("Save files found! Saving... OK");
-                borrarData(configB);
-                configB.delete();
-            }
-            System.out.println("Deleting all temp files created...");
-            File minetemp = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirMC));
-            fichdst.mkdirs();
-            Sources.installation(eti, minetemp, fichdst);
-            borrarData(minetemp);
-            minetemp.delete();
-            if (copyTemp != null){
-                if (copyTemp.exists()){
-                    borrarData(copyTemp);
-                }
-            }
-            File infer = new File(fichdst.getAbsolutePath() + Sources.sep() + Sources.infernage());
-            try{
-                System.out.print("Creating login files... ");
-                infer.createNewFile();
-                if (Sources.OS.equals("windows")){
-                    Process hidd = Runtime.getRuntime().exec("ATTRIB +H " + infer.getAbsolutePath());
-                }
-                System.out.println("OK");
-            } catch (Exception ex){
-                Sources.exception(ex, "File couldn't be created!");
-            }
-            System.out.println("Adding source files and libraries...");
-            File logger = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.Dirfiles));
-            logger.mkdirs();
-            BufferedInputStream is = new BufferedInputStream(getClass().getResourceAsStream("/"
-                    + "Resources/RunMinecraft.jar"));
-            prog.setValue(90);
-            if (direct){
-                System.out.println("Creating direct access");
-                eti.setText("Creando accesos directos del sistema...");
-                File desk = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" 
-                        + Sources.sep() + Sources.access);
-                Thread.sleep(1500);
-                for (int i = prog.getValue(); i < 99; i++){
-                    prog.setValue(i+1);
-                    Thread.sleep(100);
-                }
-                Thread.sleep(1000);
-                if (!desk.exists()){
-                    BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(desk));
-                    Sources.copy(is, output);
-                }
-                System.out.println("Done!");
+            if (Sources.OS.equals("windows") && !new File(Sources.path(Sources.Directory.DirData())).isHidden()){
+                Process hidden = Runtime.getRuntime().exec("ATTRIB +H " + Sources.Prop.getProperty("user.data"));
             }
         } catch (IOException e){
             Sources.exception(e, "Error en la instalación. Comprueba que no has borrado "
@@ -296,13 +74,6 @@ public class Worker extends SwingWorker <String, Integer>{
             exito = false;
             this.back();
         }
-        System.out.print("Checking source files... ");
-        File temp = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar"));
-        Sources.copy(new BufferedInputStream(getClass().getResourceAsStream("/Resources/minecraft.jar")),
-                new BufferedOutputStream(new FileOutputStream(temp)));
-        temp = new File(Sources.path(Sources.DirMC + Sources.sep() + Sources.MS));
-        Sources.copy(new BufferedInputStream(getClass().getResourceAsStream("/Resources/Mineshafter-proxy.jar")),
-                new BufferedOutputStream(new FileOutputStream(temp)));
         if (exito){
             res = "Done!";
         } else{
@@ -310,25 +81,16 @@ public class Worker extends SwingWorker <String, Integer>{
         }
         System.out.println(res);
         System.out.println("Installation complete!");
+        finish = true;
         return res;
-    }
-    //Añadir el JFrame
-    public void add (Vista fa){
-        fr = fa;
     }
     //Cuando termina, salta este método
     protected void done() {
-        if (fr != null){
-            fr.setVisible(true);
-        }
+        Sources.Init.multiGUI.reInit();
         if (exito && !this.isCancelled()){
             try{
-                if ((bot1 != null) && (bot1 != null) && (eti != null)){
-                    eti.setText("Minecraft instalado con éxito en " + Sources.path(Sources.DirMC));
-                    Thread.sleep(500);
-                    bot1.setEnabled(true);
-                    bot1.setVisible(true);
-                }
+                eti.setText("Minecraft instalado con éxito");
+                Thread.sleep(500);
                 prog.setValue(100);
             } catch (Exception ex){
                 Sources.exception(ex, ex.getMessage());
@@ -339,10 +101,6 @@ public class Worker extends SwingWorker <String, Integer>{
             } else{
                 prog.setForeground(Color.red);
                 prog.setString("Error en la instalación.");
-            }
-        } else if (this.isCancelled()){
-            if (fr != null){
-                fr.retry();
             }
         }
     }
@@ -358,17 +116,6 @@ public class Worker extends SwingWorker <String, Integer>{
             if (!ficheros[x].getName().equals("options.txt") && !ficheros[x].getName().equals("servers.dat")){
                 ficheros[x].delete();
             }
-        }
-    }
-    //Borrar la carpeta de datos al ejecutarse por primera vez
-    private void borrarData (File fich){
-        File[] ficheros = fich.listFiles();
-        for (int x = 0; x < ficheros.length; x++){
-            if (ficheros[x].isDirectory()){
-                borrarData(ficheros[x]);
-            }
-            System.out.println("Deleting old data: " + ficheros[x].getName());
-            ficheros[x].delete();
         }
     }
     /**

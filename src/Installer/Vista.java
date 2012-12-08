@@ -1,9 +1,7 @@
 package Installer;
 
 
-import Login.Mainclass;
 import Login.Sources;
-import java.awt.Desktop;
 import java.io.*;
 import javax.swing.*;
 
@@ -16,7 +14,7 @@ import javax.swing.*;
  *
  * @author Reed
  */
-public class Vista extends javax.swing.JFrame {
+/*public class Vista extends javax.swing.JFrame {
     private Worker work;//Installer
     private Unworker unwork;//Uninstaller
     private Restore restau;//Restorer
@@ -25,10 +23,10 @@ public class Vista extends javax.swing.JFrame {
     /**
      * Creates new form Vista
      */
-    public Vista() {
+    /*public Vista() {
         initComponents();
-        File mc = new File(Sources.path(Sources.DirMC));
-        File data = new File(Sources.path(Sources.DirData() + Sources.sep() + Sources.DirInstance));
+        File mc = new File(Sources.path(Sources.Directory.DirMC));
+        File data = new File(Sources.path(Sources.Directory.DirData()) + File.separator + Sources.Directory.DirInstance);
         if (!mc.exists() && (data.listFiles().length == 0)){
             jButton3.setEnabled(false);
         }
@@ -36,8 +34,9 @@ public class Vista extends javax.swing.JFrame {
     }
     //Método de cancelación
     public void retry(){
-        System.out.println("Cancelled");
         jProgressBar1.setVisible(false);
+        jProgressBar1.setValue(0);
+        jProgressBar1.setMinimum(0);
         jButton1.setVisible(true);
         jButton1.setEnabled(true);
         jButton2.setEnabled(true);
@@ -54,10 +53,11 @@ public class Vista extends javax.swing.JFrame {
         System.out.println("Creating new install thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        work = new Worker (jLabel2, jProgressBar1, jButton1, direct);
+        work = Sources.Init.work;
+        work.init(jLabel2, jProgressBar1, jButton1, direct);
         work.add(this);
-        work.setInstallPath(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
-                + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
+        work.setInstallPath(Sources.Prop.getProperty("user.data") + File.separator + "Update" + 
+                File.separator + Sources.Directory.Dirsrc + File.separator + Sources.Directory.Dirsrc + ".dat");
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
@@ -67,9 +67,10 @@ public class Vista extends javax.swing.JFrame {
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
         jButton6.setVisible(false);
-        updater = new Login.Updater(host, jProgressBar1, work);
+        updater = new Login.Updater();
+        updater.init(host, jProgressBar1, work);
         updater.start();
-        Mainclass.hilos.put("Updater", updater);
+        Sources.Init.hilos.put("Updater", updater);
         jLabel2.setText("Descargando archivos...");
     }
     //Creamos el SwingWorker que trabajará en segundo plano. Y lo ejecutamos
@@ -77,10 +78,11 @@ public class Vista extends javax.swing.JFrame {
         System.out.println("Creating new install thread");
         jLabel3.setText("");
         jProgressBar1.setVisible(true);
-        work = new Worker (jLabel2, jProgressBar1, jButton1, direct);
+        work = Sources.Init.work;
+        work.init(jLabel2, jProgressBar1, jButton1, direct);
         work.add(this);
-        work.setInstallPath(Sources.path(Sources.DirData() + Sources.sep() + "Update" + Sources.sep()
-                + Sources.Dirsrc + Sources.sep() + Sources.Dirsrc + ".dat"));
+        work.setInstallPath(Sources.Prop.getProperty("user.data") + File.separator + "Update" + 
+                File.separator + Sources.Directory.Dirsrc + File.separator + Sources.Directory.Dirsrc + ".dat");
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
         jButton2.setVisible(false);
@@ -90,17 +92,17 @@ public class Vista extends javax.swing.JFrame {
         jButton5.setVisible(false);
         jButton6.setEnabled(false);
         jButton6.setVisible(false);
-        updater = new Login.Updater(host, jProgressBar1, work);
+        updater = new Login.Updater();
+        updater.init(host, jProgressBar1, work);
         updater.start();
-        Mainclass.hilos.put("Updater", updater);
+        Sources.Init.hilos.put("Updater", updater);
         jLabel2.setText("Descargando archivos...");
     }
     //Botón desinstalar que ejecuta Unworker
     private void uninstall() {
-        System.out.println("Creating new uninstall thread");
         jLabel3.setText("");
-        jProgressBar1.setVisible(true);
-        unwork = new Unworker(jLabel2, jProgressBar1, jButton1, this);
+        unwork = ;
+        unwork.init(jLabel2, jProgressBar1, jButton1, this);
         unwork.execute();
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
@@ -114,10 +116,9 @@ public class Vista extends javax.swing.JFrame {
     }
     //Botón restaurar que ejecuta el restaurador
     private void restauring(){
-        System.out.println("Creating new restorer thread");
         jLabel3.setText("");
-        jProgressBar1.setVisible(true);
-        restau = new Restore(this, jLabel2, jProgressBar1, jButton1);
+        restau = Sources.Init.rest;
+        restau.init(this, jLabel2, jProgressBar1, jButton1);
         restau.execute();
         jButton1.setEnabled(false);
         jButton2.setEnabled(false);
@@ -135,7 +136,7 @@ public class Vista extends javax.swing.JFrame {
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    /*@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -254,14 +255,9 @@ public class Vista extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         //Botón Salir
-        if (Login.Vista2.see == null){
-            System.out.println("Exiting");
-            System.exit(0);
-        } else {
-            System.out.println("Returning...");
-            Login.Vista2.see.setVisible(true);
-            this.dispose();
-        }
+        retry();
+        this.setVisible(false);
+        Login.Vista2.see.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -300,7 +296,7 @@ public class Vista extends javax.swing.JFrame {
             }
         };
         t.start();
-        Login.Mainclass.hilos.put("MultiMine", t);
+        Sources.Init.hilos.put("MultiMine", t);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -318,13 +314,13 @@ public class Vista extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    /*public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
+        /*try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -343,7 +339,7 @@ public class Vista extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        /*java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 Vista vist = new Vista();
                 vist.setLocationRelativeTo(null);
@@ -358,15 +354,36 @@ public class Vista extends javax.swing.JFrame {
         }
         @Override
         public void run(){
+            File tmp;
             String[] options = new String[]{ "Singleplayer", "Multiplayer" };
             int i = JOptionPane.showOptionDialog(null, "¿Qué Minecraft desea instalar?", 
                     "Elección de Minecraft", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
                     null, options, "Multiplayer");
             if (i == 0){
-                String host = Sources.connect(MultiMine.SP);
+                String host = "";
+                tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + MultiMine.SP);
+                tmp.deleteOnExit();
+                Sources.Connection.download(tmp, MultiMine.SP);
+                try {
+                    BufferedReader bf = new BufferedReader(new FileReader(tmp));
+                    host = bf.readLine();
+                    bf.close();
+                } catch (Exception ex) {
+                    Sources.exception(ex, "Host not found");
+                }
                 installSSP(access, host);
             } else if (i == 1){
-                String host = Sources.connect(MultiMine.MP);
+                String host = "";
+                tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + MultiMine.MP);
+                tmp.deleteOnExit();
+                Sources.Connection.download(tmp, MultiMine.MP);
+                try{
+                    BufferedReader bf = new BufferedReader(new FileReader(tmp));
+                    host = bf.readLine();
+                    bf.close();
+                } catch (Exception ex){
+                    Sources.exception(ex, "Host not found");
+                }
                 installSMP(access, host);
             } else if (i == -1){
                 System.out.println("Cancelling...");
@@ -389,4 +406,4 @@ public class Vista extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
-}
+}*/

@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import javax.swing.JRootPane;
 
 /**
  *
@@ -20,6 +21,8 @@ public class Console extends javax.swing.JFrame {
      * Creates new form Console
      */
     public Console() {
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         setExtendedState(Cursor.CROSSHAIR_CURSOR);
         initComponents();
         Systemout = System.out;
@@ -45,8 +48,7 @@ public class Console extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setUndecorated(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
 
         jTextArea1.setEditable(false);
@@ -93,7 +95,7 @@ public class Console extends javax.swing.JFrame {
         // TODO add your handling code here:
         this.salir();
         System.setOut(Systemout);
-        System.out.println("[==>Console disabled!<==] Text founded:\n" + jTextArea1.getText());
+        System.out.print("[==>Console disabled!<==] Text founded:\n" + jTextArea1.getText());
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 

@@ -22,13 +22,17 @@ import javax.swing.JTextArea;
  */
 public class CHLG extends Thread{
     private JTextArea area;
-    public CHLG (JTextArea ar){
+    public boolean init = false, started = false, finish = false;
+    public CHLG (){
         super("ChangeLog");
+    }
+    public void set (JTextArea ar){
         area = ar;
+        init = true;
     }
     private void inicializar(){
         try{
-            File fich = new File(Sources.path(Sources.DirData() + Sources.sep() + "CHLog.txt"));
+            File fich = new File(Sources.Prop.getProperty("user.data") + File.separator + "CHLog.txt");
             if (!fich.exists()){
                 copy(fich);
             }
@@ -60,6 +64,8 @@ public class CHLG extends Thread{
     }
     @Override
     public void run(){
+        started = true;
         inicializar();
+        finish = true;
     }
 }

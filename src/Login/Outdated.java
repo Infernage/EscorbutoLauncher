@@ -6,6 +6,7 @@ package Login;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Clase para hacer soporte a versiones antiguas.
@@ -18,16 +19,17 @@ public class Outdated {
             if (!opt.delete()){
                 opt.deleteOnExit();
             }
-            File data = new File(Sources.path(Sources.DirData()));
-            Sources.borrarFichero(data);
+            File data = new File(Sources.Prop.getProperty("user.data"));
+            Sources.IO.borrarFichero(data);
         }
-        File copySystem = new File(System.getProperty("user.home") + Sources.sep() + "Desktop" + 
-                Sources.sep() + "Copia Minecraft");
+        File copySystem = new File(System.getProperty("user.home") + File.separator + "Desktop" + 
+                File.separator + "Copia Minecraft");
         if (copySystem.exists()){
             System.out.print("Copy system founded! Exporting to the new location... ");
             try {
-                Sources.copyDirectory(copySystem, new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft")));
-                Sources.borrarFichero(copySystem);
+                Sources.IO.copyDirectory(copySystem, new File(Sources.Prop.getProperty("user.data") + 
+                        File.separator + "Copia Minecraft"));
+                Sources.IO.borrarFichero(copySystem);
                 copySystem.delete();
                 System.out.println("OK");
             } catch (IOException ex) {
@@ -35,20 +37,78 @@ public class Outdated {
                 Sources.exception(ex, "Failed to adapt the new copySystem!");
             }
         }
-        File updateSystem = new File(Sources.path("Desktop" + Sources.sep() + "Copia Minecraft"));
+        File updateSystem = new File(Sources.path("Desktop" + File.separator + "Copia Minecraft"));
         if (updateSystem.exists()){
             try {
-                Sources.copyDirectory(updateSystem, new File(Sources.path(Sources.DirData() + Sources.sep() + "Copia Minecraft")));
+                Sources.IO.copyDirectory(updateSystem, new File(Sources.Prop.getProperty("user.data") 
+                        + File.separator + "Copia Minecraft"));
             } catch (IOException ex) {
                 Sources.exception(ex, "Failed to adapt the new copySystem!");
             }
-            Sources.borrarFichero(updateSystem);
+            Sources.IO.borrarFichero(updateSystem);
             updateSystem.delete();
         }
     }
+    public static void ver500(){
+        File bool = new File(Sources.Prop.getProperty("user.data") + File.separator + "boolean.txt");
+        File names = new File(Sources.Prop.getProperty("user.data") + File.separator 
+                + Sources.Directory.DirNM + File.separator + "ALLNM-MC.cfg");
+        File base = new File(Sources.Prop.getProperty("user.data") + File.separator +
+                Sources.Directory.DirNM);
+        File login = new File(Sources.Files.login(true));
+        File instance = new File(Sources.Files.Instance(true));
+        if (bool.exists()){
+            bool.delete();
+        }
+        if (names.exists()){
+            names.delete();
+        }
+        if (base.exists()){
+            Sources.IO.borrarFichero(base);
+            base.delete();
+        }
+        if (login.exists()){
+            login.delete();
+        }
+        if (!instance.exists()){
+            try{
+                File mc = new File(Sources.path(Sources.Directory.DirMC));
+                if (!mc.exists()){
+                    instance.createNewFile();
+                    return;
+                }
+                File[] files = new File(instance.getParent()).listFiles();
+                int i = 0;
+                boolean exit = false;
+                while(i < files.length && !exit){
+                    if (files[i].isDirectory()){
+                        File[] tmp = files[i].listFiles();
+                        if (tmp.length == 1){
+                            exit = true;
+                        }
+                    }
+                    if (!exit){
+                        i++;
+                    }
+                }
+                File dst = new File(files[i].getAbsolutePath() + File.separator + ".minecraft");
+                dst.mkdirs();
+                Sources.IO.copyDirectory(mc, dst);
+                Sources.IO.borrarFichero(mc);
+                mc.delete();
+                instance.createNewFile();
+                PrintWriter pw = new PrintWriter(instance);
+                pw.print(files[i].getName());
+                pw.close();
+            } catch(Exception ex){
+                Sources.exception(ex, ex.getMessage());
+            }
+        }
+    }
     public static void checkAll(){
-        System.out.println("Actual version: " + Mainclass.version);
+        System.out.println("Actual version: " + Sources.Init.version);
         ver4xx();
+        ver500();
         System.gc();
     }
     /*private static class outECP{

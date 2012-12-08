@@ -8,38 +8,37 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import javax.net.ssl.HttpsURLConnection;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 /**
  *
  * @author Reed
  */
-public class LogMine extends Thread{
+public class Logger extends Thread{
     private String targetURL, urlParameters, userName, password;
     private JLabel label;
-    private JButton play;
-    private Vista2 V;
-    public boolean offline = false;
-    public LogMine(String user, String pass, JLabel lab, JButton but, Vista2 vis){
+    private Minecraft.Launcher launcher;
+    public boolean offline = false, init = false, started = false, finish = false;;
+    public Logger(){
         super("LogMine");
         targetURL = "https://login.minecraft.net/";
+    }
+    public void init(String user, String pass, JLabel lab){
+        init = true;
         label = lab;
         userName = user;
         password = pass;
-        play = but;
-        V = vis;
+    }
+    public void init(String user, JLabel lab){
+        init(user, null, lab);
+        offline = true;
     }
     private String logMine (String targetURL, String urlParameters){
         HttpsURLConnection connection = null;
@@ -56,7 +55,7 @@ public class LogMine extends Thread{
             connection.connect();
             Certificate[] certs = connection.getServerCertificates();
             byte[] bytes = new byte[294];
-            DataInputStream dis = new DataInputStream(LogMine.class.getResourceAsStream("/Resources/minecraft.key"));
+            DataInputStream dis = new DataInputStream(Logger.class.getResourceAsStream("/Resources/minecraft.key"));
             dis.readFully(bytes);
             dis.close();
             Certificate c = certs[0];
@@ -88,18 +87,80 @@ public class LogMine extends Thread{
                 connection.disconnect();
         }
     }
-    public void play(String user, String pass){
+    private void launch(String arg){
+        try {
+            Sources.Connection.inputLog(userName);
+            Sources.Init.mainGUI.setVisible(false);
+            System.out.println("Initializing minecraft...");
+            if (!offline){
+                launcher = new Minecraft.Launcher(arg);
+                launcher.init();
+            } else{
+                launcher = new Minecraft.Launcher();
+                launcher.offline(userName);
+                launcher.init();
+            }
+        } catch (Exception ex) {
+            Sources.fatalException(ex, "Error inicializando minecraft.", 1);
+        }
+    }
+    @Override
+    public void run(){
+        try {
+            started = true;
+            String res = "";
+            if (offline){
+                launch(null);
+                return;
+            }
+            urlParameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + 13;
+            res = this.logMine(targetURL, urlParameters);
+            if (res == null){
+                label.setForeground(Color.red);
+                label.setText("Can't connect to minecraft.net");
+                Sources.Init.mainGUI.tries--;
+                if (Sources.Init.mainGUI.tries == 0){
+                    Sources.Init.mainGUI.offline();
+                } else{
+                    Sources.Init.mainGUI.retry();
+                }
+            } else if (!res.contains(":")){
+                if (res.trim().equals("Bad login")){
+                    label.setForeground(Color.red);
+                    label.setText("Login failed!");
+                    Sources.Init.mainGUI.retry();
+                } else if (res.trim().equals("Old version")){
+                    label.setForeground(Color.red);
+                    label.setText("Outdated minecraft launcher!");
+                } else{
+                    System.err.println(res);
+                }
+                Sources.Init.mainGUI.tries--;
+                if (Sources.Init.mainGUI.tries == 0){
+                    Sources.Init.mainGUI.offline();
+                } else{
+                    Sources.Init.mainGUI.retry();
+                }
+            } else if (res.contains(":")){
+                launch(res);
+            }
+        } catch (Exception ex) {
+            Sources.fatalException(ex, "Error inicializando minecraft.", 1);
+        }
+    }
+}
+    /*public void play(String user, String pass){
         try {
             String[] args = new String[]{ user, pass };
-            URL u = new File(Sources.path(Sources.DirMC + Sources.sep() + "minecraft.jar")).toURI().toURL();
+            URL u = new File(Sources.path(Sources.Directory.DirMC + File.separator + "minecraft.jar")).toURI().toURL();
             URLClassLoader cl = new URLClassLoader(new URL[]{u});
             Class launcherFrame = cl.loadClass("net.minecraft.LauncherFrame");
             Method[] test = launcherFrame.getMethods();
             int i = 0;
             while(i < test.length){
                 if (test[i].getName().equals("main")){
-                    if (Mainclass.consola.isVisible()){
-                        Mainclass.consola.exit();
+                    if (Sources.Init.consola.isVisible()){
+                        Sources.Init.consola.exit();
                     }
                     Vista2.see.dispose();
                     Method loader = test[i];
@@ -112,39 +173,6 @@ public class LogMine extends Thread{
                 }
             }
         } catch (Exception ex) {
-            Sources.fatalException(ex, "Error al inicializar minecraft.", 2);
+            Sources.fatalException(ex, "Error al inicializar minecraft.", 1);
         }
-    }
-    @Override
-    public void run(){
-        try {
-            urlParameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + 13;
-            String res = this.logMine(targetURL, urlParameters);
-            if (res == null){
-                label.setForeground(Color.red);
-                label.setText("Can't connect to minecraft.net");
-                play.setText("Jugar offline");
-                play.setEnabled(true);
-                offline = true;
-                return;
-            }
-            if (!res.contains(":")){
-                if (res.trim().equals("Bad login")){
-                    label.setForeground(Color.red);
-                    label.setText("Login failed!");
-                    V.back();
-                } else if (res.trim().equals("Old version")){
-                    label.setForeground(Color.red);
-                    label.setText("Outdated minecraft launcher!");
-                } else{
-                    System.err.println(res);
-                }
-                return;
-            }
-            System.out.println("Initializing minecraft...");
-            play(userName, password);
-        } catch (UnsupportedEncodingException ex) {
-            Sources.fatalException(ex, "Error inicializando minecraft.", 1);
-        }
-    }
-}
+    }*/

@@ -17,57 +17,17 @@ import javax.swing.*;
  * @author Reed
  */
 //No usada aún
-public class Systray extends Thread{
+/*public class Systray extends Thread{
     private TrayIcon icono;
     private SystemTray tray;
     private boolean exit = false;
     private Vista2 vis;
-    private Process minecraft;
-    private String pid;
     private File tempo;
-    public Systray(Vista2 vista, boolean tmp){
+    public Systray(){
         super("Systray");
-        vis = vista;
-        if (tmp) {
-            try {
-            File[] files = new File(Sources.path(Sources.DirData())).listFiles();
-            boolean exit = false;
-            int cont = 0;
-            while (!exit && cont < files.length){
-                if (files[cont].getName().contains("MGF")){
-                    exit = true;
-                } else{
-                    cont++;
-                }
-            }
-            BufferedReader bf = new BufferedReader(new FileReader(files[cont]));
-            String line = null;
-            List <String> lista = new ArrayList<String>();
-            while ((line = bf.readLine()) != null){
-                lista.add(line);
-            }
-            bf.close();
-            tempo = files[cont];
-            while(!lista.isEmpty()){
-                String command = lista.get(0);
-                if (command.contains("@")){
-                    lista.clear();
-                    String[] name = command.split("@");
-                    pid = name[0];
-                } else{
-                    lista.remove(0);
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    } else{
-            tempo = null;
-            pid = null;
-        }
     }
-    public void addProcess(Process mine){
-        minecraft = mine;
+    public void init(Vista2 vista){
+        vis = vista;
     }
     private void init(){
         if (SystemTray.isSupported()){
@@ -130,7 +90,7 @@ public class Systray extends Thread{
                     } catch (IOException ex) {
                         Logger.getLogger(Systray.class.getName()).log(Level.SEVERE, null, ex);
                     }*/
-                }
+                /*}
             };
             final JPopupMenu popup = new JPopupMenu();
             JMenuItem re = new JMenuItem("Restablecer");//, new ImageIcon("24-security-lock-open.png"));
@@ -142,7 +102,7 @@ public class Systray extends Thread{
             JMenuItem ex = new JMenuItem("Exit"); //, new ImageIcon("24-em-cross.png"));
             ex.addActionListener(salida);
             popup.add(ex);
-            icono = new TrayIcon(ic, Mainclass.title + " " + Mainclass.version, null);
+            icono = new TrayIcon(ic, Mainclass.title + " " + Mainclass.fileVersion, null);
             icono.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e){
@@ -200,4 +160,4 @@ public class Systray extends Thread{
         }
         if (tempo != null) tempo.delete();
     }
-}
+}*/
