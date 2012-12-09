@@ -254,6 +254,11 @@ public class Vista extends javax.swing.JFrame {
         // TODO add your handling code here:
         /*Botón para indicar que se tiene cuenta de Minecraft Oficial
         */
+        if (!Sources.Init.online){
+            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         System.out.print("Checking username... ");
         if (jTextField1.getText().equals("")){
             JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
@@ -290,6 +295,11 @@ public class Vista extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         //Botón de registro, se inicializan las variables @exito controla si se registra o no
+        if (!Sources.Init.online){
+            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         boolean exito = true;
         String encrypted = null;
         String encryptedPass = null;

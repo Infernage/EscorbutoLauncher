@@ -15,7 +15,7 @@ import net.lingala.zip4j.core.ZipFile;
  * @author Reed
  */
 public class Updater extends Thread{
-    private boolean data;
+    private boolean data, error = false;
     private String link;
     private String path;
     private String name = "Update.zip";;
@@ -99,7 +99,13 @@ public class Updater extends Thread{
             System.out.println("... OK");
         } catch (Exception e) {
             System.out.println("... FAILED");
-            Sources.fatalException(e, "Download crashed!", 4);
+            if (!data){
+                Sources.fatalException(e, "Download crashed!", 4);
+            } else{
+                Sources.exception(e, e.getMessage());
+                Sources.Init.multiGUI.reInit();
+            }
+            error = true;
         }
     }
     //Método de descompresión
@@ -167,7 +173,12 @@ public class Updater extends Thread{
             System.out.println("... OK");
         } catch (Exception ex) {
             System.out.println("... FAILED");
-            Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
+            if (!data){
+                Sources.fatalException(ex, "Error al desencriptar la actualización.", 4);
+            } else{
+                Sources.exception(ex, ex.getMessage());
+            }
+            error = true;
         }
         zip.delete();
     }
@@ -244,8 +255,12 @@ public class Updater extends Thread{
         } else{
             descargar();
         }
-        descomprimir();//Los descomprimimos
-        exec();//Ejecutamos el main
+        if (!error){
+            descomprimir();
+        }//Los descomprimimos
+        if (!error){
+            exec();
+        }//Ejecutamos el main
         finish = true;
     }
 }

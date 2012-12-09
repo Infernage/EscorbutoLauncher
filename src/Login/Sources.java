@@ -14,8 +14,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -232,11 +236,28 @@ public class Sources {
                 if (!Connection.isConnected()){
                     throw new Exception("Connection time out");
                 }
-                File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + "queue.txt");
+                File tmp = new File(Sources.path(Sources.Directory.DirData()) + File.separator + "queue.txt");
                 tmp.deleteOnExit();
                 Connection.download(tmp, "Base/queue.txt");
+                BufferedReader bf = new BufferedReader(new FileReader (tmp));
+                String temp = bf.readLine();
+                System.out.println("Connection result: " + temp);
+                bf.close();
                 Connection.closeConnection();
                 tmp.delete();
+                if (temp == null){
+                    System.out.println("ERROR\nTrying with alternative form...");
+                    Connection.failed = true;
+                    Connection.download(tmp, "Base/queue.txt");
+                    bf = new BufferedReader(new FileReader(tmp));
+                    temp = bf.readLine();
+                    System.out.println("Second connection result: " + temp);
+                    bf.close();
+                    tmp.delete();
+                    if (temp == null){
+                        throw new Exception("Connection result = null");
+                    }
+                }
             } catch (Exception ex) {
                 online = false;
                 System.out.println("ERROR\nConnection disabled");
@@ -260,17 +281,32 @@ public class Sources {
             Prop = new Properties();
             hilos = new HashMap<String, Thread>();
             garbage = new HashMap<String, List<Object>>();
-            error = new ErrStream();
-            error.setDaemon(true);
-            error.start();
-            hilos.put("Errors", error);
-            System.out.println("Error output created");
             image = new Splash();
             Thread t = new Thread(image, "Splash");
             t.setDaemon(true);
             t.start();
             hilos.put("Splash", t);
-            collector = new Collector();
+            System.out.println("Setting OutputStreams");
+            consola = new Console();
+            consola.setVisible(true);
+            try{
+                Thread.sleep(1000);
+            } catch (Exception ex){}
+            System.out.println("Console created");
+            error = new ErrStream();
+            error.setDaemon(true);
+            error.start();
+            hilos.put("Errors", error);
+            System.out.println("Error output created");
+            File tmp = new File(path(Directory.DirData() + File.separator + Directory.DirInstance));
+            if (!tmp.exists()){
+                tmp.mkdirs();
+            }
+            tmp = new File(path(Directory.DirData() + File.separator + Directory.Dirfiles));
+            if (!tmp.exists()){
+                tmp.mkdirs();
+            }
+            collector = new Collector("Collector");
             collector.setDaemon(true);
             collector.start();
             crypt = new AES(Files.pss);
@@ -292,11 +328,6 @@ public class Sources {
             info = new Acerca(mainGUI, true);
         }
         private static void load() throws Exception{
-            System.out.println("Setting OutputStreams");
-            consola = new Console();
-            consola.setVisible(true);
-            Thread.sleep(1000);
-            System.out.println("Console created");
             Prop.setProperty("user.data", Sources.path(Sources.Directory.DirData()));
             mainGUI.init();
             mainGUI.setIconImage(new ImageIcon(new Init().getClass().getResource("/Resources/5547.png")).getImage());
@@ -349,15 +380,7 @@ public class Sources {
             }
         }
         private static void checkSources() throws Exception{
-            File tmp = new File(path(Directory.DirData() + File.separator + Directory.DirInstance));
-            if (!tmp.exists()){
-                tmp.mkdirs();
-            }
-            tmp = new File(path(Directory.DirData() + File.separator + Directory.Dirfiles));
-            if (!tmp.exists()){
-                tmp.mkdirs();
-            }
-            tmp = new File(Files.jar(true));
+            File tmp = new File(Files.jar(true));
             File last = new File(System.getProperty("user.dir") + File.separator + Files.jar(false));
             if (!tmp.exists() && last.exists()){
                 System.out.println("Exporting resource file: " + last.getName());
@@ -502,6 +525,8 @@ public class Sources {
      */
     public static class Connection{
         private static FTPClient client = new FTPClient();
+        private static URL url;
+        public static boolean failed = false;
         /**
          * This starts the connection with the FTP server.
          * @throws Exception if any connection error happens.
@@ -520,6 +545,33 @@ public class Sources {
             }
         }
         /**
+         * Method to upload a file if the main method fails.
+         * @param file The local file.
+         * @param pathServer The path to the server.
+         * @return {@code true} if the file was upload, {@code false} in otherwise.
+         * @throws Exception if something was wrong.
+         */
+        private static boolean _2upload(File file, String pathServer) throws Exception{
+            if (pathServer == null){
+                pathServer = "";
+            }
+            if (!pathServer.startsWith("/") && !pathServer.equals("")){
+                pathServer = "/" + pathServer;
+            }
+            url = new URL("ftp://minechinchas_zxq:" + new Parameters().getFP() + "@minechinchas.zxq.net" +
+                    pathServer + ";type=i");
+            OutputStream out = url.openConnection().getOutputStream();
+            BufferedReader bf = new BufferedReader(new FileReader(file));
+            try{
+                byte[] buffer = new byte[(int)file.length()];
+                out.write(buffer);
+                return true;
+            }finally{
+                out.close();
+                bf.close();
+            }
+        }
+        /**
          * This method uploads a file to the FTP server.
          * @param file The file to upload.
          * @param pathServer The path to the destiny file.
@@ -531,6 +583,7 @@ public class Sources {
             }
             FileInputStream in = null;
             try{
+                client.enterLocalPassiveMode();
                 client.setFileType(FTP.BINARY_FILE_TYPE);
                 in = new FileInputStream(file);
                 client.storeFile(pathServer, in);
@@ -543,6 +596,17 @@ public class Sources {
         }
         public static boolean upload(File file, String path){
             boolean res = false;
+            if (failed){
+                System.out.println("[->Uploading with 2nd method<-]");
+                try{
+                    res = _2upload(file, path);
+                } catch (Exception ex){
+                    exception(ex, "Fallo al conectar con el servidor.");
+                    res = false;
+                } finally{
+                    return res;
+                }
+            }
             try{
                 if (!client.isConnected() && Init.online){
                     startConnection();
@@ -560,6 +624,33 @@ public class Sources {
             return upload(new File(file), path);
         }
         /**
+         * Method to download a file if the main method fails.
+         * @param file The local file.
+         * @param pathServer The path to the server.
+         * @return {@code true} if the file was upload, {@code false} in otherwise.
+         * @throws Exception if something was wrong.
+         */
+        private static boolean _2download(File file, String pathServer) throws Exception{
+            if (pathServer == null){
+                pathServer = "";
+            }
+            if (!pathServer.startsWith("/") && !pathServer.equals("")){
+                pathServer = "/" + pathServer;
+            }
+            url = new URL("ftp://minechinchas_zxq:" + new Parameters().getFP() + "@minechinchas.zxq.net" +
+                    pathServer + ";type=i");
+            InputStream in = url.openConnection().getInputStream();
+            BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(file));
+            try{
+                byte[] buffer = new byte[in.available()];
+                bw.write(buffer);
+                return true;
+            } finally{
+                in.close();
+                bw.close();
+            }
+        }
+        /**
          * This method downloads a file to the FTP server.
          * @param file The local file.
          * @param pathServer The server path to the file.
@@ -571,18 +662,30 @@ public class Sources {
             }
             FileOutputStream out = null;
             try{
+                client.enterLocalPassiveMode();
                 client.setFileType(FTP.BINARY_FILE_TYPE);
                 out = new FileOutputStream(file);
                 client.retrieveFile(pathServer, out);
+                return true;
             } finally{
                 if (out != null){
                     out.close();
                 }
-                return true;
             }
         }
         public static boolean download(File file, String path){
             boolean res = false;
+            if (failed){
+                System.out.println("[->Downloading with 2nd method<-]");
+                try{
+                    res = _2download(file, path);
+                } catch (Exception ex){
+                    exception(ex, "Fallo al conectar con el servidor.");
+                    res = false;
+                } finally{
+                    return res;
+                }
+            }
             try{
                 if (!client.isConnected() && Init.online){
                     startConnection();
@@ -614,12 +717,37 @@ public class Sources {
             out.close();
         }
         /**
+         * Method to append a data to a file if the main method fails.
+         * @param file The local file.
+         * @param path The server path file.
+         * @param data  The data written in the local file.
+         */
+        public static void append(String file, String path, String data){
+            File tmp = new File(path(Directory.DirData() + File.separator + file));
+            tmp.deleteOnExit();
+            boolean res = download(tmp, path);
+            if (res){
+                PrintWriter pw = null;
+                try{
+                    pw = new PrintWriter(new FileWriter(tmp, true));
+                    pw.println(data);
+                } catch (Exception ex){
+                    exception(ex, "Fallo al conectar con el servidor.");
+                } finally{
+                    if (pw != null){
+                        pw.close();
+                    }
+                }
+                upload(tmp, path);
+            }
+            tmp.delete();
+        }
+        /**
          * This method adds a log to a file on the server.
          * @param text The username.
          * @throws Exception If an error happens.
          */
         public static void inputLog(String text) throws Exception{
-            text = text.toLowerCase();
             Calendar C = new GregorianCalendar();
             StringBuilder str = new StringBuilder("Connected at ");
             str.append(C.get(Calendar.DAY_OF_MONTH)).append("/")
@@ -629,6 +757,11 @@ public class Sources {
                     .append(C.get(Calendar.MINUTE)).append(":")
                     .append(C.get(Calendar.SECOND))
                     .append(" with name of ").append(text);
+            text = text.toLowerCase();
+            if (failed){
+                append(text + "NM.dat", "Base/" + text + "NM.dat", str.toString());
+                return;
+            }
             try{
                 append(str.toString(), "Base/" + text + "NM.dat");
             } finally{

@@ -204,7 +204,6 @@ public class MultiMine extends javax.swing.JDialog {
         desinstalarB = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("MultiMine");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -589,6 +588,11 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void instalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_instalarBActionPerformed
         // TODO add your handling code here:
+        if (!Sources.Init.online){
+            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         jList1.setEnabled(false);
         instalarB.setEnabled(false);
