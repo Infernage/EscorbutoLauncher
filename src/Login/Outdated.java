@@ -91,11 +91,20 @@ public class Outdated {
                         i++;
                     }
                 }
-                File dst = new File(files[i].getAbsolutePath() + File.separator + ".minecraft");
-                dst.mkdirs();
-                Sources.IO.copyDirectory(mc, dst);
-                Sources.IO.borrarFichero(mc);
-                mc.delete();
+                if (files.length > i){
+                    File dst = new File(files[i].getAbsolutePath() + File.separator + ".minecraft");
+                    dst.mkdirs();
+                    Sources.IO.copyDirectory(mc, dst);
+                    Sources.IO.borrarFichero(mc);
+                    mc.delete();
+                } else{
+                    if (files.length > 0){
+                        i = 0;
+                    } else{
+                        instance.createNewFile();
+                       return;
+                    }
+                }
                 instance.createNewFile();
                 PrintWriter pw = new PrintWriter(instance);
                 pw.print(files[i].getName());

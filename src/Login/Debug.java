@@ -5,6 +5,10 @@
 package Login;
 import Debugger.Parameters;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -133,18 +137,32 @@ public class Debug extends javax.swing.JDialog {
             return;
         }
         if (!Sources.Init.online){
-            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
-                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE. Printing"
+                    + " into a log file...", "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            Calendar C = new GregorianCalendar();
+            File log = new File(System.getProperty("user.home") + File.separator + "Desktop" + File.separator
+                    + "MineClient_Error_" + C.get(Calendar.YEAR) + "-" + C.get(Calendar.MONTH) + "-" + 
+                    C.get(Calendar.DAY_OF_MONTH) + "_" + C.get(Calendar.HOUR_OF_DAY) + "-" + C.get(Calendar.MINUTE)
+                    + "-" + C.get(Calendar.SECOND) + ".log");
+            PrintWriter pw = null;
+            try{
+                pw = new PrintWriter(log);
+                pw.print(Sources.Init.error.err.toString());
+                pw.close();
+            } catch (Exception ex){
+                Sources.Init.error.setError(ex);
+            }
             return;
         }
         Parameters par = new Parameters();
         Session ses = Session.getDefaultInstance(par.getPs());
-        ses.setDebug(true);
+        ses.setDebug(false);
         MimeMessage msg = new MimeMessage(ses);
         try{
             msg.setFrom(new InternetAddress(par.getF()));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
             msg.setSubject(jTextField1.getText());
+            msg.setText(jTextArea1.getText() + "\n\nERRORSTREAM:\n" + Sources.Init.error.err.toString());
             Transport t = ses.getTransport(par.getT());
             t.connect(par.getF(), par.getP());
             t.sendMessage(msg, msg.getAllRecipients());
@@ -152,7 +170,7 @@ public class Debug extends javax.swing.JDialog {
             jButton1.setText("Enviado");
             jButton1.setEnabled(false);
         } catch (Exception ex){
-            ex.printStackTrace();
+            Sources.Init.error.setError(ex);
             JOptionPane.showMessageDialog(null, "No se pudo enviar el mensaje");
         }
     }//GEN-LAST:event_jButton1ActionPerformed

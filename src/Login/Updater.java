@@ -189,10 +189,7 @@ public class Updater extends Thread{
         if (!data){
             File old = new File(Sources.Prop.getProperty("user.data") + File.separator + "Update" 
                     + File.separator + Sources.Files.jar(false));
-            File next = new File(Sources.path(Sources.Directory.DirMC + File.separator + Sources.Files.jar(false)));
-            File minejar = new File(Sources.Prop.getProperty("user.data") + File.separator + 
-                    Sources.Directory.Dirfiles + File.separator + "minecraft.jar");
-            minejar.delete();
+            File next = new File(Sources.Prop.getProperty("user.data") + File.separator + "minecraft.jar");
             if (next.exists()){
                 next.delete();
             }
