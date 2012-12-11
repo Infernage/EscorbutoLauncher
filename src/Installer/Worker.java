@@ -38,7 +38,8 @@ public class Worker extends SwingWorker <String, Integer>{
         System.out.println("Install thread execution(OK)");
         String res = null;
         File fichsrc = new File(Sources.Prop.getProperty("user.data") + File.separator + "Update" + 
-                Sources.Directory.Dirsrc + File.separator + Sources.Directory.Dirsrc + ".dat");
+                File.separator + Sources.Directory.Dirsrc + File.separator + Sources.Directory.Dirsrc + 
+                ".dat");
         File fichdst = new File(Sources.Prop.getProperty("user.instance") + File.separator + instance);
         if (!fichdst.exists()){
             fichdst.mkdirs();

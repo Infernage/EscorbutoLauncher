@@ -19,6 +19,9 @@ public class Mainclass {
     public static void main(String[] args) {
         JFrame.setDefaultLookAndFeelDecorated(true);
         SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.BusinessBlackSteelSkin");
+        if (args.length == 1){
+            Sources.debug = args[0].toLowerCase().equals("true");
+        }
         Sources.Init.init();
     }
 }

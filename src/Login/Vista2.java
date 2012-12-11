@@ -34,11 +34,13 @@ public class Vista2 extends javax.swing.JFrame {
         //Asignamos el fondo al Panel
         setContentPane(Sources.Init.background);
         System.out.println("OK");
-        System.out.print("Initialiting components... ");
+        System.out.print("Initializing components... ");
         initComponents();
         System.out.println("OK");
         jProgressBar1.setVisible(false);
+        if (Sources.debug) System.out.println("[->Progessbar set as not visible<-]");
         this.setLocationRelativeTo(null);
+        if (Sources.debug) System.out.println("[->Adapting buttons<-]");
         jButton7.setFocusPainted(false);
         jButton7.setContentAreaFilled(false);
         jButton3.setFocusPainted(false);
@@ -50,20 +52,24 @@ public class Vista2 extends javax.swing.JFrame {
         File te = new File(Sources.Files.login(true));
         if (!te.exists()){
             try {
+                if (Sources.debug) System.out.println("[->Creating new remember file<-]");
                 te.createNewFile();
             } catch (IOException ex) {
                 Sources.exception(ex, "Error al recordar nombres.");
             }
         } else if (te.exists() && rem.exists()){
             try{
+                if (Sources.debug) System.out.println("[->Reading remember file<-]");
                 BufferedReader bf = new BufferedReader (new FileReader(rem));
                 String temp = bf.readLine(), temp2 = bf.readLine();
                 bf.close();
+                if (Sources.debug) System.out.println("[->Comparing data<-]");
                 if (temp.equals("true")){
                     bf = new BufferedReader (new FileReader (te));
                     temp = bf.readLine();
                     bf.close();
                     if (temp != null){
+                        if (Sources.debug) System.out.println("[->Setting user<-]");
                         jCheckBox1.setSelected(true);
                         String tmp = Sources.Init.crypt.decryptData(temp);
                         jTextField1.setText(tmp);
@@ -75,6 +81,7 @@ public class Vista2 extends javax.swing.JFrame {
                     temp2 = bf.readLine();
                     bf.close();
                     if (temp2 != null){
+                        if (Sources.debug) System.out.println("[->Setting password<-]");
                         jCheckBox2.setSelected(true);
                         String tmp = Sources.Init.crypt.decryptData(temp2);
                         jPasswordField1.setText(tmp);
@@ -85,7 +92,6 @@ public class Vista2 extends javax.swing.JFrame {
             }
         }
         System.out.println("OK");
-        //Creamos el cliente del actualizador
         
     }
     /*public void res(){
@@ -98,7 +104,7 @@ public class Vista2 extends javax.swing.JFrame {
         Sources.Init.hilos.put("ChangeLog", Sources.Init.changelog);
         System.out.println("OK");
         try{
-            System.out.print("Initialiting updater... ");
+            System.out.print("Initializing updater... ");
             URL url = new URL("http://minechinchas.blogspot.com/2012/09/downloads.html");
             Sources.Init.client.init(jLabel1, jLabel5, jButton5, jButton6, jButton4, url, this);
             Sources.Init.client.start();
@@ -120,6 +126,7 @@ public class Vista2 extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft", "Minecraft not found!", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (Sources.debug) System.out.println("[->Initializing connection<-]");
         String name = jTextField1.getText().toLowerCase();
         statusConn.setForeground(Color.white);
         statusConn.setText("");
@@ -128,6 +135,7 @@ public class Vista2 extends javax.swing.JFrame {
         jButton5.setEnabled(false);
         statusConn.setForeground(Color.white);
         if (!Sources.Init.online){
+            if (Sources.debug) System.out.println("[->OFFLINE is active<-]");
             Sources.Init.log.init("Player", statusConn);
             Sources.Init.log.start();
             Sources.Init.hilos.put("Logger", Sources.Init.log);
@@ -135,6 +143,7 @@ public class Vista2 extends javax.swing.JFrame {
         } else{
             statusConn.setText("Connecting...");
         }
+        if (Sources.debug) System.out.println("[->Writing remember file<-]");
         boolean remember = jCheckBox1.isSelected(), rememberP = jCheckBox2.isSelected();
         //Comprobamos si el Recordar está activo y lo recordamos para un futuro
         File rem = new File (Sources.Files.rmb(true));
@@ -175,6 +184,7 @@ public class Vista2 extends javax.swing.JFrame {
     public void retry(){
         jButton5.setText("Try again");
         jButton5.setEnabled(true);
+        statusConn.setForeground(Color.red);
         statusConn.setText("Failed login");
     }
     public void offline(){
@@ -473,8 +483,10 @@ public class Vista2 extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (!Sources.Init.online){
+            if (Sources.debug) System.out.println("[->Forcing ONLINE MODE<-]");
             JOptionPane.showMessageDialog(this, "La conexión no puede realizarse estando OFFLINE",
                     "Parameter ONLINE can't be forced!", JOptionPane.WARNING_MESSAGE);
+            if (Sources.debug) System.out.println("[->FAILED<-]");
             return;
         }
         try{
@@ -484,27 +496,33 @@ public class Vista2 extends javax.swing.JFrame {
                 String system;
                 File local = new File(Sources.Prop.getProperty("user.data") + File.separator + 
                         account.toLowerCase() + "NM.dat");
+                if (Sources.debug) System.out.println("[->Getting document<-]");
                 int retries = 3;
+                if (Sources.debug) System.out.println("[->Initial retries: " + retries + "<-]");
                 boolean succesfull = false;
                 while (retries > 0 && !succesfull){
                     if (Sources.Connection.download(local, "Base/" + account.toLowerCase() + "NM.dat")){
                         succesfull = true;
+                        if (Sources.debug) System.out.println("[->Gotten document<-]");
                         local.deleteOnExit();
                     } else{
                         retries--;
                         System.out.println("Download failed. Retries: " + retries);
                     }
                 }
+                if (Sources.debug) System.out.println("[->Reading file<-]");
                 BufferedReader bf = new BufferedReader(new FileReader(local));
                 system = bf.readLine();
                 String temp = bf.readLine();
                 if (temp.equals("DEL")){
+                    if (Sources.debug) System.out.println("[->Account type = DEL<-]");
                     System.out.println("FAILED. Inexistent account");
                     JOptionPane.showMessageDialog(null, "La cuenta solicitada no existe.",
                             "Account not found", JOptionPane.INFORMATION_MESSAGE);
                     bf.close();
                     local.delete();
                 } else if (temp.equals("MC")){
+                    if (Sources.debug) System.out.println("[->Account type = MC<-]");
                     System.out.println("OK. Retrieving data...");
                     System.out.println(system);
                     JOptionPane.showMessageDialog(null, "Los datos de la cuenta solo pueden ser accedidos mediante "
@@ -512,15 +530,18 @@ public class Vista2 extends javax.swing.JFrame {
                     bf.close();
                     return;
                 } else if (temp.equals("OFF")){
+                    if (Sources.debug) System.out.println("[->Account type = OFF<-]");
                     System.out.println("OK. Retrieving data...");
                     System.out.println(system);
                     System.out.print("Checking secret word... ");
                     String word = JOptionPane.showInputDialog("Introduzca la palabra secreta:");
                     if (word != null){
+                        if (Sources.debug) System.out.println("[->Comparing data<-]");
                         bf.readLine();
                         String P = Sources.Init.crypt.decryptData(bf.readLine());
                         String W = Sources.Init.crypt.decryptData(bf.readLine());
                         if (word.equals(W)){
+                            if (Sources.debug) System.out.println("[->Complete<-]");
                             System.out.println("OK");
                             JOptionPane.showMessageDialog(this, "User: " + account + "\nPassword: " + P 
                                     + "\nWord: " + W);
@@ -690,10 +711,12 @@ public class Vista2 extends javax.swing.JFrame {
     private class PlayButton extends Thread{
         private String name;
         public PlayButton(String name){
+            if (Sources.debug) System.out.println("[->Adding file name<-]");
             this.name = name + "NM.dat";
         }
         private void initialite(){
             if (!Sources.Init.online || tries == 0){
+                if (Sources.debug) System.out.println("[->OFFLINE is active<-]");
                 Sources.Init.log.init("Player", statusConn);
                 Sources.Init.log.start();
                 Sources.Init.hilos.put("Logger", Sources.Init.log);
@@ -702,12 +725,21 @@ public class Vista2 extends javax.swing.JFrame {
             try{
                 System.out.println("Looking files");
                 File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + name);
+                if (Sources.debug) System.out.println("[->Checking the username<-]");
+                if (!Sources.Connection.checkDuplicated(jTextField1.getText())){
+                    System.out.println("Account inexistent");
+                    JOptionPane.showMessageDialog(null, "La cuenta no existe.", "Account not found", JOptionPane.ERROR_MESSAGE);
+                    Sources.Init.mainGUI.retry();
+                    return;
+                }
                 BufferedReader bf = null;
                 String temp = null;
                 int connectionTries = 3;
+                if (Sources.debug) System.out.println("[->Connecting (Tries = " + connectionTries + ")<-]");
                 boolean succesfull = false;
                 while (connectionTries > 0 && !succesfull){
                     if (Sources.Connection.download(tmp, "Base/" + name)){
+                        if (Sources.debug) System.out.println("[->Connection done<-]");
                         succesfull = true;
                         tmp.deleteOnExit();
                     }else {
@@ -727,6 +759,7 @@ public class Vista2 extends javax.swing.JFrame {
                     return;
                 }
                 try{
+                    if (Sources.debug) System.out.println("[->Reading file<-]");
                     bf = new BufferedReader(new FileReader(tmp));
                     System.out.println(bf.readLine());
                     temp = bf.readLine();
@@ -738,13 +771,16 @@ public class Vista2 extends javax.swing.JFrame {
                     return;
                 }
                 if (temp.equals("OFF")){
+                    if (Sources.debug) System.out.println("[->Adding data to the file: Account type = OFF<-]");
                     String temp1 = bf.readLine(), temp2 = bf.readLine();
                     String A = Sources.Init.crypt.decryptData(temp1);
                     String B = Sources.Init.crypt.decryptData(temp2);
+                    if (Sources.debug) System.out.println("[->Checking data<-]");
                     if (A.equals(jTextField1.getText()) && B.equals(new String(jPasswordField1.getPassword()))){
                         if (bf != null){
                             bf.close();
                         }
+                        if (Sources.debug) System.out.println("[->Starting logger<-]");
                         Sources.Connection.inputLog(A);
                         Sources.Init.log.init(A, statusConn);
                         Sources.Init.log.start();
@@ -758,6 +794,7 @@ public class Vista2 extends javax.swing.JFrame {
                         retry();
                     }
                 } else if (temp.equals("MC")){
+                    if (Sources.debug) System.out.println("[->Adding data to the file: Account type = MC<-]");
                     if (!Sources.Init.log.isAlive() && Sources.Init.log.started){
                         Sources.Init.log = new Logger();
                     }
@@ -768,6 +805,7 @@ public class Vista2 extends javax.swing.JFrame {
                         Sources.Init.hilos.put("Logger", Sources.Init.log);
                     }
                 } else if (temp.equals("DEL")){
+                    if (Sources.debug) System.out.println("[->Account deleted: Account type = DEL<-]");
                     JOptionPane.showMessageDialog(null, "La cuenta no existe.");
                     retry();
                 }

@@ -137,8 +137,10 @@ public class Debug extends javax.swing.JDialog {
             return;
         }
         if (!Sources.Init.online){
+            if (Sources.debug) System.out.println("[->Forcing ONLINE MODE<-]");
             JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE. Printing"
                     + " into a log file...", "OFFLINE", JOptionPane.ERROR_MESSAGE);
+            if (Sources.debug) System.out.println("[->FAILED<-]");
             Calendar C = new GregorianCalendar();
             File log = new File(System.getProperty("user.home") + File.separator + "Desktop" + File.separator
                     + "MineClient_Error_" + C.get(Calendar.YEAR) + "-" + C.get(Calendar.MONTH) + "-" + 
@@ -146,6 +148,10 @@ public class Debug extends javax.swing.JDialog {
                     + "-" + C.get(Calendar.SECOND) + ".log");
             PrintWriter pw = null;
             try{
+                if (Sources.debug) System.out.println("[->Porting to a file<-]");
+                if (!log.exists()){
+                    log.createNewFile();
+                }
                 pw = new PrintWriter(log);
                 pw.print(Sources.Init.error.err.toString());
                 pw.close();
@@ -154,6 +160,7 @@ public class Debug extends javax.swing.JDialog {
             }
             return;
         }
+        if (Sources.debug) System.out.println("[->Setting parameters<-]");
         Parameters par = new Parameters();
         Session ses = Session.getDefaultInstance(par.getPs());
         ses.setDebug(false);
@@ -161,12 +168,15 @@ public class Debug extends javax.swing.JDialog {
         try{
             msg.setFrom(new InternetAddress(par.getF()));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
+            if (Sources.debug) System.out.println("[->Adding recipients<-]");
             msg.setSubject(jTextField1.getText());
             msg.setText(jTextArea1.getText() + "\n\nERRORSTREAM:\n" + Sources.Init.error.err.toString());
             Transport t = ses.getTransport(par.getT());
             t.connect(par.getF(), par.getP());
+            if (Sources.debug) System.out.println("[->Sending ticket<-]");
             t.sendMessage(msg, msg.getAllRecipients());
             t.close();
+            if (Sources.debug) System.out.println("[->Done<-]");
             jButton1.setText("Enviado");
             jButton1.setEnabled(false);
         } catch (Exception ex){
@@ -177,6 +187,7 @@ public class Debug extends javax.swing.JDialog {
 
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         // TODO add your handling code here:
+        if (Sources.debug) System.out.println("[->Getting errors<-]");
         if (evt.getKeyCode() == KeyEvent.VK_CONTROL){
             String a = jTextField1.getText();
             if (a.equals("DEBUGMODE")){
@@ -187,6 +198,7 @@ public class Debug extends javax.swing.JDialog {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
+        if (Sources.debug) System.out.println("[->Exiting<-]");
         exited = true;
         reInit();
     }//GEN-LAST:event_formWindowClosing

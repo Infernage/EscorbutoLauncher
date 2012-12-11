@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
  */
 public class PassConfirm extends javax.swing.JDialog {
     public boolean exited = false;
+    private boolean working = false;
     /**
      * Creates new form PassConfirm
      */
@@ -31,6 +32,7 @@ public class PassConfirm extends javax.swing.JDialog {
         jPasswordField1.setText("");
         jPasswordField2.setText("");
         exited = false;
+        working = false;
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,6 +53,7 @@ public class PassConfirm extends javax.swing.JDialog {
         jTextField2 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -130,9 +133,12 @@ public class PassConfirm extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "Introduzca el nombre de cuenta");
             return;
         }
+        if (Sources.debug) System.out.println("[->Checking for existing accounts<-]");
         boolean change = false;
         try{
             if (!Sources.Connection.checkDuplicated(jTextField2.getText())){
+                if (Sources.debug) System.out.println("[->Error 404: File not found (or your brain"
+                        + " didn't think the correct username)<-]");
                 JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar"
                         + " con el servidor.");
                 return;
@@ -140,25 +146,30 @@ public class PassConfirm extends javax.swing.JDialog {
             File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + 
                     jTextField2.getText().toLowerCase() + "NM.dat");
             tmp.deleteOnExit();
+            if (Sources.debug) System.out.println("[->Getting document<-]");
             Sources.Connection.download(tmp, "Base/" + jTextField2.getText().toLowerCase() + "NM.dat");
             BufferedReader bf = new BufferedReader(new FileReader(tmp));
             System.out.println(bf.readLine());
             String temp = bf.readLine();
             if (temp.equals("DEL")){
+                if (Sources.debug) System.out.println("[->Account type = DEL<-]");
                 JOptionPane.showMessageDialog(null, "La cuenta no existe o ha habido un problema al conectar "
                         + "con el servidor");
                 bf.close();
                 tmp.delete();
                 return;
             } else if (temp.equals("MC")){
+                if (Sources.debug) System.out.println("[->Account type = MC<-]");
                 JOptionPane.showMessageDialog(null, "Tu tipo de cuenta no permite cambiar la contraseña desde aquí.\n"
                         + "Tipo de cuenta: Minecraft oficial");
                 bf.close();
                 return;
             }
+            if (Sources.debug) System.out.println("[->Account type = OFF<-]");
             String A = null;
             bf.readLine();
             bf.readLine();
+            if (Sources.debug) System.out.println("[->Replacing data<-]");
             //Nos quitamos de encima el nombre de usuario y la contraseña y vamos directamente a la palabra secreta
             A = Sources.Init.crypt.decryptData(bf.readLine());
             //Desencriptamos la palabra y comprobamos si es la escrita en el área de texto
@@ -183,9 +194,11 @@ public class PassConfirm extends javax.swing.JDialog {
                     pw.print(str.toString());
                     pw.close();
                     bf.close();
+                    if (Sources.debug) System.out.println("[->Done<-]");
                     Sources.Connection.upload(tmp, "Base/" + jTextField2.getText().toLowerCase() + "NM.dat");
                     JOptionPane.showMessageDialog(null, "La contraseña ha sido cambiada satisfactoriamente. Recuerda tu contraseña siempre.");
-                    this.dispose();
+                    working = false;
+                    this.formWindowClosing(null);
                 } else{
                     JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.");
                 }
@@ -195,10 +208,15 @@ public class PassConfirm extends javax.swing.JDialog {
         } catch (IOException e){
             Sources.exception(e, "Error en el cambio de contraseña.");
         }
+        working = false;
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
+        if (working){
+            return;
+        }
+        if (Sources.debug) System.out.println("[->Parameter: setVisible(false)<-]");
         exited = true;
         reInit();
     }//GEN-LAST:event_formWindowClosing

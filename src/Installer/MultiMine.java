@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -31,14 +30,14 @@ public class MultiMine extends javax.swing.JDialog {
     private Awake initialite;
     private String selectTemp;
     public boolean exited = false;
-    private boolean working = false;
+    public static boolean working = false;
     /**
      * Creates new form MultiMine
      */
     public MultiMine(JFrame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        System.out.print("Initialiting... ");
+        System.out.print("Initializing... ");
         initModel();
         System.out.println("OK");
         checkMC();
@@ -60,10 +59,8 @@ public class MultiMine extends javax.swing.JDialog {
             Sources.exception(ex, ex.getMessage());
         }
     }
-    private void defaultOperation(){
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    }
     private void initModel(){
+        if (Sources.debug) System.out.println("[->Set default model<-]");
         DefaultListModel modelo = new DefaultListModel();
         modelo.addElement("SinglePlayer");
         modelo.addElement("MultiPlayer");
@@ -110,6 +107,7 @@ public class MultiMine extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft.", "Not found", JOptionPane.WARNING_MESSAGE);
         }
         DefaultListModel modelo = (DefaultListModel) jList1.getModel();
+        if (Sources.debug) System.out.println("[->Replacing the default model<-]");
         for (int i = 0; i < mcs.length; i++){
             if (mcs[i].isDirectory()){
                 String title = mcs[i].getName();
@@ -129,6 +127,7 @@ public class MultiMine extends javax.swing.JDialog {
         portB.setEnabled(true);
         jLabel4.setText("");
         jLabel2.setText("");
+        jProgressBar1.setString("");
         jProgressBar1.setValue(0);
         jProgressBar1.setMinimum(0);
         jProgressBar1.setMaximum(100);
@@ -204,6 +203,7 @@ public class MultiMine extends javax.swing.JDialog {
         desinstalarB = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("MultiMine");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -577,7 +577,7 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        if (Sources.Init.work.started || Sources.Init.rest.started || Sources.Init.unwork.started || working){
+        if (working){
             return;
         }
         exited = true;
@@ -593,7 +593,7 @@ public class MultiMine extends javax.swing.JDialog {
                     "OFFLINE", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        working = true;
         jList1.setEnabled(false);
         instalarB.setEnabled(false);
         ejecutarB.setEnabled(false);
@@ -635,7 +635,7 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void desinstalarBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_desinstalarBActionPerformed
         // TODO add your handling code here:
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        working = true;
         System.out.println("Creating new uninstall thread");
         jList1.setEnabled(false);
         modificarB.setEnabled(false);
@@ -650,7 +650,7 @@ public class MultiMine extends javax.swing.JDialog {
 
     private void restoreBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restoreBActionPerformed
         // TODO add your handling code here:
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        working = true;
         System.out.println("Creating new restorer thread");
         jList1.setEnabled(false);
         instalarB.setEnabled(false);
@@ -787,7 +787,6 @@ public class MultiMine extends javax.swing.JDialog {
                 bf.close();
             } catch (Exception ex) {
                 Sources.exception(ex, "Host not found");
-                defaultOperation();
             }
             return host;
         }
@@ -807,7 +806,6 @@ public class MultiMine extends javax.swing.JDialog {
             }
             System.out.print("Repainting... ");
             reInit();
-            defaultOperation();
             System.out.println("OK");
         }
     }
@@ -824,9 +822,7 @@ public class MultiMine extends javax.swing.JDialog {
                     ".minecraft"));
                 Sources.Prop.setProperty("user.home", Sources.path(Sources.Directory.DirData() + File.separator + 
                     Sources.Directory.DirInstance + File.separator + data));
-                Sources.Init.multiGUI.setVisible(false);
-                Sources.Init.multiGUI.reInit();
-                Sources.Init.mainGUI.setVisible(true);
+                formWindowClosing(null);
             } catch (IOException ex) {
                 Sources.exception(ex, "No se pudo iniciar la instancia.");
             }

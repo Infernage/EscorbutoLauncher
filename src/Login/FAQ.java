@@ -68,7 +68,7 @@ public class FAQ extends javax.swing.JDialog {
         jLabel24 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jLabel1.setText("P: ¿Cómo puedo cambiar mi nombre en Minecraft?");
 

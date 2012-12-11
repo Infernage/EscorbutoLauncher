@@ -9,6 +9,7 @@ import Installer.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +45,11 @@ public class Sources {
     private static String Wtmp = System.getProperty("user.home") + "\\AppData\\Roaming",
             Ltmp = System.getProperty("user.home");
     public static Properties Prop;
+    public static boolean debug = false;
+    public static void setLanguage(){
+        Prop.setProperty("es", "Escritorio");
+        Prop.setProperty("en", "Desktop");
+    }
     /** 
      * This method asigns the OS name
      */ 
@@ -225,28 +231,47 @@ public class Sources {
                 System.out.println("Check failed");
                 exception(ex, "Error al comprobar los ficheros fuentes.");
             }
+            if (Sources.debug) System.out.println("[->Splash finalized<-]");
             image.exit();
-            System.out.println("Initialiting main GUI");
+            System.out.println("Initializing main GUI");
             mainGUI.setVisible(true);
         }
         private static void setConnection(){
             System.out.println("Configurating connection...");
             try {
+                System.out.print("Patching connection... ");
+                if (debug) System.out.println("[->Patching with preferIPv4Stack=true<-]");
+                System.setProperty("java.net.preferIPv4Stack", "true");
+                System.out.println("OK");
                 Connection.startConnection();
                 if (!Connection.isConnected()){
                     throw new Exception("Connection time out");
                 }
                 File tmp = new File(Sources.path(Sources.Directory.DirData()) + File.separator + "queue.txt");
                 tmp.deleteOnExit();
-                Connection.download(tmp, "Base/queue.txt");
-                BufferedReader bf = new BufferedReader(new FileReader (tmp));
-                String temp = bf.readLine();
+                String temp = null;
+                BufferedReader bf = null;
+                try{
+                    Connection._download(tmp, "Base/queue.txt");
+                    bf = new BufferedReader(new FileReader (tmp));
+                    temp = bf.readLine();
+                } catch (Exception ex){
+                    error.setError(ex);
+                    System.out.println("ERROR");
+                    temp = null;
+                } finally{
+                    if (Connection.isConnected()){
+                        Connection.closeConnection();
+                    }
+                    if (bf != null){
+                        bf.close();
+                    }
+                }
                 System.out.println("Connection result: " + temp);
                 bf.close();
-                Connection.closeConnection();
                 tmp.delete();
                 if (temp == null){
-                    System.out.println("ERROR\nTrying with alternative form...");
+                    System.out.println("Trying with alternative form...");
                     Connection.failed = true;
                     Connection.download(tmp, "Base/queue.txt");
                     bf = new BufferedReader(new FileReader(tmp));
@@ -278,14 +303,18 @@ public class Sources {
                 de.setVisible(true);
                 System.exit(9);
             }
+            if (debug) System.out.println("[->Created new Properties<-]");
             Prop = new Properties();
+            if (debug) System.out.println("[->Created new Map<-]");
             hilos = new HashMap<String, Thread>();
             garbage = new HashMap<String, List<Object>>();
+            if (debug) System.out.println("[->Creating Splash<-]");
             image = new Splash();
             Thread t = new Thread(image, "Splash");
             t.setDaemon(true);
             t.start();
             hilos.put("Splash", t);
+            if (debug) System.out.println("[->Splash created<-]");
             System.out.println("Setting OutputStreams");
             consola = new Console();
             consola.setVisible(true);
@@ -306,15 +335,20 @@ public class Sources {
             if (!tmp.exists()){
                 tmp.mkdirs();
             }
+            if (debug) System.out.println("[->Created directories<-]");
             collector = new Collector("Collector");
             collector.setDaemon(true);
             collector.start();
             crypt = new AES(Files.pss);
+            if (debug) System.out.println("[->Created AES crypter<-]");
             background = new Background();
             changelog = new CHLG();
             client = new Cliente();
+            if (debug) System.out.println("[->Created client<-]");
             log = new Logger();
+            if (debug) System.out.println("[->Created logger<-]");
             update = new Updater();
+            if (debug) System.out.println("[->Created updater<-]");
             accountGUI = new Vista();
             vinit = new Ventanita(accountGUI, true);
             work = new Worker();
@@ -326,9 +360,13 @@ public class Sources {
             faq = new FAQ(mainGUI, true);
             err = new Debug(null, true);
             info = new Acerca(mainGUI, true);
+            if (debug) System.out.println("[->Created installer and GUIs<-]");
         }
         private static void load() throws Exception{
+            setLanguage();
+            if (debug) System.out.println("[->Language set<-]");
             Prop.setProperty("user.data", Sources.path(Sources.Directory.DirData()));
+            if (debug) System.out.println("[->New property set<-]");
             mainGUI.init();
             mainGUI.setIconImage(new ImageIcon(new Init().getClass().getResource("/Resources/5547.png")).getImage());
             mainGUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -382,6 +420,7 @@ public class Sources {
         private static void checkSources() throws Exception{
             File tmp = new File(Files.jar(true));
             File last = new File(System.getProperty("user.dir") + File.separator + Files.jar(false));
+            if (Sources.debug) System.out.println("[->Checking jar file<-]");
             if (!tmp.exists() && last.exists()){
                 System.out.println("Exporting resource file: " + last.getName());
                 IO.copy(last, tmp);
@@ -392,12 +431,19 @@ public class Sources {
                     IO.copy(last, tmp);
                 }
             }
+            if (Sources.debug) System.out.println("[->Checking resource files<-]");
             BufferedInputStream in = null;
             last = null;
             tmp = new File(Files.access(true));
             in = new BufferedInputStream(new Init().getClass().getResourceAsStream("/Resources/" + Files.access(false)));
             look(tmp, in);
-            tmp = new File(System.getProperty("user.home") + File.separator + "Desktop" + File.separator + Files.access(false));
+            String language = "";
+            if (System.getProperty("user.language").toLowerCase().equals("es") && OS.contains("lin")){
+                language = Prop.getProperty("es");
+            } else if (System.getProperty("user.language").toLowerCase().equals("en") && OS.contains("lin")){
+                language = Prop.getProperty("en");
+            }
+            tmp = new File(System.getProperty("user.home") + File.separator + language + File.separator + Files.access(false));
             in = new BufferedInputStream(new Init().getClass().getResourceAsStream("/Resources/" + Files.access(false)));
             look(tmp, in);
             tmp = new File(Files.temporal(true));
@@ -406,6 +452,7 @@ public class Sources {
             tmp = null;
             in = null;
             System.gc();
+            if (Sources.debug) System.out.println("[->Check complete<-]");
         }
         
     }
@@ -532,11 +579,13 @@ public class Sources {
          * @throws Exception if any connection error happens.
          */
         private static void startConnection() throws Exception{
+            if (debug) System.out.println("[->Started connection<-]");
             client.connect("minechinchas.zxq.net");
             client.login("minechinchas_zxq", new Parameters().getFP());
         }
         private static boolean isConnected() { return client.isConnected(); }
         private static void closeConnection(){
+            if (debug) System.out.println("[->Closed connection<-]");
             try{
                 client.logout();
                 client.disconnect();
@@ -563,8 +612,12 @@ public class Sources {
             OutputStream out = url.openConnection().getOutputStream();
             BufferedReader bf = new BufferedReader(new FileReader(file));
             try{
-                byte[] buffer = new byte[(int)file.length()];
-                out.write(buffer);
+                int i = bf.read();
+                while (i != -1){
+                    out.write(i);
+                    out.flush();
+                    i = bf.read();
+                }
                 return true;
             }finally{
                 out.close();
@@ -597,7 +650,7 @@ public class Sources {
         public static boolean upload(File file, String path){
             boolean res = false;
             if (failed){
-                System.out.println("[->Uploading with 2nd method<-]");
+                if (debug) System.out.println("[->Uploading with 2nd method<-]");
                 try{
                     res = _2upload(file, path);
                 } catch (Exception ex){
@@ -616,7 +669,9 @@ public class Sources {
                 exception(ex, "Fallo al conectar con el servidor.");
                 res = false;
             } finally{
-                closeConnection();
+                if (isConnected()){
+                    closeConnection();
+                }
                 return res;
             }
         }
@@ -640,10 +695,14 @@ public class Sources {
             url = new URL("ftp://minechinchas_zxq:" + new Parameters().getFP() + "@minechinchas.zxq.net" +
                     pathServer + ";type=i");
             InputStream in = url.openConnection().getInputStream();
-            BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(file));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             try{
-                byte[] buffer = new byte[in.available()];
-                bw.write(buffer);
+                int i = in.read();
+                while (i != -1){
+                    bw.write(i);
+                    bw.flush();
+                    i = in.read();
+                }
                 return true;
             } finally{
                 in.close();
@@ -676,7 +735,7 @@ public class Sources {
         public static boolean download(File file, String path){
             boolean res = false;
             if (failed){
-                System.out.println("[->Downloading with 2nd method<-]");
+                if (debug) System.out.println("[->Downloading with 2nd method<-]");
                 try{
                     res = _2download(file, path);
                 } catch (Exception ex){
@@ -695,7 +754,9 @@ public class Sources {
                 exception(ex, "Fallo al conectar con el servidor.");
                 res = false;
             } finally{
-                closeConnection();
+                if (isConnected()){
+                    closeConnection();
+                }
                 return res;
             }
         }
@@ -768,32 +829,47 @@ public class Sources {
                 closeConnection();
             }
         }
+        private static boolean _checkDuplicated(String accountLower){
+            try{
+                client.changeWorkingDirectory("Base");
+                String[] files = client.listNames();
+                int i = 0;
+                if (files == null){
+                    System.out.println("Error response obtained");
+                    return false;
+                }
+                while (i < files.length){
+                    if (files[i].contains(accountLower)){
+                        return true;
+                    }
+                    i++;
+                }
+                return false;
+            } catch (Exception ex){
+                Init.error.setError(ex);
+                return false;
+            }
+        }
+        /*private static boolean _2checkDuplicated(String accountLower){
+            ghdf
+        }*/
         /**
          * This method checks if the account is duplicated.
          * @param account The account name.
          * @return {@code true} if the account already exists or {@code false} in otherwise.
          */
         public static boolean checkDuplicated(String account){
-            boolean res;
-            OutputStream out = null;
+            boolean res = false;
             try{
-                out = client.appendFileStream("Base/" + account.toLowerCase() + "NM.dat");
-                if (out == null){
-                    res = false;
-                } else{
-                    res = true;
+                if (!client.isConnected() && Init.online){
+                    startConnection();
                 }
+                res = _checkDuplicated(account.toLowerCase());
             } catch (Exception ex){
+                res = false;
                 Init.error.setError(ex);
-                res = true;
             } finally{
-                if (out != null){
-                    try {
-                        out.close();
-                    } catch (IOException ex) {
-                        
-                    }
-                }
+                closeConnection();
             }
             return res;
         }

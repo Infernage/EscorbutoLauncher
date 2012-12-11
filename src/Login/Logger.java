@@ -31,16 +31,19 @@ public class Logger extends Thread{
         targetURL = "https://login.minecraft.net/";
     }
     public void init(String user, String pass, JLabel lab){
+        if (Sources.debug) System.out.println("[->Initialized logger with MC account<-]");
         init = true;
         label = lab;
         userName = user;
         password = pass;
     }
     public void init(String user, JLabel lab){
+        if (Sources.debug) System.out.println("[->Initialized logger with OFF account<-]");
         init(user, null, lab);
         offline = true;
     }
     private String logMine (String targetURL, String urlParameters){
+        if (Sources.debug) System.out.println("[->Retrieving data<-]");
         HttpsURLConnection connection = null;
         try {
             URL url = new URL(targetURL);
@@ -110,12 +113,15 @@ public class Logger extends Thread{
             started = true;
             String res = "";
             if (offline){
+                if (Sources.debug) System.out.println("[->Starting in OFFLINE MODE<-]");
                 launch(null);
                 return;
             }
+            if (Sources.debug) System.out.println("[->Adding parameters<-]");
             urlParameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + 13;
             res = this.logMine(targetURL, urlParameters);
             if (res == null){
+                if (Sources.debug) System.out.println("[->Connection failed<-]");
                 label.setForeground(Color.red);
                 label.setText("Can't connect to minecraft.net");
                 Sources.Init.mainGUI.tries--;
@@ -125,6 +131,7 @@ public class Logger extends Thread{
                     Sources.Init.mainGUI.retry();
                 }
             } else if (!res.contains(":")){
+                if (Sources.debug) System.out.println("[->Connection failed<-]");
                 if (res.trim().equals("Bad login")){
                     label.setForeground(Color.red);
                     label.setText("Login failed!");
@@ -142,6 +149,7 @@ public class Logger extends Thread{
                     Sources.Init.mainGUI.retry();
                 }
             } else if (res.contains(":")){
+                if (Sources.debug) System.out.println("[->Starting launcher in ONLINE MODE<-]");
                 launch(res);
             }
         } catch (Exception ex) {

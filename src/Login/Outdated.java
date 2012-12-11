@@ -16,6 +16,7 @@ public class Outdated {
     public static void ver4xx(){
         File opt = new File(Sources.path("opt.cfg"));
         if (opt.exists()){
+            if (Sources.debug) System.out.println("[->Outdated options founded!<-]");
             if (!opt.delete()){
                 opt.deleteOnExit();
             }
@@ -25,6 +26,7 @@ public class Outdated {
         File copySystem = new File(System.getProperty("user.home") + File.separator + "Desktop" + 
                 File.separator + "Copia Minecraft");
         if (copySystem.exists()){
+            if (Sources.debug) System.out.println("[->Old copy system founded!<-]");
             System.out.print("Copy system founded! Exporting to the new location... ");
             try {
                 Sources.IO.copyDirectory(copySystem, new File(Sources.Prop.getProperty("user.data") + 
@@ -48,8 +50,10 @@ public class Outdated {
             Sources.IO.borrarFichero(updateSystem);
             updateSystem.delete();
         }
+        if (Sources.debug) System.out.println("[->Finalized version 4.x.x search engine for<-]");
     }
     public static void ver500(){
+        if (Sources.debug) System.out.println("[->Searching files<-]");
         File bool = new File(Sources.Prop.getProperty("user.data") + File.separator + "boolean.txt");
         File names = new File(Sources.Prop.getProperty("user.data") + File.separator 
                 + Sources.Directory.DirNM + File.separator + "ALLNM-MC.cfg");
@@ -59,18 +63,23 @@ public class Outdated {
         File instance = new File(Sources.Files.Instance(true));
         if (bool.exists()){
             bool.delete();
+            if (Sources.debug) System.out.println("[->Deleted old register file<-]");
         }
         if (names.exists()){
             names.delete();
+            if (Sources.debug) System.out.println("[->Deleted old names file<-]");
         }
         if (base.exists()){
             Sources.IO.borrarFichero(base);
             base.delete();
+            if (Sources.debug) System.out.println("[->Deleted old temporal directory<-]");
         }
         if (login.exists()){
             login.delete();
+            if (Sources.debug) System.out.println("[->Deleted bugged remember file<-]");
         }
         if (!instance.exists()){
+            if (Sources.debug) System.out.println("[->Adapting new installation system<-]");
             try{
                 File mc = new File(Sources.path(Sources.Directory.DirMC));
                 if (!mc.exists()){
@@ -113,11 +122,15 @@ public class Outdated {
                 Sources.exception(ex, ex.getMessage());
             }
         }
+        if (Sources.debug) System.out.println("[->Finalized version 5.0.0 search engine for<-]");
     }
     public static void checkAll(){
         System.out.println("Actual version: " + Sources.Init.version);
+        if (Sources.debug) System.out.println("[->Started version 4.x.x search engine for<-]");
         ver4xx();
+        if (Sources.debug) System.out.println("[->Started version 5.0.0 search engine for<-]");
         ver500();
+        if (Sources.debug) System.out.println("[->Finalizing<-]");
         System.gc();
     }
     /*private static class outECP{

@@ -27,12 +27,14 @@ public class Launcher {
     }
     public Launcher(){}
     public void offline(String user){
+        if (Sources.debug) System.out.println("[->OFFLINE set<-]");
         userName = user;
         sessionId = "-";
         latestVersion = "N/A";
         downloadTicket = "N/A";
     }
     public void init(){
+        if (Sources.debug) System.out.println("[->Loading necessary files<-]");
         System.out.println("Username: " + userName + "\nSessionID: " + sessionId + "\nLatestVersion: " + 
                 latestVersion + "\nDownloadTicket: " + downloadTicket);
         String arg = Sources.Prop.getProperty("user.dir");
@@ -53,6 +55,7 @@ public class Launcher {
             }
             System.out.println("Loading natives...");
             String natives = new File(new File(arg, "bin"), "natives").toString();
+            if (Sources.debug) System.out.println("[->Setting new properties<-]");
             System.setProperty("org.lwjgl.librarypath", natives);
             System.setProperty("net.java.games.input.librarypath", natives);
             System.setProperty("user.dir", Login.Sources.Prop.getProperty("user.dir"));
@@ -62,6 +65,7 @@ public class Launcher {
             Class invoker;
             Applet applet;
             MCFrame frame;
+            if (Sources.debug) System.out.println("[->Invoking net.minecraft.client.Minecraft<-]");
             try{
                 client = loader.loadClass("net.minecraft.client.Minecraft");
                 Field field = getMCField(client);
@@ -80,9 +84,11 @@ public class Launcher {
             { "minecraft" }).toString();
             System.out.println("MCDIR: " + method + "\nLaunching...");
             try{
+                if (Sources.debug) System.out.println("[->Loading applet<-]");
                 invoker = loader.loadClass("net.minecraft.client.MinecraftApplet");
                 applet = (Applet) invoker.newInstance();
                 frame = new MCFrame("Minecraft");
+                if (Sources.debug) System.out.println("[->Starting Minecraft<-]");
                 frame.start(applet, userName, sessionId, mc);
             } catch (Exception ex){
                 Login.Sources.fatalException(ex, "Failed to launch Minecraft.", 1);
@@ -92,6 +98,7 @@ public class Launcher {
         }
     }
     public static Field getMCField(Class<?> parameter){
+        if (Sources.debug) System.out.println("[->Getting MCField<-]");
         Field[] fields = parameter.getDeclaredFields();
         int i = 0;
         Field res = null;

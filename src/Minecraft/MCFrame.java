@@ -4,6 +4,7 @@
  */
 package Minecraft;
 
+import Login.Sources;
 import java.applet.Applet;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -21,6 +22,7 @@ public class MCFrame extends Frame implements WindowListener{
     private Aplication applet = null;
     public MCFrame(String param){
         super(param);
+        if (Sources.debug) System.out.println("[->Resources set<-]");
         try{
             BufferedImage image = ImageIO.read(getClass().getResource("/Resources/5547.png"));
             setIconImage(image);
@@ -34,23 +36,31 @@ public class MCFrame extends Frame implements WindowListener{
         addWindowListener(this);
     }
     public void start(Applet ap, String user, String session, Dimension dimen){
+        if (Sources.debug) System.out.println("[->Starting applet<-]");
         try{
             applet = new Aplication(ap, new URL("http://www.minecraft.net/game"));
         } catch (Exception ex){
             Login.Sources.fatalException(ex, "Failed to start.", 1);
         }
+        if (Sources.debug) System.out.println("[->Setting applet parameters<-]");
         applet.setParameter("username", user);
         applet.setParameter("sessionid", session);
         applet.setParameter("stand-alone", "true");
+        if (Sources.debug) System.out.println("[->Setting stub<-]");
         ap.setStub(applet);
+        if (Sources.debug) System.out.println("[->Adding applet<-]");
         add(applet);
         applet.setPreferredSize(dimen);
         pack();
         setLocationRelativeTo(null);
+        if (Sources.debug) System.out.println("[->Setting in extended state<-]");
         setExtendedState(6);
+        if (Sources.debug) System.out.println("[->Validating...<-]");
         validate();
+        if (Sources.debug) System.out.println("[->Launching...<-]");
         applet.init();
         applet.start();
+        if (Sources.debug) System.out.println("[->DONE<-]");
         setVisible(true);
     }
     @Override

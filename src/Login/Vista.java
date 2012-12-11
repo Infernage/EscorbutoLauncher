@@ -17,21 +17,35 @@ import javax.swing.*;
  */
 public class Vista extends javax.swing.JFrame {
     public boolean exited = false;
+    private boolean working = false;
     /**
      * Creates new form Vista
      */
     public Vista(){
-        System.out.print("Initialiting Register GUI... ");
+        System.out.print("Initializing Register GUI... ");
         initComponents();
         System.out.println("OK");
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setTitle("Registro Minecraft 1.2.5");
     }
     public void reInit(){
+        jButton2.setEnabled(true);
+        jButton3.setEnabled(true);
+        jButton5.setEnabled(true);
         jTextField1.setText("");
         jTextField2.setText("");
         jPasswordField1.setText("");
         exited = false;
+        working = false;
+    }
+    private void close(boolean closer){
+        if (working && closer){
+            return;
+        }
+        exited = true;
+        this.setVisible(false);
+        reInit();
+        Sources.Init.mainGUI.setVisible(true);
     }
     private File createLoginFile(String type, String account, String password, String word) throws IOException{
         File acc = new File(Sources.Prop.getProperty("user.data") + File.separator + 
@@ -244,142 +258,36 @@ public class Vista extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        exited = true;
-        this.setVisible(false);
-        reInit();
-        Sources.Init.mainGUI.setVisible(true);
+        this.close(true);
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         /*Botón para indicar que se tiene cuenta de Minecraft Oficial
         */
-        if (!Sources.Init.online){
-            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
-                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        System.out.print("Checking username... ");
-        if (jTextField1.getText().equals("")){
-            JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
-            System.out.println("FAILED");
-            return;
-        }
-        if (Sources.Connection.checkDuplicated(jTextField1.getText())){
-            JOptionPane.showMessageDialog(null, "La cuenta ya existe");
-            System.out.println("FAILED\nExisting account found!");
-            return;
-        }
-        System.out.println("OK");
-        int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
-            + " tienes una cuenta oficial.\n¿Estás seguro de continuar?");
-        if (i == 0){
-            this.setVisible(false);
-            try {
-                System.out.print("Creating new save file... ");
-                File fichero = this.createLoginFile("MC", Sources.Init.crypt.encryptData(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
-                System.out.print("OK\nSynchronizing... ");
-                Sources.Connection.upload(fichero, "Base/");
-                System.out.print("OK\nDeleting temp files... ");
-                fichero.delete();
-                System.out.println("OK");
-                this.setVisible(false);
-                Sources.Init.mainGUI.setVisible(true);
-            } catch (IOException e){
-                Sources.Init.error.setError(e);
-                System.out.println("FAILED");
-            }
-        }
+        working = true;
+        jButton2.setEnabled(false);
+        jButton3.setEnabled(false);
+        jButton5.setEnabled(false);
+        Register reg = new Register(true);
+        reg.start();      
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         //Botón de registro, se inicializan las variables @exito controla si se registra o no
-        if (!Sources.Init.online){
-            JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
-                    "OFFLINE", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        boolean exito = true;
-        String encrypted = null;
-        String encryptedPass = null;
-        String secretW = null;
-        //Se controla si todos los campos están bien rellenados
-        System.out.print("Checking username... ");
-        if (jTextField1.getText().equals("")){
-            JOptionPane.showMessageDialog(null, "Debes meter un nombre de usuario.");
-            exito = false;
-            System.out.println("FAILED");
-        } else{
-            if (jTextField1.getText().contains("/") || jTextField1.getText().contains("\\") || 
-                jTextField1.getText().contains(":") || jTextField1.getText().contains("*") ||
-                jTextField1.getText().contains("?") || jTextField1.getText().contains("\"") ||
-                jTextField1.getText().contains("<") || jTextField1.getText().contains(">") ||
-                jTextField1.getText().contains("|")){
-                JOptionPane.showMessageDialog(null, "Los caracteres / \\ : * ? \" < > | no están permitidos en el nombre.");
-                exito = false;
-                System.out.println("FAILED");
-            } else{
-                encrypted = Sources.Init.crypt.encryptData(jTextField1.getText());
-                System.out.println("OK");
-            }
-        }
-        System.out.print("Checking password... ");
-        if (new String (jPasswordField1.getPassword()).equals("")){
-            JOptionPane.showMessageDialog(null, "Debes introducir una contraseña.");
-            exito = false;
-            System.out.println("FAILED");
-        } else{
-            String te = new String (jPasswordField1.getPassword());
-            if (te.length() < 3){
-                JOptionPane.showMessageDialog(null, "La contraseña es demasiado corta.");
-                exito = false;
-                System.out.println("FAILED");
-            } else{
-                encryptedPass = Sources.Init.crypt.encryptData(new String (jPasswordField1.getPassword()));
-                System.out.println("OK");
-            }
-        }
-        System.out.print("Checking secret word... ");
-        if (jTextField2.getText().equals("")){
-            JOptionPane.showMessageDialog(null, "Debes meter una palabra secreta.");
-            exito = false;
-            System.out.println("FAILED");
-        } else{
-            secretW = Sources.Init.crypt.encryptData(jTextField2.getText());
-            System.out.println("OK");
-        }
-        //Si todo está correcto, @exito = true
-        if (exito){
-            System.out.println("Creating new account...");
-            System.out.print("Checking for created accounts... ");
-            if (Sources.Connection.checkDuplicated(jTextField1.getText())){
-                JOptionPane.showMessageDialog(null, "La cuenta ya existe");
-                System.out.println("FAILED\nExisting account founded!");
-                return;
-            }
-            System.out.println("OK");
-            this.setVisible(false);
-            try {
-                System.out.print("Creating new save file... ");
-                File fichero = this.createLoginFile("OFF", encrypted, encryptedPass, secretW);
-                fichero.deleteOnExit();
-                System.out.print("OK\nSynchronizing... ");
-                Sources.Connection.upload(fichero, "Base/");
-                System.out.print("OK\nDeleting temp files... ");
-                fichero.delete();
-                System.out.println("OK");
-            } catch (IOException e){
-                System.out.println("FAILED");
-                Sources.fatalException(e, "Error al registrarse en el servidor.\n" + e.getMessage(), 10);
-            }
-            this.formWindowClosing(null);
-        }
+        if (Sources.debug) System.out.println("[->Initializing register<-]");
+        working = true;
+        jButton2.setEnabled(false);
+        jButton3.setEnabled(false);
+        jButton5.setEnabled(false);
+        Register reg = new Register(false);
+        reg.start();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
-        this.formWindowClosing(null);
+        this.close(false);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
@@ -420,6 +328,140 @@ public class Vista extends javax.swing.JFrame {
             public void run() {
             }
         });
+    }
+    private class Register extends Thread{
+        private boolean premium;
+        public Register(boolean isPremium){
+            premium = isPremium;
+        }
+        @Override
+        public void run(){
+            System.out.print("Checking premium account... ");
+            if (!premium){
+                System.out.println("OK\nNo premium account detected");
+                if (!Sources.Init.online){
+                    JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                            "OFFLINE", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (Sources.debug) System.out.println("[->Crypting new OFF account<-]");
+                boolean exito = true;
+                String encrypted = null;
+                String encryptedPass = null;
+                String secretW = null;
+                //Se controla si todos los campos están bien rellenados
+                System.out.print("Checking username... ");
+                if (jTextField1.getText().equals("")){
+                    JOptionPane.showMessageDialog(null, "Debes meter un nombre de usuario.");
+                    exito = false;
+                    System.out.println("FAILED");
+                } else{
+                    if (jTextField1.getText().contains("/") || jTextField1.getText().contains("\\") || 
+                        jTextField1.getText().contains(":") || jTextField1.getText().contains("*") ||
+                        jTextField1.getText().contains("?") || jTextField1.getText().contains("\"") ||
+                        jTextField1.getText().contains("<") || jTextField1.getText().contains(">") ||
+                        jTextField1.getText().contains("|")){
+                        JOptionPane.showMessageDialog(null, "Los caracteres / \\ : * ? \" < > | no están permitidos en el nombre.");
+                        exito = false;
+                        System.out.println("FAILED");
+                    } else{
+                        encrypted = Sources.Init.crypt.encryptData(jTextField1.getText());
+                        System.out.println("OK");
+                    }
+                }
+                System.out.print("Checking password... ");
+                if (new String (jPasswordField1.getPassword()).equals("")){
+                    JOptionPane.showMessageDialog(null, "Debes introducir una contraseña.");
+                    exito = false;
+                    System.out.println("FAILED");
+                } else{
+                    String te = new String (jPasswordField1.getPassword());
+                    if (te.length() < 3){
+                        JOptionPane.showMessageDialog(null, "La contraseña es demasiado corta.");
+                        exito = false;
+                        System.out.println("FAILED");
+                    } else{
+                        encryptedPass = Sources.Init.crypt.encryptData(new String (jPasswordField1.getPassword()));
+                        System.out.println("OK");
+                    }
+                }
+                System.out.print("Checking secret word... ");
+                if (jTextField2.getText().equals("")){
+                    JOptionPane.showMessageDialog(null, "Debes meter una palabra secreta.");
+                    exito = false;
+                    System.out.println("FAILED");
+                } else{
+                    secretW = Sources.Init.crypt.encryptData(jTextField2.getText());
+                    System.out.println("OK");
+                }
+                //Si todo está correcto, @exito = true
+                if (exito){
+                    System.out.println("Creating new account...");
+                    System.out.print("Checking for created accounts... ");
+                    if (Sources.Connection.checkDuplicated(jTextField1.getText())){
+                        JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+                        System.out.println("FAILED\nExisting account founded!");
+                        return;
+                    }
+                    System.out.println("OK");
+                    setVisible(false);
+                    try {
+                        System.out.print("Creating new save file... ");
+                        File fichero = createLoginFile("OFF", encrypted, encryptedPass, secretW);
+                        fichero.deleteOnExit();
+                        System.out.print("OK\nSynchronizing... ");
+                        Sources.Connection.upload(fichero, "Base/" + jTextField1.getText().toLowerCase() +
+                                "NM.dat");
+                        System.out.print("OK\nDeleting temp files... ");
+                        fichero.delete();
+                        System.out.println("OK");
+                    } catch (IOException e){
+                        System.out.println("FAILED");
+                        Sources.fatalException(e, "Error al registrarse en el servidor.\n" + e.getMessage(), 10);
+                    }
+                    close(false);
+                }
+            } else{
+                System.out.println("OK\nPremium account detected");
+                if (!Sources.Init.online){
+                    JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE.", 
+                            "OFFLINE", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                System.out.print("Checking username... ");
+                if (jTextField1.getText().equals("")){
+                    JOptionPane.showMessageDialog(null, "Introduce el nombre de usuario");
+                    System.out.println("FAILED");
+                    return;
+                }
+                if (Sources.Connection.checkDuplicated(jTextField1.getText())){
+                    JOptionPane.showMessageDialog(null, "La cuenta ya existe");
+                    System.out.println("FAILED\nExisting account found!");
+                    return;
+                }
+                System.out.println("OK");
+                int i = JOptionPane.showConfirmDialog(null, "Con esto saltarás al login.\nPor tanto se supone de que"
+                    + " tienes una cuenta oficial.\n¿Estás seguro de continuar?");
+                if (i == 0){
+                    setVisible(false);
+                    try {
+                        System.out.print("Creating new save file... ");
+                        File fichero = createLoginFile("MC", Sources.Init.crypt.encryptData(jTextField1.getText()), "said_/&/;JT&^_said", "said_/*$/&;(/*Ç_said");
+                        System.out.print("OK\nSynchronizing... ");
+                        Sources.Connection.upload(fichero, "Base/" + jTextField1.getText().toLowerCase() +
+                                "NM.dat");
+                        System.out.print("OK\nDeleting temp files... ");
+                        fichero.delete();
+                        System.out.println("OK");
+                        close(false);
+                    } catch (IOException e){
+                        Sources.Init.error.setError(e);
+                        System.out.println("FAILED");
+                    }
+                }
+            }
+            System.out.println("Register finalized");
+        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

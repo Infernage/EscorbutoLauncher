@@ -33,6 +33,7 @@ public class Cliente extends Thread{
         links = new HashMap<String, String>();
     }
     public void init(JLabel A, JLabel B, JButton C, JButton D, JButton E, URL url, JFrame fra){
+        if (Sources.debug) System.out.println("[->Setting properties<-]");
         init = true;
         info = B;
         state = A;
@@ -41,6 +42,7 @@ public class Cliente extends Thread{
         account = E;
         fr = fra;
         state.setText("Comprobando actualizaciones...");
+        if (Sources.debug) System.out.println("[->Reading URL<-]");
         try {
             input = new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (Exception ex) {
@@ -116,7 +118,7 @@ public class Cliente extends Thread{
             salir();
             Sources.exception(ex, ex.getMessage());
         }
-        System.out.print("U-Initialiting transfer... ");
+        System.out.print("U-Initializing transfer... ");
         Sources.Init.update.init(link, false);
         Sources.Init.update.start();//Lo ejecutamos
         Sources.Init.hilos.put("Updater", Sources.Init.update);
