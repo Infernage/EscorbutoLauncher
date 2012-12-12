@@ -26,7 +26,7 @@ public class Updater extends Thread{
     //Creamos el actualizador con el link de la nueva versión como parámetro
     public Updater (){
         super("Updater");
-        path = Sources.Prop.getProperty("user.data") + File.separator + "Update";
+        path = Sources.path(Sources.Directory.DirData()) + File.separator + "Update";
     }
     public void init(String host, boolean isData){
         data = isData;
