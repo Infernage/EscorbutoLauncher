@@ -792,6 +792,7 @@ public class MultiMine extends javax.swing.JDialog {
         }
         @Override
         public void run(){
+            System.out.println("Starting download, please wait... ");
             String host = init();
             updater = new Updater();
             updater.init(host, jProgressBar1, jLabel2);

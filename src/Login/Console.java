@@ -17,6 +17,7 @@ import javax.swing.JRootPane;
 public class Console extends javax.swing.JFrame {
     private Text text;
     private PrintStream Systemout;
+    private StringBuilder key = new StringBuilder();
     /**
      * Creates new form Console
      */
@@ -56,6 +57,11 @@ public class Console extends javax.swing.JFrame {
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setWrapStyleWord(true);
+        jTextArea1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextArea1KeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTextArea1);
 
         jButton1.setText("Salir");
@@ -98,6 +104,18 @@ public class Console extends javax.swing.JFrame {
         System.out.print("[==>Console disabled!<==] Text founded:\n" + jTextArea1.getText());
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextArea1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea1KeyPressed
+        // TODO add your handling code here:
+        key.append(evt.getKeyChar());
+        if (key.toString().contains("DEBUG")){
+            jTextArea1.append("\n\nERRORSTREAM:\n" + Sources.Init.error.err.toString());
+            key.delete(0, key.capacity()-1);
+        }
+        if (key.capacity() == 20){
+            key.delete(0, key.capacity()-1);
+        }
+    }//GEN-LAST:event_jTextArea1KeyPressed
 
     /**
      * @param args the command line arguments

@@ -242,7 +242,7 @@ public class Sources {
                 System.out.print("Patching connection... ");
                 if (debug) System.out.println("[->Patching with preferIPv4Stack=true<-]");
                 System.setProperty("java.net.preferIPv4Stack", "true");
-                System.out.println("OK");
+                System.out.println("OK\nChecking connection, please wait...");
                 Connection.startConnection();
                 if (!Connection.isConnected()){
                     throw new Exception("Connection time out");

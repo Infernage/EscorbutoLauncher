@@ -723,7 +723,7 @@ public class Vista2 extends javax.swing.JFrame {
                 return;
             }
             try{
-                System.out.println("Looking files");
+                System.out.println("Looking files, please wait...");
                 File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + name);
                 if (Sources.debug) System.out.println("[->Checking the username<-]");
                 if (!Sources.Connection.checkDuplicated(jTextField1.getText())){

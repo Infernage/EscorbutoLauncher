@@ -5,27 +5,36 @@ c)Mods añadidas.
 d)Bugs.
 _________________________________________________________
 
-b) Changelog. (Desde la versión MineLogin 4.2.2)
+b) Changelog. (Desde la versión MineLogin 5.0.0)
 
 ||Instalador||
--Añadido soporte para múltiples minecrafts (Gracias a javixbox!)
--Añadido instalación para la versión 1.4.4 como Singleplayer. No tiene mods aún.
--Cambiado sistema de instalación. Ya no depende de tener los archivos de instalación. Ahora los descarga de dropbox.
+-Añadidas más opciones al MultiMine.
+-Cambiado sistema de instalación completo.
+-Cambiada la interfaz del instalador. Ahora el instalador por defecto es el MultiMine.
 
 ||Login||
--Todo se ha comprimido en un único jar.
--Cambiado toda la interfaz gráfica y añadido un cambio de tema (Negro o Blanco) con el botón derecho.
--Añadido sistema de consola. Al iniciarse, está minimizada.
--Añadido soporte al proxy. Se activa solo.
--Añadido ejecución nativa para minecraft. (Menos errores)
--Añadido dropbox como hoster en el sistema de actualización.
+-Añadido un colector para mejorar la optimización.
+-Añadido otro método de conexión a internet.
+-Añadido tema nuevo. Haciendo click derecho en la ventana principal se puede escoger el tema.
+-Añadido modo offline a la opción de enviar error. Guarda el error en un archivo en el escritorio.
+-Arreglado sistema de recordar usuario y muchos más errores existentes.
+-Arreglado el sistema de ejecución en linux. Completamente funcional ahora.
+-Arreglado el actualizador.
+-Actualizada la retrocompatibilidad con la versión 5.0.0
+-Cambiado sistema de registro. Más eficiente ahora.
+-Cambiado sistema de Login y ejecución de Minecraft. Ahora el inicio es nativo en Applet.
+-Cambiado el JDK. Por ahora se mantiene el JDK 1.6 hasta que encuentre una solución alternativa a la conexión por FTP. El java necesario para ejecutarlo es el Java 6 Update 37.
+-Eliminado soporte de Mineshafter. El motivo ha sido la larga ausencia de inactividad y sin noticias, además de dar problemas con el Forge.
+-Eliminado minecraft.jar y Mineshafter-proxy.jar de la carpeta Resources. Ya no son necesarios.
+-Optimizado sistema de carga.
+-Optimizado actualizador.
 
 ||Minecraft||
--Dos versiones de minecraft para elegir.
+N/A
 _________________________________________________________
 
-b)Mods eliminadas (Desde la versión MineLogin 4.2.2) (MP = MultiPlayer, SP = SinglePlayer)
-
+b)Mods eliminadas (Desde la versión MineLogin 5.0.0) (MP = MultiPlayer, SP = SinglePlayer)
+(En el servidor se han eliminado el IC Nuclear control y las Logistics Pipes)
 ||MP||
 Ninguna
 
@@ -33,7 +42,7 @@ Ninguna
 Ninguna
 _________________________________________________________
 
-c)Mods añadidas. (Desde la versión MineLogin 4.2.2) (MP = MultiPlayer, SP = SinglePlayer)
+c)Mods añadidas. (Desde la versión MineLogin 5.0.0) (MP = MultiPlayer, SP = SinglePlayer)
 
 ||MP||
 Ninguna
