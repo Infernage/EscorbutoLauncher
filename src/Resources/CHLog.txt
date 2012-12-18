@@ -8,26 +8,13 @@ _________________________________________________________
 b) Changelog. (Desde la versión MineLogin 5.0.0)
 
 ||Instalador||
--Añadidas más opciones al MultiMine.
--Cambiado sistema de instalación completo.
--Cambiada la interfaz del instalador. Ahora el instalador por defecto es el MultiMine.
+-Reducido tiempo de conexión.
 
 ||Login||
--Añadido un colector para mejorar la optimización.
--Añadido otro método de conexión a internet.
--Añadido tema nuevo. Haciendo click derecho en la ventana principal se puede escoger el tema.
--Añadido modo offline a la opción de enviar error. Guarda el error en un archivo en el escritorio.
--Arreglado sistema de recordar usuario y muchos más errores existentes.
--Arreglado el sistema de ejecución en linux. Completamente funcional ahora.
--Arreglado el actualizador.
--Actualizada la retrocompatibilidad con la versión 5.0.0
--Cambiado sistema de registro. Más eficiente ahora.
--Cambiado sistema de Login y ejecución de Minecraft. Ahora el inicio es nativo en Applet.
--Cambiado el JDK. Por ahora se mantiene el JDK 1.6 hasta que encuentre una solución alternativa a la conexión por FTP. El java necesario para ejecutarlo es el Java 6 Update 37.
--Eliminado soporte de Mineshafter. El motivo ha sido la larga ausencia de inactividad y sin noticias, además de dar problemas con el Forge.
--Eliminado minecraft.jar y Mineshafter-proxy.jar de la carpeta Resources. Ya no son necesarios.
--Optimizado sistema de carga.
--Optimizado actualizador.
+-Cambiado motor de sistema de errores. La información ahora es más detallada.
+-Cambiado motor del actualizador. Ahora es mucho más simple y más rápido que antes.
+-Arreglado un error por el que el acceso directo no se actualizaba.
+-Arreglado un error por el que la memoria RAM era de unos 350MB en vez de la seleccionada.
 
 ||Minecraft||
 N/A

@@ -11,11 +11,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.util.Properties;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -25,7 +26,7 @@ import javax.swing.JOptionPane;
  * @author Reed
  */
 public class MultiMine extends javax.swing.JDialog {
-    public static String SP = "SSP.txt", MP = "SMP.txt";
+    public static String SP = "SSP", MP = "SMP";
     private TextThread text;
     private Awake initialite;
     private String selectTemp;
@@ -772,19 +773,17 @@ public class MultiMine extends javax.swing.JDialog {
     }
     private class Awake extends Thread{
         private Updater updater;
-        private String msg;
+        private String msg, url = "https://dl.dropbox.com/s/y2u5nydcyv8m26n/Installation.xml?dl=1";
         public Awake(String text){
             msg = text;
         }
         public String init(){
             String host = "";
-            File tmp = new File(Sources.Prop.getProperty("user.data") + File.separator + msg);
-            tmp.deleteOnExit();
-            Sources.Connection.download(tmp, msg);
             try {
-                BufferedReader bf = new BufferedReader(new FileReader(tmp));
-                host = bf.readLine();
-                bf.close();
+                Properties properties = new Properties();
+                properties.loadFromXML(new URL(url).openStream());
+                host = properties.getProperty(msg);
+                System.out.println(host);
             } catch (Exception ex) {
                 Sources.exception(ex, "Host not found");
             }

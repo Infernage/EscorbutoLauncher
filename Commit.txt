@@ -1,0 +1,6 @@
+Release 5.1.1
+CHANGED: Installation system.
+CHANGED: Updater system.
+CHANGED: Error system.
+DELETED: Unused classes and libraries.
+FIXED: Error with the RAM memory.

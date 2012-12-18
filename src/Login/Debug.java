@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -136,6 +137,16 @@ public class Debug extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "No has introducido ningún texto.");
             return;
         }
+        String subject = "MineClient Ticket from " + System.getProperty("user.name") + ": " + 
+                    jTextField1.getText();
+        StringBuilder build = new StringBuilder("Message: ");
+        build.append(jTextArea1.getText()).append("\n\nData:\n");
+        Iterator it = System.getProperties().keySet().iterator();
+        while (it.hasNext()){
+            String tmp = (String) it.next();
+            build.append(tmp + ": " + System.getProperty(tmp) + "\n");
+        }
+        build.append("\n\nERRORSTREAM\n").append(Sources.Init.error.err.toString());
         if (!Sources.Init.online){
             if (Sources.debug) System.out.println("[->Forcing ONLINE MODE<-]");
             JOptionPane.showMessageDialog(null, "OFFLINE parameter is active. Can't force ONLINE. Printing"
@@ -153,7 +164,8 @@ public class Debug extends javax.swing.JDialog {
                     log.createNewFile();
                 }
                 pw = new PrintWriter(log);
-                pw.print(Sources.Init.error.err.toString());
+                pw.println(subject);
+                pw.print(build.toString());
                 pw.close();
             } catch (Exception ex){
                 Sources.Init.error.setError(ex);
@@ -169,8 +181,8 @@ public class Debug extends javax.swing.JDialog {
             msg.setFrom(new InternetAddress(par.getF()));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
             if (Sources.debug) System.out.println("[->Adding recipients<-]");
-            msg.setSubject(jTextField1.getText());
-            msg.setText(jTextArea1.getText() + "\n\nERRORSTREAM:\n" + Sources.Init.error.err.toString());
+            msg.setSubject(subject);
+            msg.setText(build.toString());
             Transport t = ses.getTransport(par.getT());
             t.connect(par.getF(), par.getP());
             if (Sources.debug) System.out.println("[->Sending ticket<-]");

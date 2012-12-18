@@ -105,7 +105,7 @@ public class Vista2 extends javax.swing.JFrame {
         System.out.println("OK");
         try{
             System.out.print("Initializing updater... ");
-            URL url = new URL("http://minechinchas.blogspot.com/2012/09/downloads.html");
+            URL url = new URL("https://dl.dropbox.com/s/g6zrg7disyhlvgn/Version.xml?dl=1");
             Sources.Init.client.init(jLabel1, jLabel5, jButton5, jButton6, jButton4, url, this);
             Sources.Init.client.start();
             Sources.Init.hilos.put("Cliente", Sources.Init.client);

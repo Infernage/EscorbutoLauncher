@@ -175,7 +175,7 @@ public class Sources {
      */
     public static class Init{
         public final static String title = "MineLogin";
-        public static String version = "V5.1.0";
+        public static String version = "V5.1.1";
         public static boolean online = true;
         public static Map<String, Thread> hilos;
         public static Map<String, List<Object>> garbage;
@@ -395,12 +395,14 @@ public class Sources {
                 if (src == null){
                     throw new Exception("BufferedInputStream can't be null");
                 }
+                src.mark(100);
                 boolean res = false;
                 if (tmp.exists()){
                     dst = new BufferedInputStream(new FileInputStream(tmp));
                     res = Worker.isSame(src, dst);
                 }
                 if (!res || !tmp.exists()){
+                    src.reset();
                     out = new BufferedOutputStream(new FileOutputStream(tmp));
                     tmp.delete();
                     IO.copy(src, out);
@@ -442,6 +444,10 @@ public class Sources {
                 language = Prop.getProperty("es");
             } else if (System.getProperty("user.language").toLowerCase().equals("en") && OS.contains("lin")){
                 language = Prop.getProperty("en");
+            } else if (OS.contains("win")){
+                language = Prop.getProperty("en");
+            } else{
+                language = "Desktop";
             }
             tmp = new File(System.getProperty("user.home") + File.separator + language + File.separator + Files.access(false));
             in = new BufferedInputStream(new Init().getClass().getResourceAsStream("/Resources/" + Files.access(false)));

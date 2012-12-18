@@ -14,23 +14,20 @@ import javax.swing.*;
  * @author Reed
  */
 public class Cliente extends Thread{
-    private BufferedReader input;//Entrada de datos
-    private boolean exit = false;//Control del bucle del run
-    private boolean actualize = false; //Control del actualizador
-    private Map<String, String> links;// Lista de links del servidor(Login)
-    private List<String> comands;//Lista de links válidos del servidor
+    private InputStream input;//Entrada de datos
+    private Properties properties;//XML de las versiones
     private JLabel info, state;//Etiquetas para indicar el estado de la actualizacion
     private JButton play, installer, account;//Botón jugar e instalar
     private JFrame fr;//Ventana
-    private boolean write = false;
     private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com", 
             hostTerciario = "dropbox.com";
+    private boolean actualize = false, exit = false; //Control del actualizador
     public boolean init = false, started = false, finish = false;
+    
     //Creamos el cliente
     public Cliente(){
         super("Cliente");
-        comands = new ArrayList<String>();
-        links = new HashMap<String, String>();
+        properties = new Properties();
     }
     public void init(JLabel A, JLabel B, JButton C, JButton D, JButton E, URL url, JFrame fra){
         if (Sources.debug) System.out.println("[->Setting properties<-]");
@@ -44,7 +41,7 @@ public class Cliente extends Thread{
         state.setText("Comprobando actualizaciones...");
         if (Sources.debug) System.out.println("[->Reading URL<-]");
         try {
-            input = new BufferedReader(new InputStreamReader(url.openStream()));
+            input = url.openStream();
         } catch (Exception ex) {
             if (ex.toString().contains("Connection timed out: connect")){
                 state.setForeground(Color.red);
@@ -117,6 +114,7 @@ public class Cliente extends Thread{
             info.setText(ex.getMessage());
             salir();
             Sources.exception(ex, ex.getMessage());
+            return;
         }
         System.out.print("U-Initializing transfer... ");
         Sources.Init.update.init(link, false);
@@ -125,95 +123,63 @@ public class Cliente extends Thread{
         System.out.println("OK");
         play.setEnabled(false);
     }
-    //Método para procesar los links
-    private void procesar(){
-        String ver = null, lin = null;
-        for (int i = 0; i < comands.size(); i++){
-            StringTokenizer toke = new StringTokenizer(comands.get(i), "<>\"");
-            while (toke.hasMoreTokens()){
-                String temp = toke.nextToken();
-                if (temp.contains(hostPrincipal) || temp.contains(hostSecundario) || 
-                        temp.contains(hostTerciario)){
-                    lin = temp;
-                }
-                if (temp.contains(".") && !temp.contains(hostPrincipal) && 
-                        !temp.contains(hostSecundario) && !temp.contains(hostTerciario)){
-                    ver = temp;
-                }
-            }
-            if ((ver != null) && (lin != null)){
-                links.put(ver, lin);
-                ver = null;
-                lin = null;
-            }
-        }
-        Vista2.jProgressBar1.setVisible(false);
-        state.setText("");
-        Iterator<String> it = links.keySet().iterator();
-        try{
-            while(it.hasNext()){
-                boolean salida = false;
-                String version = it.next(), main = Sources.Init.version;
-                StringTokenizer token = new StringTokenizer(version, ".");
-                main = main.substring(1);
-                StringTokenizer actual = new StringTokenizer(main, ".");
-                while(token.hasMoreTokens() && !salida && !actualize){
-                    int V = Integer.parseInt(token.nextToken());
-                    int V2 = Integer.parseInt(actual.nextToken());
-                    if (V > V2){
-                        state.setText("Actualizando a la versión " + version);
-                        System.out.println("OK\nU-Updating login...............");
-                        actualize = true;
-                        fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                        actualizar(links.get(version));
-                    } else if (V < V2){
-                        salida = true;
-                    }
-                }
-            }
-        } catch (Exception ex){
-            Sources.Init.error.setError(ex);
-        }
-        if (!actualize){
-            System.out.println("OK\nU-No updates avaliable");
-            state.setForeground(Color.GREEN);
-            state.setText("No hay nuevas versiones disponibles");
-        }
-        salir();
-    }
     //Método de ejecución
     @Override
     public void run(){
         started = true;
+        Vista2.jProgressBar1.setVisible(false);
+        state.setText("");
         try {
             Thread.sleep(500);
         } catch (InterruptedException ex) {
             Sources.exception(ex, ex.getMessage());
         }
         System.out.println("U-Checking for updates...............");
-        while (!exit){
-            try {//Leemos los datos que nos envía el servidor
-                String msg;
-                while((msg = input.readLine()) != null){ //Si es distinto de null, comprobamos el mensaje
-                    if (msg.contains("LoginVersion")){
-                        write = true;
-                    } else if (msg.contains("EndLogin")){
-                        write = false;
-                    }
-                    if ((msg.contains(hostPrincipal) || msg.contains(hostSecundario) || 
-                            msg.contains(hostTerciario)) && write){
-                        comands.add(msg);
+        try {
+            properties.loadFromXML(input);
+            Set<String> list = properties.stringPropertyNames();
+            Iterator<String> it = list.iterator();
+            while (it.hasNext() && !exit){
+                boolean out = false;
+                String version = it.next(), main = Sources.Init.version;
+                main = main.substring(1);
+                if (main.contains(" ")){
+                    String[] tmp = main.split(" ");
+                    main = tmp[0];
+                }
+                StringTokenizer token = new StringTokenizer(version, "."), actual = new StringTokenizer(
+                        main, ".");
+                while (token.hasMoreTokens() && !out && !actualize){
+                    try {
+                        int V = Integer.parseInt(token.nextToken()), V2 = Integer.parseInt(actual.nextToken());
+                        if (V > V2){
+                            state.setText("Actualizando a la versión " + version);
+                            System.out.println("OK\nU-Updating login...............");
+                            actualize = true;
+                            fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                            actualizar(properties.getProperty(version));
+                        } else if (V < V2){
+                            out = true;
+                        }
+                    } catch (Exception e) {
+                        Sources.Init.error.setError(e);
                     }
                 }
-                System.out.print("U-Processing data... ");
-                procesar();
-            } catch (IOException ex) {
-                state.setForeground(Color.red);
-                state.setText("ERROR! No se ha podido recibir la información del servidor.");
-                info.setForeground(Color.red);
-                info.setText(ex.getMessage());
-                Sources.exception(ex, "Error recibiendo la información del servidor.");
             }
+            if (!actualize){
+                System.out.println("OK\nU-No updates avaliable");
+                state.setForeground(Color.GREEN);
+                state.setText("No hay nuevas versiones disponibles");
+                play.setEnabled(true);
+                installer.setEnabled(true);
+                account.setEnabled(true);
+            }
+        } catch (Exception ex) {
+            state.setForeground(Color.red);
+            state.setText("ERROR! No se ha podido recibir la información del servidor.");
+            info.setForeground(Color.red);
+            info.setText(ex.getMessage());
+            Sources.exception(ex, "Error recibiendo la información del servidor.");
         }
         try {
             if (input != null){
@@ -225,11 +191,6 @@ public class Cliente extends Thread{
             info.setForeground(Color.red);
             info.setText(ex.getMessage());
             Sources.exception(ex, ex.getMessage());
-        }
-        if (!actualize){
-            play.setEnabled(true);
-            installer.setEnabled(true);
-            account.setEnabled(true);
         }
         finish = true;
     }
