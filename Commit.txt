@@ -1,6 +1,13 @@
-Release 5.1.1
-CHANGED: Installation system.
-CHANGED: Updater system.
-CHANGED: Error system.
-DELETED: Unused classes and libraries.
-FIXED: Error with the RAM memory.
+Release 5.2.0
+ADDED: Config file and config options.
+ADDED: Option to MultiMine for import .minecraft folders.
+CHANGED: Updater functionality. It isn't necessary Temporal.jar file now.
+CHANGED: Jar structure.
+CHANGED: Outdated class functionality.
+CHANGED: MultiMine to do more flexible.
+CHANGED: Installation and uninstallation system.
+DELETED: FTP connection.
+DELETED: Restore system. Is useless now.
+FIXED: RAM usage.
+FIXED: A lot of minor errors.
+Optimized code.
