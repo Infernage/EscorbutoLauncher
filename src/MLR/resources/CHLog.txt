@@ -5,22 +5,28 @@ c)Mods añadidas.
 d)Bugs.
 _________________________________________________________
 
-b) Changelog. (Desde la versión MineLogin 5.0.0)
+b) Changelog. (Desde la versión 5.1.1)
 
-||Instalador||
--Reducido tiempo de conexión.
-
-||Login||
--Cambiado motor de sistema de errores. La información ahora es más detallada.
--Cambiado motor del actualizador. Ahora es mucho más simple y más rápido que antes.
--Arreglado un error por el que el acceso directo no se actualizaba.
--Arreglado un error por el que la memoria RAM era de unos 350MB en vez de la seleccionada.
+||Launcher||
+-Añadidas opciones.
+-Añadida opción para importar otros minecraft.
+-Cambiado el sistema de actualización. El archivo Temporal.jar ya no es necesario.
+-Cambiada estructura del RUN.jar.
+-Cambiado el sistema de la clase Outdated. Ahora es más preciso.
+-Cambiado el MultiMine. Ahora es mucho más flexible.
+-Cambiado los sistemas de instalación y desinstalación. Son más rápidos.
+-Eliminada la conexión FTP. Ahora es inútil.
+-Eliminado el sistema de restauración. Ahora es inútil.
+-Arreglado error por el que no usaba la RAM adecuada. Ahora es configurable en las opciones.
+-Arreglados otros errores.
+-Arreglado un error por el que los FPS bajaban cada 1.5 segundos.
+-Optimizado el código.
 
 ||Minecraft||
 N/A
 _________________________________________________________
 
-b)Mods eliminadas (Desde la versión MineLogin 5.0.0) (MP = MultiPlayer, SP = SinglePlayer)
+b)Mods eliminadas (Desde la versión 5.1.1) (MP = MultiPlayer, SP = SinglePlayer)
 (En el servidor se han eliminado el IC Nuclear control y las Logistics Pipes)
 ||MP||
 Ninguna
@@ -29,7 +35,7 @@ Ninguna
 Ninguna
 _________________________________________________________
 
-c)Mods añadidas. (Desde la versión MineLogin 5.0.0) (MP = MultiPlayer, SP = SinglePlayer)
+c)Mods añadidas. (Desde la versión 5.1.1) (MP = MultiPlayer, SP = SinglePlayer)
 
 ||MP||
 Ninguna
