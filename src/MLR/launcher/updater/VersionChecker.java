@@ -12,7 +12,7 @@ import java.net.*;
 import java.util.*;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class VersionChecker extends Thread{
     private InputStream input;//Entrada de datos

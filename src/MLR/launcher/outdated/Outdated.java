@@ -11,7 +11,7 @@ import java.net.URLClassLoader;
 
 /**
  * Clase para hacer soporte a versiones antiguas.
- * @author Reed
+ * @author Infernage
  */
 public class Outdated {
     public static String getOldVersion(){ return InnerApi.Init.version; }
@@ -29,11 +29,9 @@ public class Outdated {
         if (ver < 500) ver = 499;
         switch (ver){
             case 499: Ver5.before500();
-                break;
             case 500: Ver5.ver500();
-                break;
             case 511: Ver5.ver511();
-                break;
+            case 520: Ver5.ver520();
         }
     }
     public static void startEngines(){

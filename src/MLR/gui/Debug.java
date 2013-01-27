@@ -20,7 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Debug extends javax.swing.JDialog {
     public boolean exited = false;

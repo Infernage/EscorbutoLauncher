@@ -14,7 +14,7 @@ import java.util.List;
 import javax.swing.*;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 //No usada aún
 /*public class Systray extends Thread{

@@ -24,7 +24,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class AES {
     private SecretKey sKey;

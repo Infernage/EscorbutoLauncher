@@ -9,7 +9,7 @@ import java.io.*;
 import javax.swing.*;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Uninstaller extends SwingWorker<Integer, Integer>{
     //Clase de desinstalación

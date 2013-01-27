@@ -6,13 +6,12 @@ package MLR;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-import java.util.Properties;
 import javax.swing.JFrame;
 import org.jvnet.substance.*;
 /**
  *
  * @author Infernage
- * @version 5.1.1
+ * @version 5.2.1
  */
 public class Starter {
     /**

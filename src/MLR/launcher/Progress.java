@@ -10,7 +10,7 @@ import java.io.*;
 import javax.swing.JProgressBar;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Progress extends Thread{
     private File dst, src;

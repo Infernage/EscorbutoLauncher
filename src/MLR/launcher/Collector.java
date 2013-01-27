@@ -12,7 +12,7 @@ import MLR.launcher.updater.VersionChecker;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Collector extends Thread{
     private boolean exit = false;

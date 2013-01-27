@@ -11,7 +11,7 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 //Música de Fondo en Vista2 (NO IMPLEMENTADO AUN)
 public class Music extends SwingWorker <Void,Void> {

@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Updater extends Thread{
     private String link;

@@ -15,7 +15,7 @@ import javax.swing.JRootPane;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Console extends javax.swing.JFrame {
     private Text text;
@@ -150,6 +150,7 @@ public class Console extends javax.swing.JFrame {
                     int line;
                     while ((line = builder.indexOf("\n")) != -1){
                         jTextArea1.append(builder.substring(0, line));
+                        InnerApi.writeMSG1ln(builder.substring(0, line));
                         builder = builder.substring(line + 1);
                         jTextArea1.append("\n");
                     }
@@ -175,16 +176,19 @@ public class Console extends javax.swing.JFrame {
             jTextArea1.append(msg);
             jTextArea1.append("\n");
             jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+            InnerApi.writeMSGln(msg + "\n");
         }
         @Override
         public void println(){
             jTextArea1.append("\n");
             jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+            InnerApi.writeMSGln("");
         }
         @Override
         public void print(String msg){
             jTextArea1.append(msg);
             jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
+            InnerApi.writeMSG(msg);
         }
     }
 }

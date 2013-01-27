@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Aplication extends Applet implements AppletStub {
     private Applet applet;

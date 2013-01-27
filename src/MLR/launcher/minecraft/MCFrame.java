@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class MCFrame extends Frame implements WindowListener{
     private Aplication applet = null;

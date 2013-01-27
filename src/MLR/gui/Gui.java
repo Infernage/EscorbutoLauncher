@@ -21,7 +21,7 @@ import org.jvnet.substance.SubstanceLookAndFeel;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Gui extends javax.swing.JFrame {
     private JPopupMenu menu;
@@ -125,7 +125,7 @@ public class Gui extends javax.swing.JFrame {
     }
     private void Play(){
         File instances = new File(InnerApi.Directory.instance(InnerApi.getInstance()));
-        if (!instances.exists()){
+        if (!instances.exists() || InnerApi.configuration.getProperty("user.dir") == null){
             JOptionPane.showMessageDialog(null, "No se han encontrado instalaciones de Minecraft", "Minecraft not found!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -230,6 +230,11 @@ public class Gui extends javax.swing.JFrame {
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 formMouseReleased(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
 
@@ -564,6 +569,12 @@ public class Gui extends javax.swing.JFrame {
         // TODO add your handling code here:
         InnerApi.Init.opt.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        InnerApi.stopAll();
+    }//GEN-LAST:event_formWindowClosing
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;

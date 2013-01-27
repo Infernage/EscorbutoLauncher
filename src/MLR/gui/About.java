@@ -13,7 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JRootPane;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class About extends javax.swing.JDialog {
 

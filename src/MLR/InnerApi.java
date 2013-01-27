@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,20 +37,31 @@ import javax.swing.JProgressBar;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class InnerApi {
 
     public static String OS;
     public static Properties configuration;
     public static boolean debug = false;
-    private static Map<String, String> config = new HashMap<String, String>();
+    private static Map<String, String> config = new HashMap<String, String>(); //Internal MLR's configuration
 
+    /**
+     * This sets the language of the Desktop
+     */
     public static void setLanguage() {
         config.put("es", "Escritorio");
         config.put("en", "Desktop");
     }
     
+    public static String getPropertyC(String key){
+        return config.get(key);
+    }
+    
+    /**
+     * This obtains the language of the Desktop
+     * @return The language of the Desktop
+     */
     public static String getLanguage(){
         if (OS.equals("linux") && System.getProperty("user.language").toLowerCase().equals("es")){
             return config.get("es");
@@ -58,6 +71,47 @@ public class InnerApi {
             return config.get("en");
         }
         return config.get("en");
+    }
+    
+    /**
+     * Methods to write a message to the Console
+     * @param msg The message
+     */
+    public static void writeMSG(String msg){
+        Init.pw.print(msg);
+        Init.pw.flush();
+    }
+    /**
+     * Methods to write a message to the Console
+     * @param msg The message
+     */
+    public static void writeMSGln(String msg){
+        Init.pw.println(msg);
+        Init.pw.flush();
+    }
+    /**
+     * Methods to write a message to the Console
+     * @param msg The message
+     */
+    public static void writeMSG1ln(String msg){
+        Init.pw1.println(msg);
+        Init.pw1.flush();
+    }
+    /**
+     * Methods to write a message to the Console
+     * @param msg The message
+     */
+    public static void writeMSG1(String msg){
+        Init.pw1.print(msg);
+        Init.pw1.flush();
+    }
+    
+    /**
+     * Stops the streams of the console
+     */
+    public static void stopAll(){
+        Init.pw.close();
+        Init.pw1.close();
     }
 
     /**
@@ -103,6 +157,10 @@ public class InnerApi {
         }
     }
 
+    /**
+     * This method obtains the datapath of MLR
+     * @return The datapath of MLR
+     */
     public static String dataPath(){
         if (OS.equals("windows")){
             return System.getenv("APPDATA");
@@ -177,6 +235,11 @@ public class InnerApi {
         return instance;
     }
 
+    /**
+     * This method return the avaliable name of the instance
+     * @param instance The name to check
+     * @return The name checked
+     */
     public static String checkInstance(String instance) {
         File inst = new File(Directory.instance(instance));
         if (inst.exists() && (inst.list().length > 0)) {
@@ -202,9 +265,9 @@ public class InnerApi {
      * This class initialite the program.
      */
     public static class Init {
-
+        private static PrintWriter pw, pw1;
         public final static String title = "MineLauncher";
-        public static String version = "V5.2.0";
+        public static String version = "V5.2.1";
         public static Map<String, Thread> hilos;
         public static Collector collector;
         /**
@@ -268,20 +331,77 @@ public class InnerApi {
                 System.out.println("Check failed");
                 exception(ex, "Error al comprobar los ficheros fuentes.");
             }
+            boolean quizb = false;
+            try {
+                quizb = searchQuiz();
+            } catch (Exception e) {
+                exception(e, e.getMessage());
+            }
             if (InnerApi.debug) {
                 System.out.println("[->Splash finalized<-]");
             }
             image.exit();
-            System.out.println("Launching main GUI");
-            mainGUI.setVisible(true);
+            if (quizb){
+                System.out.println("Launching Quiz GUI");
+                Quiz quiz = new Quiz();
+                quiz.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                quiz.setLocationRelativeTo(null);
+                quiz.setVisible(true);
+            } else{
+                System.out.println("Launching main GUI");
+                mainGUI.setVisible(true);
+            }
         }
+        
+        private static boolean searchQuiz() throws Exception{
+            File quest = new File(config.get("MLR.data") + File.separator + "Quiz.qzx");
+            if (!quest.exists()){
+                quest.createNewFile();
+            }
+            BufferedReader bf = new BufferedReader(new FileReader(quest));
+            String tmp = bf.readLine();
+            bf.close();
+            if (tmp == null){
+                int i = JOptionPane.showConfirmDialog(null, "¿Quieres realizar la encuesta sobre las mods del server?", "Mods quest", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                if (i == 0){
+                    return true;
+                } else{
+                    int j = JOptionPane.showConfirmDialog(null, "¿Quieres que se te vuelva a preguntar al volver a iniciar el launcher?", null, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    if (j != 0){
+                        PrintWriter pw = new PrintWriter(quest);
+                        pw.print("Done!");
+                        pw.close();
+                    }
+                    return false;
+                }
+            } else{
+                if (!tmp.equals("Done!")){
+                    int i = JOptionPane.showConfirmDialog(null, "¿Quieres realizar la encuesta sobre las mods del server?", "Mods quest", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    if (i == 0){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        
         private static void loadDirs(){
+            File tmp = new File(Directory.instance(null));
+            if (!tmp.exists()) {
+                tmp.mkdirs();
+            }
+            tmp = new File(Directory.logger(null));
+            if (!tmp.exists()) {
+                tmp.mkdirs();
+            }
+            if (debug) {
+                System.out.println("[->Created directories<-]");
+            }
             File prop = new File(InnerApi.Files.Instance());
             if (prop.exists()){
                 try {
                     BufferedReader bf = new BufferedReader(new FileReader(prop));
                     String inst = bf.readLine();
-                    System.out.println(inst);
                     if (inst != null){
                         InnerApi.configuration.setProperty("user.dir", InnerApi.Directory.instance(inst + 
                                 File.separator + InnerApi.Directory.MINECRAFT));
@@ -298,11 +418,51 @@ public class InnerApi {
                     e.printStackTrace();
                 }
             }
+            File log = new File(InnerApi.Directory.data("MLR_log_0.log"));
+            if (!log.exists()){
+                try {
+                    log.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else{
+                log.delete();
+                try {
+                    log.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                pw = new PrintWriter(new FileWriter(log, true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            File log1 = new File(InnerApi.Directory.data("MLR_log_1.log"));
+            if (!log1.exists()){
+                try {
+                    log1.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else{
+                log1.delete();
+                try {
+                    log1.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                pw1 = new PrintWriter(new FileWriter(log1, true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         
         private static String getConfigPath(){
             if (OS.equals("windows")){
-                return System.getenv("APPDATA") + "/Data";
+                return System.getenv("APPDATA") + "\\Data";
             } else if (OS.equals("linux")){
                 return System.getProperty("user.home") + "/.Data";
             }
@@ -321,7 +481,7 @@ public class InnerApi {
             System.setProperty("java.net.preferIPv4Stack", "true");
             System.out.println("OK");
         }
-
+        
         private static void createConfig(File cfg) throws Exception {
             configuration.load(new FileInputStream(cfg));
             configuration.setProperty("maxRAM", "512");
@@ -336,7 +496,7 @@ public class InnerApi {
             configuration.store(fos, "Default config");
             fos.close();
         }
-
+        
         private static void loadPaths(){
             String str = configuration.getProperty("installPath");
             String configPath = getConfigPath();
@@ -354,6 +514,9 @@ public class InnerApi {
             System.out.println("Config loaded");
         }
         
+        /**
+         * Method used of Options to reload the installation path
+         */
         public static void reloadPath(){
             String str = configuration.getProperty("installPath");
             if (str.equals("default")){
@@ -364,6 +527,10 @@ public class InnerApi {
 
         private static void loadConfig() {
             configuration = new Properties();
+            File data = new File(getConfigPath());
+            if (!data.exists()){
+                data.mkdirs();
+            }
             File cfg = new File(getConfigPath() + File.separator + "MLR.cfg");
             if (debug) {
                 System.out.println("[->Checking config file<-]");
@@ -414,17 +581,6 @@ public class InnerApi {
             error.start();
             hilos.put("Errors", error);
             System.out.println("Error output created");
-            File tmp = new File(Directory.instance(null));
-            if (!tmp.exists()) {
-                tmp.mkdirs();
-            }
-            tmp = new File(Directory.logger(null));
-            if (!tmp.exists()) {
-                tmp.mkdirs();
-            }
-            if (debug) {
-                System.out.println("[->Created directories<-]");
-            }
             collector = new Collector("Collector");
             collector.setDaemon(true);
             collector.start();
@@ -478,38 +634,6 @@ public class InnerApi {
             Outdated.startEngines();
         }
 
-        private static void look(File tmp, BufferedInputStream src) throws Exception {
-            BufferedInputStream dst = null;
-            BufferedOutputStream out = null;
-            try {
-                if (src == null) {
-                    throw new Exception("BufferedInputStream can't be null");
-                }
-                src.mark(0);
-                boolean res = false;
-                if (tmp.exists()) {
-                    dst = new BufferedInputStream(new FileInputStream(tmp));
-                    res = Installer.isSame(src, dst);
-                }
-                if (!res || !tmp.exists()) {
-                    src.reset();
-                    out = new BufferedOutputStream(new FileOutputStream(tmp));
-                    tmp.delete();
-                    IO.copy(src, out);
-                }
-            } finally {
-                if (dst != null) {
-                    dst.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-                if (src != null) {
-                    src.close();
-                }
-            }
-        }
-
         private static void checkSources() throws Exception {
             String current = URLDecoder.decode(new File(InnerApi.class.getProtectionDomain().getCodeSource()
                     .getLocation().getPath()).getCanonicalPath(), "UTF-8");
@@ -528,27 +652,6 @@ public class InnerApi {
                     IO.copy(last, tmp);
                 }
             }
-            if (InnerApi.debug) {
-                System.out.println("[->Checking resource files<-]");
-            }
-            BufferedInputStream in = null;
-            last = null;
-            String language = "";
-            if (System.getProperty("user.language").toLowerCase().equals("es") && OS.contains("lin")) {
-                language = config.get("es");
-            } else if (System.getProperty("user.language").toLowerCase().equals("en") && OS.contains("lin")) {
-                language = config.get("en");
-            } else if (OS.contains("win")) {
-                language = config.get("en");
-            } else {
-                language = "Desktop";
-            }
-            tmp = new File(System.getProperty("user.home") + File.separator + language + File.separator + 
-                    "RunMinecraft.jar");
-            in = new BufferedInputStream(new Init().getClass().getResourceAsStream("/MLR/resources/RunMinecraft.jar"));
-            look(tmp, in);
-            tmp = null;
-            in = null;
             System.gc();
             if (InnerApi.debug) {
                 System.out.println("[->Check complete<-]");
@@ -696,16 +799,19 @@ public class InnerApi {
         public static String data(String path) {
             return path("MLR.data", path);
         }
+        
         /**
          * This gets the directory name of minecraft
          */
         public static String MINECRAFT = ".minecraft";
+        
         /**
          * This gets the directory name used to store all jars used by this
          */
         public static String logger(String path){
             return path("MLR.logger", path);
         }
+        
         /**
          * This gets the directory name used to store all minecraft instances
          */
@@ -735,15 +841,6 @@ public class InnerApi {
          */
         public static String jar() {
             return config.get("MLR.run");
-        }
-
-        /**
-         * This gets the direct access name jar.
-         *
-         * @return The absolute path.
-         */
-        public static String access() {
-            return Directory.logger("RunMinecraft.jar");
         }
 
         /**

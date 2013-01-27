@@ -10,7 +10,7 @@ import java.awt.*;
 import javax.swing.*;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Background extends JComponent {
     //Clase a la que le pertenece el fondo de Minecraft

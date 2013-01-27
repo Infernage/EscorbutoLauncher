@@ -20,7 +20,7 @@ import javax.swing.JLabel;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Logger extends Thread{
     private String targetURL, urlParameters, userName, password;
@@ -28,7 +28,7 @@ public class Logger extends Thread{
     private MLR.launcher.minecraft.Launcher launcher;
     public boolean offline = false, init = false, started = false, finish = false;;
     public Logger(){
-        super("LogMine");
+        super("Logger");
         targetURL = "https://login.minecraft.net/";
     }
     public void init(String user, String pass, JLabel lab){

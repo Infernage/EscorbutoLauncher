@@ -16,7 +16,7 @@ import javax.swing.JRootPane;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class FAQ extends javax.swing.JDialog {
 

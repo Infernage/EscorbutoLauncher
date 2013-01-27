@@ -11,7 +11,7 @@ import java.io.PrintStream;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class ErrStream extends Thread{
      public StringBuilder err;
@@ -52,14 +52,17 @@ public class ErrStream extends Thread{
          @Override
          public void println(String msg){
              err.append(msg).append("\n");
+             InnerApi.writeMSGln(msg);
          }
          @Override
          public void println(){
              err.append("\n");
+             InnerApi.writeMSGln("");
          }
          @Override
          public void print(String msg){
              err.append(msg);
+             InnerApi.writeMSG(msg);
          }
      }
 }

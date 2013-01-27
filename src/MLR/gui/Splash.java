@@ -9,7 +9,7 @@ import javax.swing.*;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Splash extends JFrame implements Runnable {
     private boolean exit = false;

@@ -21,7 +21,7 @@ import net.lingala.zip4j.core.ZipFile;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Launcher {
     private String userName, latestVersion, downloadTicket, sessionId;
@@ -78,6 +78,7 @@ public class Launcher {
             InnerApi.Init.consola.setInput(minecraft.getInputStream());
             Thread.sleep(1000);
             minecraft.waitFor();
+            InnerApi.stopAll();
             System.exit(0);
         } catch (Exception e) {
             InnerApi.fatalException(e, "Failed to launch minecraft!", 1);

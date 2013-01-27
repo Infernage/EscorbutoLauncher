@@ -37,7 +37,7 @@ import net.lingala.zip4j.core.ZipFile;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class MultiMine extends javax.swing.JFrame {
     public static String SP = "SSP", MP = "SMP";

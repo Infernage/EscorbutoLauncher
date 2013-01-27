@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class CHLG extends Thread{
     private JTextArea area;

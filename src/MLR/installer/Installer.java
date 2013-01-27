@@ -12,7 +12,7 @@ import javax.swing.*;
 import net.lingala.zip4j.core.ZipFile;
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Installer extends SwingWorker <String, Integer>{
     private JLabel eti;

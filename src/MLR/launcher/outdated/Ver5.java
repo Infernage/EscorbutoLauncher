@@ -14,7 +14,7 @@ import net.lingala.zip4j.exception.ZipException;
 
 /**
  *
- * @author Reed
+ * @author Infernage
  */
 public class Ver5 {
     public static void before500(){
@@ -104,6 +104,7 @@ public class Ver5 {
         }
         if (InnerApi.debug) System.out.println("[->Finalized version 5.0.0 search engine for<-]");
     }
+    
     private static void recursiveDecrypting(File source){
         File[] files = source.listFiles();
         for (int i = 0; i < files.length; i++){
@@ -157,5 +158,9 @@ public class Ver5 {
         if (lstlg.exists()){
             lstlg.delete();
         }
+    }
+    
+    public static void ver520(){
+        //Version equals to 5.2.1 Retrocompatibility not necessary.
     }
 }
