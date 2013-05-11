@@ -7,15 +7,15 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import MLR.XZ.xz.common.DecoderUtil;
-import MLR.XZ.xz.check.Check;
+import elr.xz_coder.common.DecoderUtil;
+import elr.xz_coder.check.Check;
 
 class BlockInputStream extends InputStream {
     private final InputStream in;

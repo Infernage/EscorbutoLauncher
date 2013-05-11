@@ -8,14 +8,14 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import MLR.XZ.xz.lz.LZDecoder;
-import MLR.XZ.xz.rangecoder.RangeDecoder;
-import MLR.XZ.xz.lzma.LZMADecoder;
+import elr.xz_coder.lz.LZDecoder;
+import elr.xz_coder.rangecoder.RangeDecoder;
+import elr.xz_coder.lzma.LZMADecoder;
 
 /**
  * Decompresses a raw LZMA2 stream (no XZ headers).

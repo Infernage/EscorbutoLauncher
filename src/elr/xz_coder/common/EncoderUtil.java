@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.common;
+package elr.xz_coder.common;
 
 import java.io.OutputStream;
 import java.io.IOException;

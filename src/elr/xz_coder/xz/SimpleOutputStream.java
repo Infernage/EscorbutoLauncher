@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.IOException;
-import MLR.XZ.xz.simple.SimpleFilter;
+import elr.xz_coder.simple.SimpleFilter;
 
 class SimpleOutputStream extends FinishableOutputStream {
     private static final int TMPBUF_SIZE = 4096;

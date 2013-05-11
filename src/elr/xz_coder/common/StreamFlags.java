@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.common;
+package elr.xz_coder.common;
 
 public class StreamFlags {
     public int checkType = -1;

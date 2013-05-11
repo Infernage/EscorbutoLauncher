@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lz;
+package elr.xz_coder.lz;
 
 final class Hash234 extends CRC32Hash {
     private static final int HASH_2_SIZE = 1 << 10;

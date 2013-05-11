@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.IOException;
-import MLR.XZ.xz.delta.DeltaEncoder;
+import elr.xz_coder.delta.DeltaEncoder;
 
 class DeltaOutputStream extends FinishableOutputStream {
     private static final int TMPBUF_SIZE = 4096;

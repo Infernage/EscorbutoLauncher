@@ -8,9 +8,9 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lzma;
+package elr.xz_coder.lzma;
 
-import MLR.XZ.xz.rangecoder.RangeCoder;
+import elr.xz_coder.rangecoder.RangeCoder;
 
 abstract class LZMACoder {
     static final int POS_STATES_MAX = 1 << 4;

@@ -7,15 +7,15 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
-import MLR.XZ.xz.simple.ARMThumb;
-import MLR.XZ.xz.simple.SPARC;
-import MLR.XZ.xz.simple.PowerPC;
-import MLR.XZ.xz.simple.IA64;
-import MLR.XZ.xz.simple.SimpleFilter;
-import MLR.XZ.xz.simple.ARM;
-import MLR.XZ.xz.simple.X86;
+import elr.xz_coder.simple.ARMThumb;
+import elr.xz_coder.simple.SPARC;
+import elr.xz_coder.simple.PowerPC;
+import elr.xz_coder.simple.IA64;
+import elr.xz_coder.simple.SimpleFilter;
+import elr.xz_coder.simple.ARM;
+import elr.xz_coder.simple.X86;
 import java.io.InputStream;
 
 class BCJDecoder extends BCJCoder implements FilterDecoder {

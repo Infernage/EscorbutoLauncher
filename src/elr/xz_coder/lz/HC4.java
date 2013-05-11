@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lz;
+package elr.xz_coder.lz;
 
 final class HC4 extends LZEncoder {
     private final Hash234 hash;

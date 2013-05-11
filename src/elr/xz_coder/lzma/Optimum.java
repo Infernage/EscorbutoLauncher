@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lzma;
+package elr.xz_coder.lzma;
 
 final class Optimum {
     private static final int INFINITY_PRICE = 1 << 30;

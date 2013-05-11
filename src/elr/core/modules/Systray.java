@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package MLR.launcher;
+package elr.core.modules;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
@@ -16,7 +16,7 @@ import javax.swing.*;
  *
  * @author Infernage
  */
-//No usada aún
+//Not used yet!
 /*public class Systray extends Thread{
     private TrayIcon icono;
     private SystemTray tray;

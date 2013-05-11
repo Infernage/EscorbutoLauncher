@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 abstract class LZMA2Coder implements FilterCoder {
     public static final long FILTER_ID = 0x21;

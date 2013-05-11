@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lz;
+package elr.xz_coder.lz;
 
 public final class Matches {
     public final int[] len;

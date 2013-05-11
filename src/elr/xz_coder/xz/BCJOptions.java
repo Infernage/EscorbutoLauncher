@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 abstract class BCJOptions extends FilterOptions {
     private final int alignment;

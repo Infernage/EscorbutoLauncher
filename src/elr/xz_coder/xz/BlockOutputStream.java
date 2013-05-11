@@ -7,13 +7,13 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import MLR.XZ.xz.common.EncoderUtil;
-import MLR.XZ.xz.check.Check;
+import elr.xz_coder.common.EncoderUtil;
+import elr.xz_coder.check.Check;
 
 class BlockOutputStream extends FinishableOutputStream {
     private final OutputStream out;

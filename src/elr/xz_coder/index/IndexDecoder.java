@@ -7,17 +7,18 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.index;
+package elr.xz_coder.index;
 
+import elr.xz_coder.index.BlockInfo;
 import java.io.IOException;
 import java.io.EOFException;
 import java.util.zip.CheckedInputStream;
-import MLR.XZ.xz.common.DecoderUtil;
-import MLR.XZ.xz.common.StreamFlags;
-import MLR.XZ.xz.SeekableInputStream;
-import MLR.XZ.xz.CorruptedInputException;
-import MLR.XZ.xz.MemoryLimitException;
-import MLR.XZ.xz.UnsupportedOptionsException;
+import elr.xz_coder.common.DecoderUtil;
+import elr.xz_coder.common.StreamFlags;
+import elr.xz_coder.xz.SeekableInputStream;
+import elr.xz_coder.xz.CorruptedInputException;
+import elr.xz_coder.xz.MemoryLimitException;
+import elr.xz_coder.xz.UnsupportedOptionsException;
 
 public class IndexDecoder extends IndexBase {
     private final BlockInfo info = new BlockInfo();

@@ -7,16 +7,16 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.EOFException;
-import MLR.XZ.xz.common.DecoderUtil;
-import MLR.XZ.xz.common.StreamFlags;
-import MLR.XZ.xz.index.IndexHash;
-import MLR.XZ.xz.check.Check;
+import elr.xz_coder.common.DecoderUtil;
+import elr.xz_coder.common.StreamFlags;
+import elr.xz_coder.index.IndexHash;
+import elr.xz_coder.check.Check;
 
 /**
  * Decompresses exactly one XZ Stream in streamed mode (no seeking).

@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
-import MLR.XZ.xz.simple.IA64;
+import elr.xz_coder.simple.IA64;
 
 /**
  * BCJ filter for Itanium (IA-64) instructions.

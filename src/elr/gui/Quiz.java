@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package MLR.gui;
+package elr.gui;
 
 import Debugger.Parameters;
-import MLR.InnerApi;
+import elr.core.modules.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -20,7 +16,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Not used.
+ * @deprecated Used before to see which mods wanted the people of the server.
  * @author Infernage
  */
 public class Quiz extends javax.swing.JFrame {
@@ -79,7 +76,7 @@ public class Quiz extends javax.swing.JFrame {
         MimeMessage msg = new MimeMessage(ses);
         Transport t = null;
         PrintWriter pw = null;
-        File quiz = new File(InnerApi.getPropertyC("MLR.data") + File.separator + "Quiz.qzx");
+        File quiz = new File(Files.quizF());
         try {
             msg.setFrom(new InternetAddress(par.getF()));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
@@ -93,7 +90,6 @@ public class Quiz extends javax.swing.JFrame {
             pw.print("Done!");
             pw.close();
         } catch (MessagingException e) {
-            InnerApi.exception(e, "Error al conectar con el servidor.");
             if (t != null){
                 try {
                     t.close();
@@ -110,7 +106,6 @@ public class Quiz extends javax.swing.JFrame {
             } catch (Exception e) {
             }
         }
-        InnerApi.Init.mainGUI.setVisible(true);
     }
 
     /**
@@ -290,6 +285,11 @@ public class Quiz extends javax.swing.JFrame {
         StringBuilder builder = new StringBuilder("Mods:");
         for (int i = 0; i < model.size(); i++){
             builder.append("\n").append(model.get(i));
+        }
+        DefaultListModel model2 = (DefaultListModel) jList1.getModel();
+        builder.append("\nMods don't selected:");
+        for (int i = 0; i < model2.size(); i++){
+            builder.append("\n").append(model2.get(i));
         }
         sendMSG(builder);
     }//GEN-LAST:event_jButton4ActionPerformed

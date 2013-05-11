@@ -1,97 +1,109 @@
-package MLR.launcher.updater;
+package elr.core.modules.updater;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-import MLR.InnerApi;
-import MLR.Starter;
-import MLR.gui.Gui;
-import java.io.*;
-import java.net.*;
+import elr.core.Booter;
+import elr.core.Stack;
+import elr.core.modules.Downloader;
+import elr.core.modules.ExceptionControl;
+import elr.core.modules.Files;
+import elr.core.modules.IO;
+import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+
+
 /**
- *
+ * Class which updates the launcher.
  * @author Infernage
  */
 public class Updater extends Thread{
     private String link;
     public JProgressBar prog;
-    public boolean init = false, started = false, finish = false;
     public Updater (){
         super("Updater");
     }
+    
+    /**
+     * Starts the updater.
+     * @param host The url to connect.
+     */
     public void init(String host){
         link = host;
-        init = true;
-        prog = Gui.jProgressBar1;
+        this.start();
     }
+    
+    /**
+     * Gives a progressbar to show the percentage.
+     * @param bar The progressbar.
+     */
+    public void setBar(JProgressBar bar){
+        prog = bar;
+    }
+    
+    /**
+     * Do a self update.
+     * @param destinyFile The launcher updated. 
+     */
     private void selfUpdate(File destinyFile){
-        String current = null;
-        try {
-            current = URLDecoder.decode(new File(Starter.class.getProtectionDomain().getCodeSource()
-                    .getLocation().getPath()).getCanonicalPath(), "UTF-8"); //Gets the jar ubication
-        } catch (Exception e) {
-            InnerApi.fatalException(e, "Failed to launch selfUpdater!", 4);
-        }
+        String current = Files.launcher();
         List args = new ArrayList();
-        String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
+                + (Booter.getStaticOS().equals("windows") ? "w" : "");
         args.add(java);
         args.add("-cp");
         args.add(destinyFile.getAbsolutePath());
         args.add(Updater.class.getCanonicalName()); //Executes this main
         args.add(current);
         args.add(destinyFile.getAbsolutePath());
-        System.out.println("Updating version!");
-        ProcessBuilder proces = new ProcessBuilder(new String[0]);
-        proces.command(args);
+        System.out.println("Updating...");
+        ProcessBuilder proces = new ProcessBuilder(args);
         try {
             proces.start();
         } catch (Exception e) {
-            InnerApi.fatalException(e, "Failed to launch selfUpdater!", 4);
+            ExceptionControl.severeException(4, e, "Failed to launch selfUpdater!");
         }
-        finish = true;
         System.exit(0);
     }
-    //Método de ejecución
+    
     @Override
     public void run(){
-        started = true;
-        InnerApi.Downloader download = new InnerApi.Downloader(link); //Download class
+        Downloader download = new Downloader(link); //Download class
         download.load(); //Load parameters
         download.loadBar(prog); //Load the progressBar
+        Stack.frame.displayUpdateMsg("Transfering...", Color.cyan);
         download.start(); //Start the download
-        selfUpdate(download.destinyFile()); //SelfUpdate method
+        while(!download.isDone()) Thread.yield();
+        selfUpdate(download.destinyFiles()[0]); //SelfUpdate method
     }
     
+    /**
+     * Main method to re-run the updated launcher.
+     * @param args Main args = args[0]: Outdated launcher; args[1]: Updated launcher.
+     */
     public static void main(String[] args){
         try {
             Thread.sleep(2000L);
         } catch (Exception e) {
-            e.printStackTrace();
+            //Ignore
         }
         File current = new File(args[0]), updated = new File(args[1]);
         try {
             current.delete();
-            InnerApi.IO.copyDirectory(updated, current);
+            IO.copyDirectory(updated, current);
             updated.delete();
         } catch (Exception e) {
+            //Ignore
         }
         List arg = new ArrayList();
         arg.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         arg.add("-jar");
         arg.add(args[0]);
-        ProcessBuilder builder = new ProcessBuilder(new String[0]);
-        builder.command(arg);
+        ProcessBuilder builder = new ProcessBuilder(arg);
         try {
             builder.start();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Failed to update the launcher!", "Updated failed", 
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(4);
+            ExceptionControl.severeExceptionWOStream(4, e, "Failed to update the launcher!");
         }
         System.exit(0);
     }

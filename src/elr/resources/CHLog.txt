@@ -1,44 +1,22 @@
-INDICE
-a)Changelog
-b)Mods eliminadas.
-c)Mods añadidas.
-d)Bugs.
-_________________________________________________________
+Changelog
+Since 5.2.1 version
 
-b) Changelog. (Desde la versión 5.2.0)
++Added ELRModPack.
++Added a new Gui. More compact now.
++Added a possibility to edit the mods from your instances!
++Added a new Splash. Include a progress bar to show the state of the load.
++Added a custom JRE to the launcher.
++Added a encoder/decoder. It uses XZ Data Compression.
++Added a beta support to MACOSX.
++Added a possibility to create your owns modpacks.
+*Modified the load method of the launcher.
+*Modified the remember username/password method.
+*Modified the console. Now displays more specific information.
+*Modified the Minecraft launcher system.
+*Modified the ubication where all instances were saved.
+-Deleted Quiz.java.
+-Deleted the theme selector, instead it's only one available.
+-Fixed bugs #19 and #20.
 
-||Launcher||
--Añadido encuesta para elegir las mods de la actualización próxima del server.
--Añadido log para el launcher y el minecraft.
--Añadida opción para guardar el reporte de algún bug en un fichero txt en el escritorio.
--Añadido compresor y descompresor. Aún no implementado. (Compresor/Decompresor utiliza el XZ Data Compression)
--Cambiada retrocompatibilidad temporalmente.
--Cambiado Java necesario. Ahora se necesita como mínimo la versión Java 7 Update 11.
--Eliminado acceso directo.
--Arreglado un bug que causaba la mala inicialización de la interfaz MultiMine.
-
-||Minecraft||
-N/A
-_________________________________________________________
-
-b)Mods eliminadas (Desde la versión 5.2.0) (MP = MultiPlayer, SP = SinglePlayer)
-(En el servidor se han eliminado el IC Nuclear control y las Logistics Pipes)
-||MP||
-Ninguna
-
-||SP||
-Ninguna
-_________________________________________________________
-
-c)Mods añadidas. (Desde la versión 5.2.0) (MP = MultiPlayer, SP = SinglePlayer)
-
-||MP||
-Ninguna
-
-||SP||
-Ninguna
-_________________________________________________________
-
-d) Bugs
-
-Lista de todos los bugs hasta ahora conocidos: http://minechinchas.blogspot.com.es/2012/09/bugs-y-problemas.html
+Bugs:
+->The error sender doesn't send any error if the antivirus/firewall is active on Windows.

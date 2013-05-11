@@ -8,11 +8,11 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lzma;
+package elr.xz_coder.lzma;
 
-import MLR.XZ.xz.lz.LZEncoder;
-import MLR.XZ.xz.lz.Matches;
-import MLR.XZ.xz.rangecoder.RangeEncoder;
+import elr.xz_coder.lz.LZEncoder;
+import elr.xz_coder.lz.Matches;
+import elr.xz_coder.rangecoder.RangeEncoder;
 
 final class LZMAEncoderNormal extends LZMAEncoder {
     private static final int OPTS = 4096;

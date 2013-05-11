@@ -8,12 +8,12 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lzma;
+package elr.xz_coder.lzma;
 
 import java.io.IOException;
-import MLR.XZ.xz.lz.LZDecoder;
-import MLR.XZ.xz.rangecoder.RangeDecoder;
-import MLR.XZ.xz.CorruptedInputException;
+import elr.xz_coder.lz.LZDecoder;
+import elr.xz_coder.rangecoder.RangeDecoder;
+import elr.xz_coder.xz.CorruptedInputException;
 
 public final class LZMADecoder extends LZMACoder {
     private final LZDecoder lz;

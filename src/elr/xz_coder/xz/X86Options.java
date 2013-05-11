@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
-import MLR.XZ.xz.simple.X86;
+import elr.xz_coder.simple.X86;
 
 /**
  * BCJ filter for x86 (32-bit and 64-bit) instructions.

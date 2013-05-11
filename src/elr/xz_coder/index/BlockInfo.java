@@ -7,9 +7,9 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.index;
+package elr.xz_coder.index;
 
-import MLR.XZ.xz.common.StreamFlags;
+import elr.xz_coder.common.StreamFlags;
 
 public class BlockInfo {
     public StreamFlags streamFlags;

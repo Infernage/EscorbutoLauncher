@@ -7,13 +7,13 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.EOFException;
-import MLR.XZ.xz.common.DecoderUtil;
+import elr.xz_coder.common.DecoderUtil;
 
 /**
  * Decompresses a .xz file in streamed mode (no seeking).

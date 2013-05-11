@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.index;
+package elr.xz_coder.index;
 
 import java.io.InputStream;
 import java.io.DataInputStream;
@@ -15,20 +15,20 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CheckedInputStream;
-import MLR.XZ.xz.common.DecoderUtil;
-import MLR.XZ.xz.XZIOException;
-import MLR.XZ.xz.CorruptedInputException;
+import elr.xz_coder.common.DecoderUtil;
+import elr.xz_coder.xz.XZIOException;
+import elr.xz_coder.xz.CorruptedInputException;
 
 public class IndexHash extends IndexBase {
-    private MLR.XZ.xz.check.Check hash;
+    private elr.xz_coder.check.Check hash;
 
     public IndexHash() {
         super(new CorruptedInputException());
 
         try {
-            hash = new MLR.XZ.xz.check.SHA256();
+            hash = new elr.xz_coder.check.SHA256();
         } catch (java.security.NoSuchAlgorithmException e) {
-            hash = new MLR.XZ.xz.check.CRC32();
+            hash = new elr.xz_coder.check.CRC32();
         }
     }
 

@@ -7,15 +7,15 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.index;
+package elr.xz_coder.index;
 
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.zip.CheckedOutputStream;
-import MLR.XZ.xz.common.EncoderUtil;
-import MLR.XZ.xz.XZIOException;
+import elr.xz_coder.common.EncoderUtil;
+import elr.xz_coder.xz.XZIOException;
 
 public class IndexEncoder extends IndexBase {
     private final ArrayList records = new ArrayList();

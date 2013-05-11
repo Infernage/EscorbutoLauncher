@@ -7,16 +7,16 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.common;
+package elr.xz_coder.common;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.EOFException;
 import java.util.zip.CRC32;
-import MLR.XZ.xz.XZ;
-import MLR.XZ.xz.XZFormatException;
-import MLR.XZ.xz.CorruptedInputException;
-import MLR.XZ.xz.UnsupportedOptionsException;
+import elr.xz_coder.xz.XZ;
+import elr.xz_coder.xz.XZFormatException;
+import elr.xz_coder.xz.CorruptedInputException;
+import elr.xz_coder.xz.UnsupportedOptionsException;
 
 public class DecoderUtil extends Util {
     public static boolean isCRC32Valid(byte[] buf, int off, int len,

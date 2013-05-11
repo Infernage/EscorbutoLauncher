@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.rangecoder;
+package elr.xz_coder.rangecoder;
 
 import java.util.Arrays;
 

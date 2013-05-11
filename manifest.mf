@@ -1,3 +1,9 @@
 Manifest-Version: 1.0
+Created-By: Netbeans 7.1.3
+Specification-Title: Escorbuto Launcher
+Specification-Version: 6.0.0
+Specification-Vendor: Escorbuto
+Implementation-Title: ELR
+Implementation-Version: 6.0.0
+Implementation-Vendor: Escorbuto
 X-COMMENT: Main-Class will be added automatically by build
-

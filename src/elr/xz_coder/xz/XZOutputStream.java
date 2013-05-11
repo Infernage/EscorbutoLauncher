@@ -7,14 +7,14 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.OutputStream;
 import java.io.IOException;
-import MLR.XZ.xz.common.EncoderUtil;
-import MLR.XZ.xz.common.StreamFlags;
-import MLR.XZ.xz.check.Check;
-import MLR.XZ.xz.index.IndexEncoder;
+import elr.xz_coder.common.EncoderUtil;
+import elr.xz_coder.common.StreamFlags;
+import elr.xz_coder.check.Check;
+import elr.xz_coder.index.IndexEncoder;
 
 /**
  * Compresses into the .xz file format.

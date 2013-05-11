@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 class IndexIndicatorException extends Exception {
     private static final long serialVersionUID = 1L;

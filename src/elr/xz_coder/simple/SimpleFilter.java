@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.simple;
+package elr.xz_coder.simple;
 
 public interface SimpleFilter {
     int code(byte[] buf, int off, int len);

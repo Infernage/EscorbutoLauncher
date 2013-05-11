@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.simple;
+package elr.xz_coder.simple;
 
 public final class IA64 implements SimpleFilter {
     private static final int[] BRANCH_TABLE = {

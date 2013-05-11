@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.check;
+package elr.xz_coder.check;
 
 public class None extends Check {
     public None() {

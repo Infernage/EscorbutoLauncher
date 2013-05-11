@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.check;
+package elr.xz_coder.check;
 
-import MLR.XZ.xz.XZ;
-import MLR.XZ.xz.UnsupportedOptionsException;
+import elr.xz_coder.xz.XZ;
+import elr.xz_coder.xz.UnsupportedOptionsException;
 
 public abstract class Check {
     int size;

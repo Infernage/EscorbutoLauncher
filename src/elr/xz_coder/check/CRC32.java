@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.check;
+package elr.xz_coder.check;
 
 public class CRC32 extends Check {
     private final java.util.zip.CRC32 state = new java.util.zip.CRC32();

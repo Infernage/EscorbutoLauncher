@@ -8,11 +8,11 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lz;
+package elr.xz_coder.lz;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import MLR.XZ.xz.CorruptedInputException;
+import elr.xz_coder.xz.CorruptedInputException;
 
 public final class LZDecoder {
     private final byte[] buf;

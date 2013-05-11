@@ -7,11 +7,11 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
 import java.io.IOException;
-import MLR.XZ.xz.delta.DeltaDecoder;
+import elr.xz_coder.delta.DeltaDecoder;
 
 /**
  * Decodes raw Delta-filtered data (no XZ headers).

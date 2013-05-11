@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.delta;
+package elr.xz_coder.delta;
 
 public class DeltaEncoder extends DeltaCoder {
     public DeltaEncoder(int distance) {

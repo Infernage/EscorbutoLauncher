@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 class BCJEncoder extends BCJCoder implements FilterEncoder {
     private final BCJOptions options;

@@ -1,186 +1,191 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package MLR.launcher;
+package elr.core.modules;
 
-import MLR.InnerApi;
+import elr.core.Stack;
+import elr.loader.MinecraftLoader;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
-import javax.swing.JLabel;
 
 /**
- *
+ * Class used to login at minecraft.net.
  * @author Infernage
  */
 public class Logger extends Thread{
-    private String targetURL, urlParameters, userName, password;
-    private JLabel label;
-    private MLR.launcher.minecraft.Launcher launcher;
-    public boolean offline = false, init = false, started = false, finish = false;;
+    private String targetURL, userName, password, maxRam, selectedInstance;
+    private elr.loader.MinecraftLoader launcher;
+    private boolean offline = false;
     public Logger(){
         super("Logger");
         targetURL = "https://login.minecraft.net/";
     }
-    public void init(String user, String pass, JLabel lab){
-        if (InnerApi.debug) System.out.println("[->Initialized logger with MC account<-]");
-        init = true;
-        label = lab;
+    
+    /**
+     * Initializes the login in premium mode.
+     * @param user The username.
+     * @param pass The password.
+     */
+    public void init(String user, String pass){
         userName = user;
         password = pass;
     }
-    public void init(String user, JLabel lab){
-        if (InnerApi.debug) System.out.println("[->Initialized logger with OFF account<-]");
-        init(user, null, lab);
+    
+    /**
+     * Initializes the login in demo mode.
+     * @param user The username.
+     */
+    public void init(String user){
+        init(user, null);
         offline = true;
     }
-    private String logMine (String targetURL, String urlParameters){
-        if (InnerApi.debug) System.out.println("[->Retrieving data<-]");
+    
+    /**
+     * Sets the instance to be executed and the ram to be allocated.
+     * @param instance The instance to be executed.
+     * @param ram The ram to be allocated.
+     */
+    public void setParameters(String instance, String ram){
+        maxRam = ram;
+        selectedInstance = instance;
+    }
+    
+    /**
+     * Do the minecraft.net login.
+     * @param parameters The parameters to send.
+     * @return The response of minecraft.net.
+     */
+    private String doPost(Map<String, Object> parameters){
+        StringBuilder build = new StringBuilder();
+        for (Map.Entry entry : parameters.entrySet()){
+            if (build.length() > 0){
+                build.append("&");
+            }
+            try {
+                build.append(URLEncoder.encode((String)entry.getKey(), "UTF-8"));
+                if (entry.getValue() != null){
+                    build.append('=').append(URLEncoder.encode((String)entry.getValue(), "UTF-8"));
+                }
+            } catch (Exception e) {
+                Stack.console.setError(e, 3, this.getClass());
+            }
+        }
         HttpsURLConnection connection = null;
         try {
             URL url = new URL(targetURL);
-            connection = (HttpsURLConnection)url.openConnection();
+            connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
+            connection.setRequestProperty("Content-Length", Integer.toString(build.toString()
+                    .getBytes().length));
             connection.setRequestProperty("Content-Language", "en-US");
             connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.connect();
-            Certificate[] certs = connection.getServerCertificates();
-            byte[] bytes = new byte[294];
-            DataInputStream dis = new DataInputStream(Logger.class.getResourceAsStream("/MLR/resources/minecraft.key"));
-            dis.readFully(bytes);
-            dis.close();
-            Certificate c = certs[0];
-            PublicKey pk = c.getPublicKey();
-            byte[] data = pk.getEncoded();
-            for (int i = 0; i < data.length; i++) {
-                if (data[i] == bytes[i]) continue; throw new RuntimeException("Public key mismatch");
+            Certificate[] certificates = connection.getServerCertificates();
+            byte[] stream = new byte[294];
+            DataInputStream input = new DataInputStream(Logger.class
+                    .getResourceAsStream("/elr/resources/minecraft.key"));
+            input.readFully(stream);
+            input.close();
+            Certificate certificate = certificates[0];
+            PublicKey key = certificate.getPublicKey();
+            byte[] keyStream = key.getEncoded();
+            for (int i = 0; i < keyStream.length; i++){
+                if (keyStream[i] != stream[i]) throw new RuntimeException("Public key mismatch");
             }
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-            StringBuffer response = new StringBuffer();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                response.append(line);
-                response.append('\r');
+            DataOutputStream output = new DataOutputStream(connection.getOutputStream());
+            output.writeBytes(build.toString());
+            output.flush();
+            output.close();
+            InputStream in = connection.getInputStream();
+            BufferedReader bf = new BufferedReader(new InputStreamReader(in));
+            StringBuilder buffer = new StringBuilder();
+            String str;
+            while((str = bf.readLine()) != null){
+                buffer.append(str).append('\r');
             }
-            rd.close();
-            String str1 = response.toString();
-            return str1;
-        } catch (Exception e) {
-            InnerApi.exception(e, "Error conectándose a la página web.");
+            bf.close();
+            return buffer.toString();
+        } catch (IOException | RuntimeException e) {
+            ExceptionControl.showException(3, e, "Login failed");
             return null;
-        } finally {
-            if (connection != null)
-                connection.disconnect();
+        } finally{
+            if (connection != null) connection.disconnect();
         }
     }
+    
+    /**
+     * Encapsule the login.
+     * @param user The username.
+     * @param pass The password.
+     */
+    private void login(String user, String pass){
+        Stack.frame.displayLoginMsg("Logging...", Color.yellow);
+        HashMap parameters = new HashMap();
+        parameters.put("user", user);
+        parameters.put("password", pass);
+        parameters.put("version", Integer.toString(13));
+        String post = doPost(parameters);
+        if (post == null){
+            Stack.frame.displayLoginMsg("Can't connect to minecraft.net", Color.red);
+            return;
+        }
+        if (!post.contains(":")){
+            switch (post.trim()) {
+                case "Bad login":
+                    Stack.frame.displayLoginMsg("Login failed", Color.red);
+                    break;
+                case "Old version":
+                    Stack.frame.displayLoginMsg("Outdated Logger", Color.red);
+                    break;
+                case "User not premium":
+                    Stack.frame.displayLoginMsg(post, Color.red);
+                    break;
+                default:
+                    Stack.frame.displayLoginMsg(post, Color.red);
+                    break;
+            }
+            return;
+        }
+        launch(post);
+    }
+    
+    /**
+     * Launchs the minecraft.
+     * @param arg The response of minecraft.net.
+     */
     private void launch(String arg){
         try {
-            InnerApi.Init.mainGUI.setVisible(false);
             System.out.println("Initializing minecraft...");
             if (!offline){
-                launcher = new MLR.launcher.minecraft.Launcher(arg);
-                launcher.init();
+                String[] par = arg.split(":");
+                launcher = new MinecraftLoader(par[2], par[3]);
             } else{
-                launcher = new MLR.launcher.minecraft.Launcher();
-                launcher.offline(userName);
-                launcher.init();
+                launcher = new MinecraftLoader(userName, "-");
             }
+            launcher.initMinecraft(selectedInstance, maxRam);
         } catch (Exception ex) {
-            InnerApi.fatalException(ex, "Error inicializando minecraft.", 1);
+            ExceptionControl.showException(4, ex, "Error launching minecraft");
         }
     }
+    
     @Override
     public void run(){
-        try {
-            started = true;
-            String res = "";
-            if (offline){
-                if (InnerApi.debug) System.out.println("[->Starting in OFFLINE MODE<-]");
-                launch(null);
-                return;
-            }
-            if (InnerApi.debug) System.out.println("[->Adding parameters<-]");
-            urlParameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + 13;
-            res = this.logMine(targetURL, urlParameters);
-            if (res == null){
-                if (InnerApi.debug) System.out.println("[->Connection failed<-]");
-                label.setForeground(Color.red);
-                label.setText("Can't connect to minecraft.net");
-                InnerApi.Init.mainGUI.tries--;
-                if (InnerApi.Init.mainGUI.tries == 0){
-                    InnerApi.Init.mainGUI.offline();
-                } else{
-                    InnerApi.Init.mainGUI.retry();
-                }
-            } else if (!res.contains(":")){
-                if (InnerApi.debug) System.out.println("[->Connection failed<-]");
-                if (res.trim().equals("Bad login")){
-                    label.setForeground(Color.red);
-                    label.setText("Login failed!");
-                    InnerApi.Init.mainGUI.retry();
-                } else if (res.trim().equals("Old version")){
-                    label.setForeground(Color.red);
-                    label.setText("Outdated minecraft launcher!");
-                } else{
-                    System.err.println(res);
-                }
-                InnerApi.Init.mainGUI.tries--;
-                if (InnerApi.Init.mainGUI.tries == 0){
-                    InnerApi.Init.mainGUI.offline();
-                } else{
-                    InnerApi.Init.mainGUI.retry();
-                }
-            } else if (res.contains(":")){
-                if (InnerApi.debug) System.out.println("[->Starting launcher in ONLINE MODE<-]");
-                launch(res);
-            }
-        } catch (Exception ex) {
-            InnerApi.fatalException(ex, "Error inicializando minecraft.", 1);
+        if (offline){
+            launch(null);
+            return;
         }
+        login(userName, password);
     }
 }
-    /*public void play(String user, String pass){
-        try {
-            String[] args = new String[]{ user, pass };
-            URL u = new File(InnerApi.path(InnerApi.Directory.DirMC + File.separator + "minecraft.jar")).toURI().toURL();
-            URLClassLoader cl = new URLClassLoader(new URL[]{u});
-            Class launcherFrame = cl.loadClass("net.minecraft.LauncherFrame");
-            Method[] test = launcherFrame.getMethods();
-            int i = 0;
-            while(i < test.length){
-                if (test[i].getName().equals("main")){
-                    if (InnerApi.Init.consola.isVisible()){
-                        InnerApi.Init.consola.exit();
-                    }
-                    Gui.see.dispose();
-                    Method loader = test[i];
-                    loader.setAccessible(true);
-                    Gui.see.setVisible(false);
-                    loader.invoke(launcherFrame, new Object[]{ args });
-                    i = test.length;
-                } else{
-                    i++;
-                }
-            }
-        } catch (Exception ex) {
-            InnerApi.fatalException(ex, "Error al inicializar minecraft.", 1);
-        }
-    }*/

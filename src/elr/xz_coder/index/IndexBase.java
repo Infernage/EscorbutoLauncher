@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.index;
+package elr.xz_coder.index;
 
-import MLR.XZ.xz.common.Util;
-import MLR.XZ.xz.XZIOException;
+import elr.xz_coder.common.Util;
+import elr.xz_coder.xz.XZIOException;
 
 abstract class IndexBase {
     private final XZIOException invalidIndexException;

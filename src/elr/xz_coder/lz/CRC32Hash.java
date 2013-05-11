@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lz;
+package elr.xz_coder.lz;
 
 /**
  * Provides a CRC32 table using the polynomial from IEEE 802.3.

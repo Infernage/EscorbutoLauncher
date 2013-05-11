@@ -1,0 +1,17 @@
+--------------------------------------------------------------------------
+ ClaySoldiersMod Configuration File, made by sanandreasps ConfigManagerII
+--------------------------------------------------------------------------
+[ Item IDs ]
+#   clayNexus = 6862
+#   pegasusDoll = 6852
+#   disruptor = 6849
+#   clayCookie = 6854
+#   brickDoll = 6853
+#   horseDoll = 6851
+#   shearBlade = 6863
+#   soldierDoll = 6850
+#   bunnyDoll = 6856
+#   brickLump = 6861
+#   geckoDoll = 6857
+#   shield = 6860
+#   turtleDoll = 6855

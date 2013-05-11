@@ -1,35 +1,39 @@
-package MLR.launcher;
+package elr.core.modules;
 
-
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 import java.io.*;
 import javax.swing.JProgressBar;
+
 /**
- *
+ * Downloader class has implemented a private class which do exactly the same with no errors.
  * @author Infernage
  */
+@Deprecated
 public class Progress extends Thread{
+    private final int MBYTES = 1048576;
     private File dst, src;
     private JProgressBar progres;
-    public double tam;
-    public double size = 0;
+    private double tam, size = 0, offset = 0;
     private boolean exit = false;
+    
     public Progress (File D, File S, JProgressBar prog){
         dst = D;
         src = S;
         progres = prog;
         tam = 1;
     }
+    
+    public void setSize(int size){
+        this.size = size/MBYTES;
+    }
+    
+    public void setOffset(int offset){
+        this.offset = offset/MBYTES;
+    }
+    
     public void out(){
         exit = true;
     }
-    public void setSize(int size){
-        this.size = size/1048576;
-    }
+    
     public void check(File fil){
         if (fil.isFile()){
             tam = fil.length();
@@ -48,20 +52,20 @@ public class Progress extends Thread{
             }
         }
     }
+    
     @Override
     public void run(){
-        double inst = 0;
-        double perc = 0;
+        double inst, perc;
         progres.setMaximum(100);
         progres.setMinimum(0);
         if (src != null){
             check(src);
-            size = tam/1048576;
+            size = tam/MBYTES;
         }
         tam = 0;
         while(!exit){
             check(dst);
-            inst = tam/1048576;
+            inst = (tam/MBYTES) + offset;
             perc = (inst/size)*100;
             if (perc > 100){
                 perc = 100;
@@ -70,7 +74,5 @@ public class Progress extends Thread{
             progres.setString((int) perc + "%");
             tam = 0;
         }
-        progres.setValue(100);
-        progres.setString(100 + "%");
     }
 }

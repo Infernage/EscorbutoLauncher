@@ -1,102 +1,124 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package MLR.launcher.minecraft;
+package elr.loader;
 
-import MLR.InnerApi;
+import net.minecraft.Launcher;
+import elr.core.Booter;
+import elr.core.modules.ExceptionControl;
 import java.applet.Applet;
 import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
-import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 /**
- *
+ * GUI used to allocate Minecraft.
  * @author Infernage
  */
-public class MCFrame extends Frame implements WindowListener{
-    private Aplication applet = null;
-    public MCFrame(String param){
-        super(param);
-        try{
-            BufferedImage image = ImageIO.read(getClass().getResource("/MLR/resources/5547.png"));
-            setIconImage(image);
-        } catch (Exception ex){
-            MLR.InnerApi.fatalException(ex, "Failed to initialite.", 1);
+public class MinecraftFrame extends JFrame{
+    private Launcher wrapper;
+    
+    /**
+     * Default constructor.
+     */
+    public MinecraftFrame(){
+        super("Minecraft");
+        if (Booter.getStaticOS().equals("macosx")){
+            try {
+                Class screen = Class.forName("com.apple.eawt.FullScreenUtilities");
+                Method fullScreen = screen.getDeclaredMethod("setWindowCanFullScreen", new Class[] { 
+                    Window.class, Boolean.TYPE });
+                fullScreen.invoke(null, new Object[] { this, Boolean.valueOf(true) });
+            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | 
+                    IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                e.printStackTrace();
+                //Ignore
+            }
         }
+        setIconImage(new ImageIcon(this.getClass().getResource("/elr/resources/5547.png")).getImage());
         super.setVisible(true);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setResizable(true);
-        addWindowListener(this);
+        this.setResizable(true);
+        loadSize(new Dimension(854, 480));
+        addWindowListener(new WindowAdapter(){
+            
+            @Override
+            public void windowClosing(WindowEvent evt){
+                new Thread(){
+                    @Override
+                    public void run(){
+                        try {
+                            Thread.sleep(15000);
+                        } catch (Exception e) {
+                            //Ignore, only force exit
+                        }
+                        System.out.println("Force exit!");
+                        System.exit(0);
+                    }
+                }.start();
+                if (wrapper != null){
+                    wrapper.stop();
+                    wrapper.destroy();
+                }
+                System.exit(0);
+            }
+        });
     }
-    public void start(Applet ap, String user, String session, Dimension dimen){
-        System.out.println("Starting applet");
-        try{
-            applet = new Aplication(ap, new URL("http://www.minecraft.net/game"));
-        } catch (Exception ex){
-            MLR.InnerApi.fatalException(ex, "Failed to start.", 1);
-        }
-        System.out.println("Setting applet parameters");
-        applet.setParameter("username", user);
-        applet.setParameter("sessionid", session);
-        applet.setParameter("stand-alone", "true");
-        System.out.println("Setting applet stub");
-        ap.setStub(applet);
-        System.out.println("Adding applet");
-        add(applet);
-        applet.setPreferredSize(dimen);
-        pack();
+    
+    /**
+     * Initializes the size of the Frame.
+     * @param size The size of the Frame.
+     */
+    private void loadSize(Dimension size){
+        setSize(size);
         setLocationRelativeTo(null);
-        System.out.println("Setting in extended state");
         setExtendedState(6);
-        System.out.println("Validating...");
+    }
+    
+    /**
+     * Initializes the load of Minecraft.
+     * @param applet The applet of Minecraft.
+     * @param user The username.
+     * @param sessionId The session id provided by minecraft.net.
+     * @throws MalformedURLException 
+     */
+    public void start(Applet applet, String user, String sessionId) throws MalformedURLException{
+        wrapper = new Launcher(applet, new URL("http://www.minecraft.net/game"));
+        wrapper.setParameter("username", user);
+        wrapper.setParameter("sessionid", sessionId);
+        wrapper.setParameter("stand-alone", "true");
+        applet.setStub(wrapper);
+        add(wrapper);
+        Dimension size = new Dimension(854, 480);
+        wrapper.setPreferredSize(size);
+        pack();
         validate();
-        System.out.println("Launching...");
-        applet.init();
-        applet.start();
+        new Thread(){
+            @Override
+            public void run(){
+                try {
+                    Thread.sleep(10000);
+                } catch (Exception e) {
+                    //Ignore
+                }
+                if (!wrapper.isActive()){
+                    try {
+                        MinecraftLoader.launch(false);
+                    } catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException 
+                            | NoSuchMethodException | InvocationTargetException | InstantiationException 
+                            | IOException e) {
+                        ExceptionControl.severeExceptionWOStream(2, e, "Failed to reload Minecraft");
+                    }
+                }
+            }
+        }.start();
+        wrapper.init();
+        wrapper.start();
+        loadSize(size);
         setVisible(true);
-    }
-    @Override
-    public void windowOpened(WindowEvent e) {
-        
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-        if (applet != null){
-            applet.stop();
-            applet.destroy();
-        }
-        System.exit(0);
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-        
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-        
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-        
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-        
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-        
     }
 }

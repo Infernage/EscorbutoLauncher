@@ -1,46 +1,67 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package MLR.gui;
+package elr.gui;
+
 import Debugger.Parameters;
-import MLR.InnerApi;
+import com.sun.mail.smtp.SMTPTransport;
+import elr.core.Stack;
+import elr.core.modules.Directory;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+
 /**
- *
+ * GUI used to report an error.
  * @author Infernage
  */
 public class Debug extends javax.swing.JDialog {
-    public boolean exited = false;
+    private StringBuilder builder;
+    
     /**
-     * Creates new form Debug
+     * Creates new form Debug.
      */
     public Debug(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        this.setLocationRelativeTo(null);
+        builder = new StringBuilder();
+        reInit();
     }
-    public void reInit(){
+    
+    /**
+     * Private method to remake the debug class.
+     */
+    private void reInit(){
         this.setLocationRelativeTo(null);
-        jTextField1.setText("");
-        jTextArea1.setText("");
+        builder.delete(0, builder.length());
+        description.setText("");
+        builder.append("JVM properties and PC info from user ").append(System.getProperty("user.name")).append("\n\n");
         jButton1.setText("Send");
         jButton1.setEnabled(true);
-        exited = false;
+        for (Object obj : System.getProperties().keySet()){
+            builder.append("Key: ").append(obj).append(" Value: ").append(System.getProperty((String) obj)).append("\n");
+        }
+        builder.append("-----------------------------").append("\n\n");
+        info.setText(builder.toString());
     }
+    
+    /**
+     * Method which is assigned to do the reInit() method and setVisible().
+     * @param flag {@code true} if the component is visible, {@code false} otherwise.
+     */
+    @Override
+    public void setVisible(boolean flag){
+        reInit();
+        super.setVisible(flag);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,36 +71,35 @@ public class Debug extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTextField1 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        description = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        info = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
         });
 
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField1KeyPressed(evt);
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel2.setText("Error description");
+
+        description.setColumns(20);
+        description.setLineWrap(true);
+        description.setRows(5);
+        description.setWrapStyleWord(true);
+        description.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                descriptionKeyTyped(evt);
             }
         });
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Nombre del error");
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel2.setText("Descripción del error");
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(jTextArea1);
+        jScrollPane1.setViewportView(description);
 
         jButton1.setText("Send");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -88,43 +108,53 @@ public class Debug extends javax.swing.JDialog {
             }
         });
 
+        info.setEditable(false);
+        info.setColumns(20);
+        info.setLineWrap(true);
+        info.setRows(5);
+        info.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(info);
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel3.setText("Information to send");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap(217, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addGap(217, 217, 217))
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1)
-                            .addComponent(jScrollPane1)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 132, Short.MAX_VALUE)
-                .addComponent(jLabel2)
-                .addGap(127, 127, 127))
             .addGroup(layout.createSequentialGroup()
-                .addGap(139, 139, 139)
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(229, 229, 229)
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(241, 241, 241)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel1)
+                .addContainerGap()
+                .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -134,88 +164,92 @@ public class Debug extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if (jTextField1.getText().equals("") || jTextArea1.getText().equals("")){
-            JOptionPane.showMessageDialog(null, "No has introducido ningún texto.");
-            return;
+        String subject = "ELR Ticket from " + System.getProperty("user.name");
+        StringBuilder build = new StringBuilder(info.getText());
+        build.append("\n\nERRORSTREAM\n");
+        if (Stack.console != null){
+            if (!Stack.console.builder.toString().equals("")){
+                build.append(Stack.console.builder.toString());
+            } else build.append("No error stream found");
         }
-        String subject = "MineClient Ticket from " + System.getProperty("user.name") + ": " + 
-                    jTextField1.getText();
-        StringBuilder build = new StringBuilder("Message: ");
-        build.append(jTextArea1.getText()).append("\n\nData:\n");
-        Iterator it = System.getProperties().keySet().iterator();
-        while (it.hasNext()){
-            String tmp = (String) it.next();
-            build.append(tmp + ": " + System.getProperty(tmp) + "\n");
-        }
-        build.append("\n\nERRORSTREAM\n").append(InnerApi.Init.error.err.toString());
-        if (InnerApi.debug) System.out.println("[->Setting parameters<-]");
         Parameters par = new Parameters();
-        Session ses = Session.getDefaultInstance(par.getPs());
+        Session ses = Session.getInstance(par.getPs());
         ses.setDebug(false);
         MimeMessage msg = new MimeMessage(ses);
+        SMTPTransport t = null;
         try{
             msg.setFrom(new InternetAddress(par.getF()));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
-            if (InnerApi.debug) System.out.println("[->Adding recipients<-]");
+            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
             msg.setSubject(subject);
+            msg.setSentDate(new Date());
             msg.setText(build.toString());
-            Transport t = ses.getTransport(par.getT());
+            t = (SMTPTransport) ses.getTransport(par.getT());
             t.connect(par.getF(), par.getP());
-            if (InnerApi.debug) System.out.println("[->Sending ticket<-]");
             t.sendMessage(msg, msg.getAllRecipients());
-            t.close();
-            if (InnerApi.debug) System.out.println("[->Done<-]");
-            jButton1.setText("Enviado");
+            jButton1.setText("Sent");
             jButton1.setEnabled(false);
         } catch (Exception ex){
-            InnerApi.Init.error.setError(ex);
-            if (InnerApi.debug) System.out.println("[->FAILED<-]");
+            if (ex.toString().contains("535 No SMTP server defined")){
+                int i = JOptionPane.showConfirmDialog(null, "Please, disable your antivirus/firewall and "
+                        + "try again.\nDo you want to save the error stream into a file?");
+                if (i != 0) return;
+            } else{
+                JOptionPane.showMessageDialog(null, "The message couldn't be sent");
+            }
+            if (Stack.console != null) Stack.console.setError(ex, 1, this.getClass());
             Calendar C = new GregorianCalendar();
-            File log = new File(System.getProperty("user.home") + File.separator + "Desktop" + File.separator
-                    + "MineClient_Error_" + C.get(Calendar.YEAR) + "-" + C.get(Calendar.MONTH) + "-" + 
-                    C.get(Calendar.DAY_OF_MONTH) + "_" + C.get(Calendar.HOUR_OF_DAY) + "-" + C.get(Calendar.MINUTE)
-                    + "-" + C.get(Calendar.SECOND) + ".log");
-            PrintWriter pw = null;
+            File log = new File(Directory.currentPath() + File.separator + "EscorbutoLauncher_Error_" + 
+                    C.get(Calendar.YEAR) + "-" + C.get(Calendar.MONTH) + "-" + 
+                    C.get(Calendar.DAY_OF_MONTH) + "_" + C.get(Calendar.HOUR_OF_DAY) + "-" + 
+                    C.get(Calendar.MINUTE) + "-" + C.get(Calendar.SECOND) + ".log");
             try{
-                if (InnerApi.debug) System.out.println("[->Porting to a file<-]");
                 if (!log.exists()){
                     log.createNewFile();
                 }
-                pw = new PrintWriter(log);
-                pw.println(subject);
-                pw.print(build.toString());
-                pw.close();
+                try (PrintWriter pw = new PrintWriter(log)) {
+                    pw.println(subject);
+                    pw.print(build.toString());
+                }
             } catch (Exception e){
-                InnerApi.Init.error.setError(e);
+                //Well... we attempted
             }
-            JOptionPane.showMessageDialog(null, "No se pudo enviar el mensaje.\nEl error se ha guardado "
-                    + "en un fichero\nen el escritorio.");
+            JOptionPane.showMessageDialog(null, "Error file has been saved in the current launcher path");
+        } finally{
+            try {
+                if (t != null) t.close();
+            } catch (Exception e) {
+                //Ignore
+            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
-        // TODO add your handling code here:
-        if (InnerApi.debug) System.out.println("[->Getting errors<-]");
-        if (evt.getKeyCode() == KeyEvent.VK_CONTROL){
-            String a = jTextField1.getText();
-            if (a.equals("DEBUGMODE")){
-                jTextArea1.setText("ERRORSTREAM:\n" + InnerApi.Init.error.err.toString());
-            }
-        }
-    }//GEN-LAST:event_jTextField1KeyPressed
-
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        if (InnerApi.debug) System.out.println("[->Exiting<-]");
-        exited = true;
-        reInit();
+        setVisible(false);
     }//GEN-LAST:event_formWindowClosing
+
+    private void descriptionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_descriptionKeyTyped
+        // TODO add your handling code here:
+        if (evt.getKeyChar() != KeyEvent.VK_BACK_SPACE && evt.getKeyChar() != KeyEvent.VK_ESCAPE){
+            info.append(evt.getKeyChar() + "");
+        } else if (evt.getKeyChar() == KeyEvent.VK_ENTER){
+            info.append("\n");
+        } else {
+            if (description.getText().length() != 0){
+                info.setText(info.getText().substring(0, info.getText().length() - 1));
+            } else{
+                info.setText(builder.toString());
+            }
+        }
+    }//GEN-LAST:event_descriptionKeyTyped
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea description;
+    private javax.swing.JTextArea info;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 }

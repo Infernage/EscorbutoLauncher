@@ -12,7 +12,7 @@
     <import file="nbproject/build-impl.xml"/>
     <target name="package-for-store" depends="jar">
         <!-- Cambiar nombre del .jar (No debe tener espacios-->
-        <property name="store.jar.name" value = "RUN"/>
+        <property name="store.jar.name" value = "ELR"/>
         <!-- NO EDITAR -->
         <property name="store.dir" value="output"/>
         <property name="store.jar" value="${store.dir}/${store.jar.name}.jar"/>
@@ -23,6 +23,13 @@
             <zipgroupfileset dir ="dist/lib" includes="*.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Created-By" value="Netbeans 7.1.3"/>
+                <attribute name="Specification-Title" value="Escorbuto Launcher"/>
+                <attribute name="Specification-Version" value="6.0.0"/>
+                <attribute name="Specification-Vendor" value="Escorbuto"/>
+                <attribute name="Implementation-Title" value="ELR"/>
+                <attribute name="Implementation-Version" value="6.0.0"/>
+                <attribute name="Implementation-Vendor" value="Escorbuto"/>
             </manifest>
         </jar>
         <zip destfile="${store.jar}">

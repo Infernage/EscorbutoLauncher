@@ -33,4 +33,4 @@
  * <p>
  * This software is provided "as is", without any warranty.
  */
-package MLR.XZ.xz;
+package elr.xz_coder.xz;

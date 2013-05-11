@@ -7,18 +7,18 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.EOFException;
-import MLR.XZ.xz.common.DecoderUtil;
-import MLR.XZ.xz.common.StreamFlags;
-import MLR.XZ.xz.check.Check;
-import MLR.XZ.xz.index.IndexDecoder;
-import MLR.XZ.xz.index.BlockInfo;
+import elr.xz_coder.common.DecoderUtil;
+import elr.xz_coder.common.StreamFlags;
+import elr.xz_coder.check.Check;
+import elr.xz_coder.index.IndexDecoder;
+import elr.xz_coder.index.BlockInfo;
 
 /**
  * Decompresses a .xz file in random access mode.

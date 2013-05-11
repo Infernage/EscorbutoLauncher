@@ -7,10 +7,10 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.InputStream;
-import MLR.XZ.xz.simple.SPARC;
+import elr.xz_coder.simple.SPARC;
 
 /**
  * BCJ filter for SPARC.

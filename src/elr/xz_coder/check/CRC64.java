@@ -7,7 +7,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.check;
+package elr.xz_coder.check;
 
 public class CRC64 extends Check {
     private static final long poly = 0xC96C5795D7870F42L;

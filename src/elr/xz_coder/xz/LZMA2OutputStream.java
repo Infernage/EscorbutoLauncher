@@ -8,13 +8,13 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import MLR.XZ.xz.lz.LZEncoder;
-import MLR.XZ.xz.rangecoder.RangeEncoder;
-import MLR.XZ.xz.lzma.LZMAEncoder;
+import elr.xz_coder.lz.LZEncoder;
+import elr.xz_coder.rangecoder.RangeEncoder;
+import elr.xz_coder.lzma.LZMAEncoder;
 
 class LZMA2OutputStream extends FinishableOutputStream {
     static final int COMPRESSED_SIZE_MAX = 64 << 10;

@@ -8,7 +8,7 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz.lzma;
+package elr.xz_coder.lzma;
 
 final class State {
     static final int STATES = 12;

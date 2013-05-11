@@ -1,71 +1,83 @@
-package MLR.launcher.updater;
+package elr.core.modules.updater;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-import MLR.InnerApi;
-import MLR.gui.Gui;
+import elr.core.Stack;
+import elr.core.modules.ExceptionControl;
 import java.awt.Color;
+import java.awt.HeadlessException;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+
 /**
- *
+ * Class used to check for updates.
  * @author Infernage
  */
 public class VersionChecker extends Thread{
-    private InputStream input;//Entrada de datos
-    private Properties properties;//XML de las versiones
-    private final String hostPrincipal = "2shared.com", hostSecundario = "sendspace.com", 
-            hostTerciario = "dropbox.com";
-    private boolean actualize = false, exit = false; //Control del actualizador
-    public boolean init = false, started = false, finish = false;
+    private InputStream input;
+    private Properties properties;//XML versions
+    private final String firstHost = "2shared.com", secondHost = "sendspace.com", 
+            thirdHost = "dropbox.com";
+    private boolean actualize = false, exit = false;
     
-    //Creamos el cliente
     public VersionChecker(){
-        super("Cliente");
+        super(VersionChecker.class.getName());
         properties = new Properties();
     }
-    public void init(URL url){
-        if (InnerApi.debug) System.out.println("[->Setting properties<-]");
-        init = true;
-        InnerApi.Init.mainGUI.stateMsg("Comprobando actualizaciones...", Color.white);
-        if (InnerApi.debug) System.out.println("[->Reading URL<-]");
+    
+    /**
+     * Starts the thread.
+     */
+    public void init(){
         try {
-            input = url.openStream();
+            input = new URL("https://dl.dropbox.com/s/g6zrg7disyhlvgn/Version.xml?dl=1").openStream();
         } catch (Exception ex) {
             if (ex.toString().contains("Connection timed out: connect")){
-                InnerApi.Init.mainGUI.stateMsg("No connection", Color.red);
+                Stack.frame.displayUpdateMsg("No connection", Color.red);
             } else{
-                InnerApi.Init.mainGUI.stateMsg("ERROR", Color.red);
-                InnerApi.exception(ex, ex.getMessage());
+                Stack.frame.displayUpdateMsg("Check failed!", Color.red);
+                Stack.console.printError("Error checking for updates", 3, this.getClass());
             }
-            salir();
+            exit();
         }
+        this.start();
     }
-    //Método para salir del bucle
-    public void salir(){
+    
+    /**
+     * Check if the thread is updating.
+     * @return {@code true} if is updating, {@code false} instead.
+     */
+    public boolean isUpdating() { return actualize; }
+    
+    /**
+     * Forces the exit of the thread.
+     */
+    public void exit(){
         exit = true;
     }
-    //Método actualizador
-    private void actualizar(String link){
-        InnerApi.Init.mainGUI.startUpdater();
-        Gui.jProgressBar1.setVisible(true);
+    
+    /**
+     * Executes the Updater class.
+     * @param link The url of updated launcher.
+     */
+    private void update(String link){
+        Stack.frame.startUpdater();
         boolean stop = false;
-        System.out.print("U-Preparing transfer... ");
+        Stack.frame.displayUpdateMsg("Preparing transfer...", Color.cyan);
         try {
-            if (link.contains(hostPrincipal)){
-                if (InnerApi.debug) System.out.println("[->Starting " + hostPrincipal + " engine<-]");
+            if (link.contains(firstHost)){
                 URL url = new URL(link);
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                 String lin;
                 while (((lin = in.readLine()) != null) && !stop){
-                    if (lin.contains(hostPrincipal + "/download") && lin.contains(".zip")){
+                    if (lin.contains(firstHost + "/download") && lin.contains(".jar")){
                         StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
-                            if (te.contains(".zip")){
+                            if (te.contains(".jar")){
                                 link = te;
                                 stop = true;
                             }
@@ -73,17 +85,16 @@ public class VersionChecker extends Thread{
                     }
                 }
                 in.close();
-            } else if (link.contains(hostSecundario)){
-                if (InnerApi.debug) System.out.println("[->Starting " + hostSecundario + " engine<-]");
+            } else if (link.contains(secondHost)){
                 URL url = new URL(link);
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                 String lin;
                 while (((lin = in.readLine()) != null) && !stop){
-                    if (lin.contains("download_button") && lin.contains(hostSecundario) && lin.contains(".zip")){
+                    if (lin.contains("download_button") && lin.contains(secondHost) && lin.contains(".jar")){
                         StringTokenizer token = new StringTokenizer(lin, "'\"");
                         while (token.hasMoreTokens()){
                             String te = token.nextToken();
-                            if (te.contains(".zip") && te.contains(hostSecundario)){
+                            if (te.contains(".jar") && te.contains(secondHost)){
                                 link = te;
                                 stop = true;
                             }
@@ -91,40 +102,37 @@ public class VersionChecker extends Thread{
                     }
                 }
                 in.close();
-            } else if (link.contains(hostTerciario)){
-                if (InnerApi.debug) System.out.println("[->Starting " + hostTerciario + " engine<-]");
+            } else if (link.contains(thirdHost)){
                 stop = true;
             }
-            System.out.println("OK");
         } catch (Exception ex) {
-            System.out.println("FAILED");
-            InnerApi.Init.mainGUI.stateMsg("ERROR", Color.red);
-            salir();
-            InnerApi.exception(ex, ex.getMessage());
+            Stack.frame.displayUpdateMsg("Transfer failed!", Color.red);
+            ExceptionControl.showException(3, ex, "Transfer failed");
+            exit();
             return;
         }
-        System.out.print("U-Initializing transfer... ");
-        InnerApi.Init.update.init(link);
-        InnerApi.Init.update.start();
-        InnerApi.Init.hilos.put("Updater", InnerApi.Init.update);
-        System.out.println("OK");
+        Stack.frame.displayUpdateMsg("Starting transfer...", Color.cyan);
+        if (Stack.update == null){
+            Stack.update = new Updater();
+        } else if (!Stack.update.isAlive()){
+            Stack.update = new Updater();
+        }
+        Stack.frame.startBar(Stack.update);
+        Stack.update.init(link);
     }
-    //Método de ejecución
+    
     @Override
     public void run(){
-        started = true;
-        Gui.jProgressBar1.setVisible(false);
-        InnerApi.Init.mainGUI.stateMsg("", Color.white);
-        System.out.println("U-Checking for updates...............");
+        if (exit) return;
+        Stack.frame.displayUpdateMsg("Checking for updates...", Color.white);
+        System.out.println("Checking for updates...");
         try {
             properties.loadFromXML(input);
-            if (InnerApi.debug) System.out.println("[->Getting versions<-]");
             Set<String> list = properties.stringPropertyNames();
             Iterator<String> it = list.iterator();
             while (it.hasNext() && !exit){
                 boolean out = false;
-                String version = it.next(), main = InnerApi.Init.version;
-                main = main.substring(1);
+                String version = it.next(), main = Stack.getProgramVersion();
                 if (main.contains(" ")){
                     String[] tmp = main.split(" ");
                     main = tmp[0];
@@ -133,38 +141,43 @@ public class VersionChecker extends Thread{
                         main, ".");
                 while (token.hasMoreTokens() && !out && !actualize){
                     try {
-                        int V = Integer.parseInt(token.nextToken()), V2 = Integer.parseInt(actual.nextToken());
+                        int V = Integer.parseInt(token.nextToken()), 
+                                V2 = Integer.parseInt(actual.nextToken());
                         if (V > V2){
-                            InnerApi.Init.mainGUI.stateMsg("Actualizando a la versión " + version, Color.CYAN);
-                            System.out.println("U-Updating login...............");
-                            actualize = true;
-                            actualizar(properties.getProperty(version));
+                            int i = JOptionPane.showConfirmDialog(null, "There is a new update avaliable."
+                                    + " Do you want to update? Version: " + version, "Update avaliable", 
+                                    JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                            if (i == 0){
+                                Stack.frame.displayUpdateMsg("Updating to version " + version, Color.cyan);
+                                actualize = true;
+                                update(properties.getProperty(version));
+                            } else{
+                                exit = true;
+                                out = true;
+                                Stack.frame.displayUpdateMsg("Updates available", Color.yellow);
+                            }
                         } else if (V < V2){
                             out = true;
                         }
-                    } catch (Exception e) {
-                        InnerApi.Init.error.setError(e);
+                    } catch (NumberFormatException | HeadlessException e) {
+                        Stack.console.setError(e, 3, this.getClass());
                     }
                 }
             }
-            if (!actualize){
-                System.out.println("U-No updates avaliable");
-                InnerApi.Init.mainGUI.stateMsg("No hay nuevas versiones disponibles", Color.green);
-                InnerApi.Init.mainGUI.finishUpdater();
+            if (!actualize && !exit){
+                Stack.frame.displayUpdateMsg("No updates available", Color.green);
             }
         } catch (Exception ex) {
-            InnerApi.Init.mainGUI.stateMsg("ERROR! No se ha podido recibir la información del servidor.", 
-                    Color.red);
-            InnerApi.exception(ex, "Error recibiendo la información del servidor.");
+            Stack.frame.displayUpdateMsg("Error obtainig the server info", Color.red);
+            ExceptionControl.showException(3, ex, "Error obtaining the server info");
         }
         try {
             if (input != null){
                 input.close();
             }
         } catch (Exception ex) {
-            InnerApi.Init.mainGUI.stateMsg("ERROR!", Color.red);
-            InnerApi.exception(ex, ex.getMessage());
+            Stack.console.printError("Error closing the stream!", 2, this.getClass());
+            Stack.console.setError(ex, 2, this.getClass());
         }
-        finish = true;
     }
 }

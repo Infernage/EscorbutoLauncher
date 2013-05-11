@@ -7,9 +7,9 @@
  * You can do whatever you want with this file.
  */
 
-package MLR.XZ.xz;
+package elr.xz_coder.xz;
 
-import MLR.XZ.xz.lzma.LZMAEncoder;
+import elr.xz_coder.lzma.LZMAEncoder;
 
 class LZMA2Encoder extends LZMA2Coder implements FilterEncoder {
     private final LZMA2Options options;
