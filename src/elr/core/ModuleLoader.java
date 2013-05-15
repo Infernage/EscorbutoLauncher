@@ -4,7 +4,7 @@ import elr.gui.UI;
 import elr.gui.utilities.Backgrounds;
 import elr.core.modules.Console;
 import elr.gui.utilities.MineFont;
-import elr.core.modules.Configuration;
+import elr.core.modules.configuration.Configuration;
 import elr.core.modules.ExceptionControl;
 import elr.core.modules.CHLG;
 import elr.core.modules.Directory;

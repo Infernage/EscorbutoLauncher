@@ -2,13 +2,13 @@ package elr.core;
 
 import elr.Starter;
 import elr.gui.Debug;
-import elr.core.modules.Configuration;
+import elr.core.modules.configuration.Configuration;
 import elr.core.modules.ExceptionControl;
 import elr.core.modules.AES;
 import elr.core.modules.Directory;
+import elr.core.modules.compressor.Compressor;
+import elr.core.modules.compressor.Compressor.CompressionLevel;
 import elr.gui.Splash;
-import elr.xz_coder.Decoder;
-import elr.xz_coder.Encoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -82,30 +82,36 @@ public class Booter extends Starter.StaticForms{
                     System.out.println("Decoding launcher state");
                     Splash.displayMsg("Decoding configuration...");
                     Splash.set(15);
-                    File decrypted = Decoder.decode(Stack.crypter, file);
-                    try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(decrypted))){
-                        Stack.config = (Configuration) input.readObject();
-                        Stack.config.setInternalProperty(Configuration.ConfigVar.elr_currentJar.name(), 
-                                currentPath);
-                        Stack.config.setInternalProperty(Configuration.ConfigVar.elr_currentPath.name(), 
-                                new File(currentPath).getParent());
-                        if (Stack.config.getValueInternalConfig(Configuration.ConfigVar
-                                .elr_selectedInstance.name()) != null){
-                            File selectedInstance = new File(Directory.instances(), Stack.config
-                                    .getValueInternalConfig(Configuration.ConfigVar.elr_selectedInstance
-                                    .name()));
-                            if (!selectedInstance.exists() || selectedInstance.list().length < 2){
-                                Stack.config.resetInternalProperty(new Booter(), Configuration.ConfigVar
-                                        .elr_selectedInstance.name());
+                    try {
+                        File decrypted = Compressor.cryptedDecompression(file, file.getParentFile(), Stack.crypter);
+                        try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(decrypted))){
+                            Stack.config = (Configuration) input.readObject();
+                            Stack.config.setInternalProperty(Configuration.ConfigVar.elr_currentJar.name(), 
+                                    currentPath);
+                            Stack.config.setInternalProperty(Configuration.ConfigVar.elr_currentPath.name(), 
+                                    new File(currentPath).getParent());
+                            if (Stack.config.getValueInternalConfig(Configuration.ConfigVar
+                                    .elr_selectedInstance.name()) != null){
+                                File selectedInstance = new File(Directory.instances(), Stack.config
+                                        .getValueInternalConfig(Configuration.ConfigVar.elr_selectedInstance
+                                        .name()));
+                                if (!selectedInstance.exists() || selectedInstance.list().length < 2){
+                                    Stack.config.resetInternalProperty(new Booter(), Configuration.ConfigVar
+                                            .elr_selectedInstance.name());
+                                }
                             }
+                            shutdownHook = new Hook(file, decrypted);
+                            Runtime.getRuntime().addShutdownHook(shutdownHook);
+                        } catch (IOException | ClassNotFoundException e) {
+                            if (shutdownHook != null) shutdownHook.release();
+                            if (decrypted != null) decrypted.delete();
+                            file.delete();
+                            System.out.println("Reset done");
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
-                        shutdownHook = new Hook(file, decrypted);
-                        Runtime.getRuntime().addShutdownHook(shutdownHook);
-                    } catch (IOException | ClassNotFoundException e) {
-                        if (shutdownHook != null) shutdownHook.release();
-                        if (decrypted != null) decrypted.delete();
+                    } catch (Exception e) {
                         file.delete();
-                        System.out.println("Reset done");
                         e.printStackTrace();
                         throw new RuntimeException(e);
                     }
@@ -121,7 +127,8 @@ public class Booter extends Starter.StaticForms{
                 File temp = null;
                 try {
                     config.createNewFile();
-                    temp = Encoder.encode(Stack.crypter, config);
+                    temp = Compressor.cryptedCompression(config, config.getParentFile(), 
+                            CompressionLevel.FAST, Stack.crypter);
                     shutdownHook = new Hook(temp, config);
                     Runtime.getRuntime().addShutdownHook(shutdownHook);
                 } catch (Exception e) {
@@ -233,7 +240,8 @@ public class Booter extends Starter.StaticForms{
                 saveConfigs();
                 release();
                 crypted.delete();
-                Encoder.encode(Stack.crypter, decrypted);
+                Compressor.cryptedCompression(decrypted, decrypted.getParentFile(), CompressionLevel.FAST,
+                        Stack.crypter);
             } catch (Exception e) {
                 try {
                     ExceptionControl.showExceptionWOStream(e, "Released failed!", 0);

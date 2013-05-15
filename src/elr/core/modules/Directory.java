@@ -1,5 +1,6 @@
 package elr.core.modules;
 
+import elr.core.modules.configuration.Configuration;
 import elr.core.Stack;
 
 /**

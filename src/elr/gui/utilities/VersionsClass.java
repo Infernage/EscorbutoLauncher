@@ -5,7 +5,7 @@ import elr.core.modules.Directory;
 import elr.core.modules.Downloader;
 import elr.core.modules.ExceptionControl;
 import elr.core.modules.IO;
-import elr.xz_coder.Decoder;
+import elr.core.modules.compressor.Compressor;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -101,10 +101,10 @@ public class VersionsClass{
          * @return A list with all files decrypted.
          * @throws IOException 
          */
-        private List<File> decryptFiles(File[] files) throws IOException{
+        private List<File> decryptFiles(File[] files) throws Exception{
             List<File> list = new ArrayList<>();
             for (File file : files) {
-                list.add(Decoder.decode(Stack.crypter, file));
+                list.add(Compressor.secureDecompression(file, file.getParentFile(), Stack.crypter));
                 file.delete();
             }
             return list;
@@ -201,10 +201,7 @@ public class VersionsClass{
          * @throws ZipException 
          */
         private File decodeModPack(File modPack) throws IOException, ZipException{
-            File zipped = Decoder.decode(Stack.crypter, modPack);
-            ZipFile zip = new ZipFile(zipped);
-            zip.extractAll(modPack.getParent());
-            return new File(modPack.getParent(), ".minecraft");
+            return Compressor.secureDecompression(modPack, modPack.getParentFile(), Stack.crypter);
         }
         
         /**

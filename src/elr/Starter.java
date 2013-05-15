@@ -2,16 +2,12 @@ package elr;
 
 import elr.Starter.StaticForms;
 import elr.core.Booter;
-import elr.core.modules.AES;
 import elr.core.modules.IO;
+import elr.core.modules.compressor.Compressor;
 import elr.gui.Splash;
-import elr.xz_coder.Decoder;
-import elr.xz_coder.Encoder;
-import elr.xz_coder.xz.UnsupportedOptionsException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -20,9 +16,6 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 import org.jvnet.substance.SubstanceLookAndFeel;
 
 
@@ -32,45 +25,6 @@ import org.jvnet.substance.SubstanceLookAndFeel;
  * @version 6.0.0
  */
 public class Starter {
-    /**
-     * Developer method. Testing to compress a file.
-     * @param input The file to compress.
-     * @param privileged Choose if the file will be encoded with privileges or not.
-     * @param nameDST The zip name.
-     * @return The file encoded.
-     * @throws ZipException If happens an error while compressing.
-     * @throws FileNotFoundException If the file isn't found.
-     * @throws UnsupportedOptionsException If the current SO don't support the operation.
-     * @throws IOException If happens an I/O error.
-     */
-    private static File compress(File input, boolean privileged, String nameDST) throws ZipException, 
-            FileNotFoundException, UnsupportedOptionsException, IOException{
-        String name;
-        if (nameDST == null) name = input.getName() + ".zip";
-        else name = nameDST;
-        File toZip = new File(input.getParent(), name);
-        if (toZip.exists()) toZip.delete();
-        ZipFile zip = new ZipFile(toZip);
-        ZipParameters par = new ZipParameters();
-        par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-        par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
-        System.out.println("Compressing");
-        if (input.isDirectory()){
-            zip.createZipFileFromFolder(input, par, false, 10485760);
-        } else{
-            zip.createZipFile(input, par, false, 10485760);
-        }
-        input = zip.getFile();
-        File encoded;
-        System.out.println("Encoding");
-        if(privileged){
-            encoded = Encoder.privilegedEncode(new Starter(), input);
-        } else{
-            encoded = Encoder.encode(new AES(StaticForms.password), input);
-        }
-        return encoded;
-    }
-    
     /**
      * Private method which has only use to execute before compiling selected actions.
      */
@@ -103,7 +57,7 @@ public class Starter {
                                     FileOutputStream(temp))) {
                         IO.copy(input, output);
                     }
-                    File customJRE = Decoder.privilegedDecoder(new Starter(), temp);
+                    File customJRE = Compressor.privilegedDecompression(temp, temp.getParentFile(), new Starter());
                     ZipFile zip = new ZipFile(customJRE);
                     zip.extractAll(jreOutput.getParent());
                     temp.delete();
@@ -186,7 +140,6 @@ public class Starter {
         //SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.NebulaBrickWallSkin");
         //SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin.RavenGraphiteGlassSkin");
         System.out.println("Starting boot...");
-        JOptionPane.showMessageDialog(null, System.getProperty("java.home"));
         Booter.startBoot();
     }
 }

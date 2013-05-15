@@ -40,7 +40,6 @@ public class MinecraftLoader {
         Stack.about = null;
         Stack.changelog = null;
         Stack.checker = null;
-        Stack.crypter = null;
         Stack.downloader = null;
         Stack.font = null;
         Stack.frame.dispose();
@@ -130,7 +129,6 @@ public class MinecraftLoader {
             finalizeAll();
             minecraft = processCreator.start();
             Stack.console.setInput(minecraft.getInputStream());
-            Stack.frame.setVisible(false);
             minecraft.waitFor();
         } catch (IOException | InterruptedException e) {
             ExceptionControl.severeException(2, e, "Failed to initialize Minecraft process");

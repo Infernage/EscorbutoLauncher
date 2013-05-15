@@ -1,7 +1,7 @@
 package elr.core.modules.outdated;
 
 import elr.core.Stack;
-import elr.core.modules.Configuration;
+import elr.core.modules.configuration.Configuration;
 import elr.core.modules.Directory;
 import java.io.File;
 

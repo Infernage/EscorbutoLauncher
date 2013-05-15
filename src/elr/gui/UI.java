@@ -3,7 +3,7 @@ package elr.gui;
 import elr.core.Booter;
 import elr.core.Stack;
 import elr.gui.utilities.UIClass;
-import elr.core.modules.Configuration;
+import elr.core.modules.configuration.Configuration;
 import elr.core.modules.Directory;
 import elr.core.modules.ExceptionControl;
 import elr.core.modules.Files;
@@ -315,7 +315,6 @@ public class UI extends javax.swing.JFrame {
         eaqB.setForeground(new java.awt.Color(255, 0, 255));
         eaqB.setText("EAQ");
         eaqB.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        eaqB.setEnabled(false);
         eaqB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 eaqBActionPerformed(evt);
