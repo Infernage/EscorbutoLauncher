@@ -104,7 +104,8 @@ public class VersionsClass{
         private List<File> decryptFiles(File[] files) throws Exception{
             List<File> list = new ArrayList<>();
             for (File file : files) {
-                list.add(Compressor.secureDecompression(file, file.getParentFile(), Stack.crypter));
+                list.add(Compressor.secureDecompression(file, new File(file.getParent(), 
+                        file.getName() + ".zip"), Stack.crypter));
                 file.delete();
             }
             return list;
@@ -201,7 +202,8 @@ public class VersionsClass{
          * @throws ZipException 
          */
         private File decodeModPack(File modPack) throws IOException, ZipException{
-            return Compressor.secureDecompression(modPack, modPack.getParentFile(), Stack.crypter);
+            return Compressor.secureDecompression(modPack, new File(modPack.getParent(), 
+                    modPack.getName() + ".zip"), Stack.crypter);
         }
         
         /**

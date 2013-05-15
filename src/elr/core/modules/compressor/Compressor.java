@@ -32,6 +32,7 @@ public class Compressor {
      */
     public static void basicCompression(File src, File dst, CompressionLevel level) throws 
             ZipException{
+        if (dst.isDirectory()) throw new RuntimeException("Destiny file can't be a directory");
         ZipFile zip = new ZipFile(dst);
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);

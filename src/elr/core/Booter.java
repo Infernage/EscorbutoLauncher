@@ -83,8 +83,10 @@ public class Booter extends Starter.StaticForms{
                     Splash.displayMsg("Decoding configuration...");
                     Splash.set(15);
                     try {
-                        File decrypted = Compressor.cryptedDecompression(file, file.getParentFile(), Stack.crypter);
-                        try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(decrypted))){
+                        File decrypted = Compressor.cryptedDecompression(file, 
+                                new File(file.getParent(), file.getName() + ".zip"), Stack.crypter);
+                        try (ObjectInputStream input = new ObjectInputStream(
+                                new FileInputStream(decrypted))){
                             Stack.config = (Configuration) input.readObject();
                             Stack.config.setInternalProperty(Configuration.ConfigVar.elr_currentJar.name(), 
                                     currentPath);
@@ -127,8 +129,8 @@ public class Booter extends Starter.StaticForms{
                 File temp = null;
                 try {
                     config.createNewFile();
-                    temp = Compressor.cryptedCompression(config, config.getParentFile(), 
-                            CompressionLevel.FAST, Stack.crypter);
+                    temp = Compressor.cryptedCompression(config, new File(config.getParent(), 
+                            config.getName() + ".zip"), CompressionLevel.FAST, Stack.crypter);
                     shutdownHook = new Hook(temp, config);
                     Runtime.getRuntime().addShutdownHook(shutdownHook);
                 } catch (Exception e) {
@@ -240,8 +242,8 @@ public class Booter extends Starter.StaticForms{
                 saveConfigs();
                 release();
                 crypted.delete();
-                Compressor.cryptedCompression(decrypted, decrypted.getParentFile(), CompressionLevel.FAST,
-                        Stack.crypter);
+                Compressor.cryptedCompression(decrypted, new File(decrypted.getParent(), 
+                        decrypted.getName() + ".zip"), CompressionLevel.FAST, Stack.crypter);
             } catch (Exception e) {
                 try {
                     ExceptionControl.showExceptionWOStream(e, "Released failed!", 0);
