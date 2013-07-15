@@ -15,6 +15,7 @@
         <property name="store.jar.name" value = "ELR"/>
         <!-- NO EDITAR -->
         <property name="store.dir" value="output"/>
+        <property name="store.dist" value="dist"/>
         <property name="store.jar" value="${store.dir}/${store.jar.name}.jar"/>
         <delete dir = "${store.dir}"/>
         <mkdir dir="${store.dir}"/>
@@ -37,6 +38,7 @@
             excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
         </zip>
         <delete file="${store.dir}/temp_final.jar"/>
+        <delete dir = "${store.dist}"/>
     </target>
     <!--
 

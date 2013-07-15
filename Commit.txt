@@ -1,12 +1,5 @@
-Release 5.2.1
-ADDED: Javadoc to all internal api.
-ADDED: A quiz to choose mods in the server.
-ADDED: Log for launcher and minecraft.
-ADDED: Option to save a bug into a file in the desktop.
-ADDED: Compressor and Decompressor. Not implemented yet. (Thx to XZ people!)
-CHANGED: README.md
-CHANGED: Changelog.
-CHANGED: Retrocompatibility system temporally.
-CHANGED: JRE necessary to run. Now it's needed JRE7 Update 11.
-DELETED: Direct access.
-FIXED: A bug that caused a bad interface initialization MultiMine.
+Release 6.0.1
+Optimized code. More security and stable now.
+Optimized execution time.
+FIXED: When a import isn't selected and pushed import button, changes its text to importing.
+FIXED: Configuration file problem. Now is saved properly.
