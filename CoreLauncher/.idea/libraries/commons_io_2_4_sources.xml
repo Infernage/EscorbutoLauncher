@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="commons-io-2.4-sources">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../libraries/commons-io-2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/Debugger.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/filedrop.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/gson-2.2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/javax.mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/substance-4.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/zip4j_1.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../libraries/commons-io-2.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/gson-2.2.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

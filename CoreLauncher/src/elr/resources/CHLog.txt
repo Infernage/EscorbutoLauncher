@@ -1,0 +1,22 @@
+Changelog
+Since 5.2.1 version
+
++Added ELRModPack.
++Added a new Gui. More compact now.
++Added a possibility to edit the mods from your instances!
++Added a new Splash. Include a progress bar to show the state of the load.
++Added a custom JRE to the launcher.
++Added a encoder/decoder. It uses XZ Data Compression.
++Added a beta support to MACOSX.
++Added a possibility to create your owns modpacks.
+*Modified the load method of the launcher.
+*Modified the remember username/password method.
+*Modified the console. Now displays more specific information.
+*Modified the Minecraft launcher system.
+*Modified the ubication where all instances were saved.
+-Deleted Quiz.java.
+-Deleted the theme selector, instead it's only one available.
+-Fixed bugs #19 and #20.
+
+Bugs:
+->The error sender doesn't send any error if the antivirus/firewall is active on Windows.

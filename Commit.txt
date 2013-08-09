@@ -1,5 +1,0 @@
-Release 6.0.1
-Optimized code. More security and stable now.
-Optimized execution time.
-FIXED: When a import isn't selected and pushed import button, changes its text to importing.
-FIXED: Configuration file problem. Now is saved properly.
