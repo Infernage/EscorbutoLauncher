@@ -207,7 +207,8 @@ public class InstanceForm extends javax.swing.JDialog {
                         //Ignore
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Loader.getMainGui().getConsoleTab().printErr(e, "Failed to download the instance", 
+                            3, this.getClass());
                     IO.deleteDirectory(namePath);
                     namePath.delete();
                 }

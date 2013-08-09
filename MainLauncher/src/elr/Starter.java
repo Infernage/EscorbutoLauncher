@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import javax.swing.JFrame;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.skin.BusinessBlackSteelSkin;
 
 
 /**
@@ -67,6 +69,7 @@ public class Starter {
     public static void main(String[] args) {
         System.setProperty("java.net.useSystemProxies", "true");
         JFrame.setDefaultLookAndFeelDecorated(true);
+        SubstanceLookAndFeel.setSkin(new BusinessBlackSteelSkin());
         if (args.length == 2){
             if (args[0].equals("--deleteFile")){
                 new File(args[1]).delete();
@@ -84,6 +87,9 @@ public class Starter {
         File root = new File(workingDir);
         if (!root.exists()) root.mkdirs();
         MainFrame frame = new MainFrame(OS, workingDir, currentJar);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
         frame.load();
     }
 }

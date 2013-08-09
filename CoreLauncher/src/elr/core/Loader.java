@@ -16,6 +16,7 @@ import elr.modules.threadsystem.DownloadJob;
 import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Instances;
 import elr.profiles.Profile;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,11 +48,6 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.skin.BusinessBlackSteelSkin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -241,10 +237,10 @@ public class Loader {
     private void startAllProtocols(JFrame frame){
         initFrame(frame);
         gui.getConsoleTab().setFileStream();
-        final DownloadJob resources = new DownloadJob("Resources", gui.getProgressBar());
         ThreadPool.getInstance().submit(new Runnable(){
             @Override
             public void run(){
+                DownloadJob resources = new DownloadJob("Resources", gui.getProgressBar());
                 Set<Downloader> assets = new HashSet<>();
                 File asset = new File(Directory.minecraftResources());
                 try {
@@ -352,20 +348,7 @@ public class Loader {
         });
         for (Profile profile : config.getProfiles()) {
             for (Instances instance : profile.getList()) {
-                if (instance.getPath().exists()){
-                    File assets = new File(instance.getPath(), "assets");
-                    if (!assets.exists()){
-                        try {
-                            IO.copyDirectory(new File(Directory.minecraftResources()), assets);
-                        } catch (Exception e) {
-                            gui.getConsoleTab().printErr(e, "Failed to import assets from instance " 
-                                    + instance.getName() + " of " + profile.getProfilename() + 
-                                    " profile", 3, this.getClass());
-                            IO.deleteDirectory(assets);
-                            assets.delete();
-                        }
-                    }
-                } else profile.removeInstance(instance);
+                if (!instance.getPath().exists()) profile.removeInstance(instance);
             }
         }
     }
@@ -374,17 +357,19 @@ public class Loader {
      * Initializes the main frame removing all its containers.
      */
     private void initFrame(JFrame frame){
-        SubstanceLookAndFeel.setSkin(new BusinessBlackSteelSkin());
-        frame.getContentPane().removeAll();
-        gui = new MainGui(frame);
-        frame.getContentPane().add(gui);
-        frame.setTitle("EscorbutoLauncher " + version_program);
-        frame.setIconImage(new ImageIcon(frame.getClass().getResource("/elr/resources/5547.png"))
+        JFrame recreated = new JFrame();
+        recreated.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        recreated.setResizable(false);
+        recreated.setPreferredSize(new Dimension(636, 395));
+        recreated.setTitle("EscorbutoLauncher " + version_program);
+        recreated.setIconImage(new ImageIcon(this.getClass().getResource("/elr/resources/5547.png"))
                 .getImage());
-        frame.pack();
-        frame.setSize(frame.getSize().width, 395);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        gui = new MainGui(recreated);
+        recreated.add(gui);
+        recreated.pack();
+        frame.dispose();
+        recreated.setLocationRelativeTo(null);
+        recreated.setVisible(true);
     }
     
     /**

@@ -91,6 +91,14 @@ public class DownloadJob implements Job<Downloader, File>{
     }
     
     /**
+     * Looks if the download has finalized successfully.
+     * @return {@code true} if there aren't errors.
+     */
+    public boolean isSuccessfull(){
+        return fails.isEmpty() && isDone();
+    }
+    
+    /**
      * Looks if the job has finalized or not.
      * @return {@code true} if the job has finalized.
      */

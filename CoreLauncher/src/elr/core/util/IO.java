@@ -20,6 +20,7 @@ public class IO {
      */
     public static void deleteDirectory(File file) {
         File[] list = file.listFiles();
+        if (list == null) return;
         for (int x = 0; x < list.length; x++) {
             if (list[x].isDirectory()) {
                 deleteDirectory(list[x]);
@@ -89,14 +90,13 @@ public class IO {
             long B = dst.length();
             String one = src.getName();
             String two = dst.getName();
-            BufferedInputStream alpha = new BufferedInputStream(new FileInputStream(src));
-            BufferedInputStream beta = new BufferedInputStream(new FileInputStream(dst));
-            boolean temp = check(alpha, beta);
-            if (A == B && one.equals(two) && temp){
-                res = true;
+            try (BufferedInputStream alpha = new BufferedInputStream(new FileInputStream(src));
+                    BufferedInputStream beta = new BufferedInputStream(new FileInputStream(dst))) {
+                boolean temp = isSame(alpha, beta);
+                if (A == B && one.equals(two) && temp){
+                    res = true;
+                }
             }
-            alpha.close();
-            beta.close();
         } catch (Exception ex) {
             MessageControl.showExceptionMessage(2, ex, "Error checking files");
         }
@@ -111,7 +111,7 @@ public class IO {
      * @throws IOException
      * @throws IllegalArgumentException if the stream is null
      */
-    private static boolean isSame( InputStream input1, InputStream input2 ){
+    private static boolean isSame(InputStream input1, InputStream input2){
         try {
             byte[] buffer1 = new byte[1024];
             byte[] buffer2 = new byte[1024];
@@ -141,6 +141,7 @@ public class IO {
      * @param beta The destiny inputstream
      * @return {@code true} if the two inputstream are equals, and {@code false} in otherwise
      */
+    @Deprecated
     private static boolean check (BufferedInputStream alpha, BufferedInputStream beta){
         boolean res = true;
         try{
@@ -172,7 +173,7 @@ public class IO {
      * @param dstDir The destination directory.
      * @return {@code true} if the two directories are equals, and {@code false} in otherwise
      */
-    private static boolean checkDirectory(File srcDir, File dstDir){
+    public static boolean checkDirectory(File srcDir, File dstDir){
         boolean res = true;
         try{
             long A = srcDir.length();

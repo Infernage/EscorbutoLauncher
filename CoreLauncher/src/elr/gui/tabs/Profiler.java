@@ -2,6 +2,7 @@ package elr.gui.tabs;
 
 import elr.core.Loader;
 import elr.core.interfaces.Listener;
+import elr.core.util.Directory;
 import elr.core.util.IO;
 import elr.core.util.MessageControl;
 import elr.core.util.Util;
@@ -15,6 +16,8 @@ import elr.minecraft.MinecraftEndAction;
 import elr.minecraft.loader.MinecraftLoader;
 import elr.minecraft.versions.ExtractRules;
 import elr.minecraft.versions.Library;
+import elr.modules.threadsystem.DownloadJob;
+import elr.modules.threadsystem.Downloader;
 import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Profile;
 import elr.profiles.Instances;
@@ -27,6 +30,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -548,6 +552,19 @@ public class Profiler extends javax.swing.JPanel implements Listener{
             @Override
             public void run() {
                 Loader.getMainGui().setSelectedTab(3);
+                Loader.getMainGui().getConsoleTab().println("Checking assets...");
+                File assets = new File(selectedInstance.getPath(), "assets"),
+                        src_assets = new File(Directory.minecraftResources());
+                try {
+                    if (!assets.exists() || !IO.checkDirectory(src_assets, assets)){
+                        IO.deleteDirectory(assets);
+                        IO.copyDirectory(src_assets, assets);
+                    }
+                } catch (Exception e) {
+                    MessageControl.showExceptionMessage(3, e, "Failed to import Minecraft assets");
+                    IO.deleteDirectory(assets);
+                    assets.delete();
+                }
                 MinecraftEndAction runnable = new MinecraftEndAction(selected.getAction());
                 Loader.getMainGui().getConsoleTab().println("Cleaning old natives...");
                 File versions = new File(selectedInstance.getPath(), "versions");
@@ -607,7 +624,6 @@ public class Profiler extends javax.swing.JPanel implements Listener{
                             File.separator + (Loader.getConfiguration().getOS().equals(OS.windows) ? 
                             "javaw" : "java");
                     File user_dir = selectedInstance.getPath();
-                    File assets = new File(user_dir, "assets");
                     args.add(javaPath);
                     if (Loader.getConfiguration().getOS().equals(OS.osx)){
                         args.add("-Xdock:icon=" + new File(assets, "icons" + File.separator + "minecraft.icns").getAbsolutePath());

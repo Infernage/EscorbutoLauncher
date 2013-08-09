@@ -604,37 +604,39 @@ public class ModsEditorForm extends javax.swing.JDialog {
                         downloading = false;
                         return;
                     }
-                    File original = new File(selected.getPath().getPath() + File.separator + "versions" + 
-                            selected.getVersion().getId() + File.separator + selected.getVersion()
-                            .getId() + ".jar");
-                    File copy = new File(original.getParent(), selected.getVersion().getId() + 
-                            "-copy.jar");
-                    try {
-                        IO.copy(original, copy);
-                    } catch (Exception ignore) {
-                        copy = original;
-                    }
-                    try {
-                        ZipFile zip = new ZipFile(original);
-                        List<FileHeader> headers = zip.getFileHeaders();
-                        List<String> metainf = new ArrayList<>();
-                        for (FileHeader header : headers) {
-                            if (header.getFileName().contains("META-INF/")){
-                                metainf.add(header.getFileName());
+                    if (selected.isLower1_6()){
+                        File original = new File(selected.getPath().getPath() + File.separator + "versions" + 
+                                File.separator + selected.getVersion().getId() + File.separator +
+                                selected.getVersion().getId() + ".jar");
+                        File copy = new File(original.getParent(), selected.getVersion().getId() + 
+                                "-copy.jar");
+                        try {
+                            if (!copy.exists()) IO.copy(original, copy);
+                        } catch (Exception ignore) {
+                            copy = original;
+                        }
+                        try {
+                            ZipFile zip = new ZipFile(original);
+                            List<FileHeader> headers = zip.getFileHeaders();
+                            List<String> metainf = new ArrayList<>();
+                            for (FileHeader header : headers) {
+                                if (header.getFileName().contains("META-INF/")){
+                                    metainf.add(header.getFileName());
+                                }
                             }
+                            for (String str : metainf) {
+                                zip.removeFile(str);
+                            }
+                        } catch (Exception e) {
+                            MessageControl.showExceptionMessage(3, e, "Failed to delete META-INF from "
+                                    + "Minecraft");
+                            if (!original.getName().equals(copy.getName())){
+                                original.delete();
+                                copy.renameTo(original);
+                            }
+                            downloading = false;
+                            return;
                         }
-                        for (String str : metainf) {
-                            zip.removeFile(str);
-                        }
-                    } catch (Exception e) {
-                        MessageControl.showExceptionMessage(3, e, "Failed to delete META-INF from "
-                                + "Minecraft");
-                        if (!original.getName().equals(copy.getName())){
-                            original.delete();
-                            copy.renameTo(original);
-                        }
-                        downloading = false;
-                        return;
                     }
                     jProgressBar1.setIndeterminate(false);
                     jProgressBar1.setVisible(true);
@@ -655,6 +657,7 @@ public class ModsEditorForm extends javax.swing.JDialog {
                             job.addJob(new Downloader(new URL(forge.getDownloadURL()), job, target, 
                                     false, true));
                             List<Future<File>> list = job.startJob();
+                            if (!job.isSuccessfull()) throw new Exception();
                             File forgeFile = list.get(0).get();
                             selected.addForge(new LocalMinecraftForge(forgeFile, forge.getForgeVersion(),
                                     forge.getMCVersion(), null));
@@ -668,6 +671,7 @@ public class ModsEditorForm extends javax.swing.JDialog {
                                         false));
                             }
                             List<Future<File>> list = job.startJob();
+                            if (!job.isSuccessfull()) throw new Exception();
                             File forgeFile = null;
                             for (Future<File> future : list) {
                                 File local = future.get();
@@ -683,7 +687,10 @@ public class ModsEditorForm extends javax.swing.JDialog {
                         jLabel3.setText("MCForge: " + selected.getForge().getForgeVersion());
                     } catch (Exception e) {
                         MessageControl.showExceptionMessage(3, e, "Failed to install forge.");
-                        if (selected.getForge() != null) selected.getForge().getPath().delete();
+                        if (selected.getForge() != null){
+                            selected.getForge().getPath().delete();
+                            selected.removeForge();
+                        }
                     }
                     jProgressBar1.setIndeterminate(true);
                     jProgressBar1.setVisible(false);
