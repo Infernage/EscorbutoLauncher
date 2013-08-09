@@ -36,7 +36,7 @@ class Updater{
         prog = bar;
     }
     
-    public File start(){
+    private File start(){
         Downloader download = new Downloader(link, frame); //Download class
         download.load(); //Load parameters
         download.setBar(prog); //Load the progressBar

@@ -47,15 +47,15 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.skin.BusinessBlackSteelSkin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Initial class of CoreELR.
@@ -90,17 +90,6 @@ public class Loader {
     
     public static void saveConfiguration(){
         kill.saveConfig();
-    }
-    
-    public static void main(String[] args) throws IOException, ZipException, ParserConfigurationException, SAXException{
-        JFrame fr = new JFrame("Test");
-        fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        fr.setSize(636, 395);
-        fr.setLocationRelativeTo(null);
-        fr.setVisible(true);
-        load(new String[] { "windows", System.getenv("APPDATA") + File.separator + "ELR", "NULL" }, 
-                fr, new File(System.getenv("APPDATA"), "ELR" + File.separator + "ELauncher.jar"), 
-                new JProgressBar(), System.out);
     }
         
     /**

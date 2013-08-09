@@ -67,6 +67,11 @@ public class Starter {
     public static void main(String[] args) {
         System.setProperty("java.net.useSystemProxies", "true");
         JFrame.setDefaultLookAndFeelDecorated(true);
+        if (args.length == 2){
+            if (args[0].equals("--deleteFile")){
+                new File(args[1]).delete();
+            }
+        }
         //Creates the root file into the computer.
         String OS = setOS();
         String workingDir = getWorkingDir(OS);

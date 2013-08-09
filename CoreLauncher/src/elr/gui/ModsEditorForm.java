@@ -29,6 +29,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -599,6 +601,38 @@ public class ModsEditorForm extends javax.swing.JDialog {
                                 + " version " + forge.getMCVersion() + ".\nYou are trying to install"
                                 + " in MC version " + selected.getVersion().getId() + ".", "Required"
                                 + " version different");
+                        downloading = false;
+                        return;
+                    }
+                    File original = new File(selected.getPath().getPath() + File.separator + "versions" + 
+                            selected.getVersion().getId() + File.separator + selected.getVersion()
+                            .getId() + ".jar");
+                    File copy = new File(original.getParent(), selected.getVersion().getId() + 
+                            "-copy.jar");
+                    try {
+                        IO.copy(original, copy);
+                    } catch (Exception ignore) {
+                        copy = original;
+                    }
+                    try {
+                        ZipFile zip = new ZipFile(original);
+                        List<FileHeader> headers = zip.getFileHeaders();
+                        List<String> metainf = new ArrayList<>();
+                        for (FileHeader header : headers) {
+                            if (header.getFileName().contains("META-INF/")){
+                                metainf.add(header.getFileName());
+                            }
+                        }
+                        for (String str : metainf) {
+                            zip.removeFile(str);
+                        }
+                    } catch (Exception e) {
+                        MessageControl.showExceptionMessage(3, e, "Failed to delete META-INF from "
+                                + "Minecraft");
+                        if (!original.getName().equals(copy.getName())){
+                            original.delete();
+                            copy.renameTo(original);
+                        }
                         downloading = false;
                         return;
                     }

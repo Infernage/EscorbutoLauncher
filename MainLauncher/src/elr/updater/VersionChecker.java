@@ -6,12 +6,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -21,6 +25,7 @@ import java.util.StringTokenizer;
  * @author Infernage
  */
 public class VersionChecker{
+    private int silentVersion = 7;
     private MainFrame frame;
     private InputStream input;
     private Properties properties;//XML versions
@@ -115,19 +120,47 @@ public class VersionChecker{
         return updater.init(link);
     }
     
+    private void silentUpdate() throws MalformedURLException, IOException, InterruptedException{
+        InputStream silentInput = new URL("https://dl.dropbox.com/s/uwnnc823nq57dwb/MainELRVersions."
+                + "xml?dl=1").openStream();
+        Properties silentProperties = new Properties();
+        silentProperties.loadFromXML(silentInput);
+        Set<String> internalVersions = silentProperties.stringPropertyNames();
+        for (String ver : internalVersions) {
+            int remote = Integer.parseInt(ver);
+            if (remote > silentVersion){
+                Updater internal = new Updater(frame);
+                internal.setBar(frame.getBar());
+                File updated = internal.init(silentProperties.getProperty(ver));
+                List<String> args = new ArrayList<>();
+                args.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + 
+                        "java" + (frame.getOS().equals("windows") ? "w" : ""));
+                args.add("-cp");
+                args.add(updated.getPath());
+                args.add(SilentUpdater.class.getCanonicalName());
+                args.add(updated.getPath());
+                args.add(frame.getCurrentJar());
+                new ProcessBuilder(args).start();
+                Thread.sleep(200);
+                System.exit(0);
+            }
+        }
+    }
+    
     public File start(){
         if (exit) return null;
         File res = null;
         frame.println("Checking for updates");
+        try {
+            silentUpdate();
+        } catch (Exception e) {
+            //Ignore
+            e.printStackTrace();
+        }
         String main = null;
         File prog_version = new File(frame.getWorkingDir(), "prog_ver.cfg");
         try {
             if (!prog_version.exists()){
-                try {
-                    prog_version.createNewFile();
-                } catch (Exception e) {
-                    //Ignore
-                }
                 if (!frame.getLauncher().exists()) main = "0.0.0";
                 else{
                     try {
@@ -139,11 +172,6 @@ public class VersionChecker{
                     } catch (Exception e) {
                         main = "0.0.0";
                     }
-                }
-                try(PrintWriter pw = new PrintWriter(prog_version)){
-                    pw.print(main);
-                } catch(Exception ex){
-                    //Ignore
                 }
             } else{
                 try(BufferedReader bf = new BufferedReader(new FileReader(prog_version))){
@@ -168,6 +196,7 @@ public class VersionChecker{
                         int V = Integer.parseInt(token.nextToken()), 
                                 V2 = Integer.parseInt(actual.nextToken());
                         if (V > V2){
+                            Outdated.checkOutdated(main, version, frame);
                             actualize = true;
                             frame.println("Updating to version " + version);
                             res = update(properties.getProperty(version));

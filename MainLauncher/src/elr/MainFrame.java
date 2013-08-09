@@ -43,6 +43,8 @@ public class MainFrame extends JFrame {
     
     public String getOS(){ return OS; }
     
+    public String getCurrentJar(){ return currJar; }
+    
     public void load(){
         if (currJar.equals("NULL")){
             println("FATAL ERROR: Unable to recognize the current file from the launcher");
