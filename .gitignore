@@ -162,3 +162,33 @@ pip-log.txt
 # Mac crap
 .DS_Store
 /nbproject/private/
+
+#Netbeans
+#I don't know why it isn't included -.-
+*.class
+*.jar
+ELR.log
+CoreLauncher/nbproject/private
+MainLauncher/nbproject/private
+CoreLauncher/nbproject/
+MainLauncher/nbproject/
+CoreLauncher/output/
+MainLauncher/output/
+CoreLauncher/test/
+MainLauncher/test/
+CoreLauncher/build/
+MainLauncher/build/
+CoreLauncher/nbbuild/
+MainLauncher/nbbuild/
+CoreLauncher/dist/
+MainLauncher/dist/
+CoreLauncher/nbdist/
+MainLauncher/nbdist/
+CoreLauncher/nbactions.xml
+MainLauncher/nbactions.xml
+CoreLauncher/nb-configuration.xml
+MainLauncher/nb-configuration.xml
+CoreLauncher/nbbuild.xml
+MainLauncher/nbbuild.xml
+CoreLauncher/build.xml
+MainLauncher/build.xml

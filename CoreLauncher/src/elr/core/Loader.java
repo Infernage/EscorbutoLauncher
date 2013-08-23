@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.BindException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -101,28 +102,64 @@ public class Loader {
         if (secure != null) throw new RuntimeException("Loader already created");
         if (args[2].equalsIgnoreCase("null")) args[2] = args[1] + File.separator + "MainELR.jar";
         stream.println("Allowed response from server: " + allowed);
+        try {
+            int attempts = 100;
+            int port = 7777;
+            while (attempts > 0){
+                try {
+                    unique = new ServerSocket(port);
+                    attempts = 0;
+                    System.out.println("Internal server successfully created on port " + port);
+                } catch (Exception e) {
+                    Socket sock = new Socket();
+                    sock.connect(new InetSocketAddress("127.0.0.1", port), 10000);
+                    String response = null;
+                    try (BufferedReader bf = new BufferedReader(new InputStreamReader(sock
+                            .getInputStream())); PrintWriter pw = new PrintWriter(sock
+                                    .getOutputStream())){
+                        pw.println("ELRPROGRAM");
+                        pw.flush();
+                        while ((response = bf.readLine()) == null && sock.isConnected());
+                    }
+                    if (response.equals("ELRQUIT")) throw new BindException();
+                    System.err.println("Failed to assign the port " + port + " to the internal server..."
+                            + " Tries left: " + attempts);
+                    attempts--;
+                    port++;
+                    if (attempts == 0){
+                        e.printStackTrace();
+                        throw new IOException("Impossible to assign a port. Tried 100 "
+                            + "times");
+                    }
+                }
+            }
+        } catch (BindException e){
+            e.printStackTrace();
+            MessageControl.showErrorMessage("Program is already running", "ERROR");
+            System.exit(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            MessageControl.showErrorMessage("Something failed with the internal server! Cause: "
+                    + e.toString(), "ERROR");
+            System.err.println("Something failed with the internal server!");
+            System.exit(1);
+        }
         new Thread("Unique_Instance"){
             @Override
             public void run(){
                 try {
-                    int attempts = 100;
-                    int port = 7777;
-                    while(attempts > 0){
-                        try {
-                            unique = new ServerSocket(port);
-                            attempts = 0;
-                            System.out.println("Internal server successfully created on port " + port);
-                        } catch (Exception e) {
-                            System.err.println("Failed to assign the port " + port + " to the internal"
-                                    + " server... Tries left: " + attempts);
-                            attempts--;
-                            port++;
-                            if (attempts == 0) throw new IOException("Impossible to assign a port. Tried"
-                                    + " 100 times.");
-                        }
-                    }
                     Socket sock;
                     while((sock = unique.accept()) != null){
+                        try (PrintWriter pw = new PrintWriter(sock.getOutputStream());
+                                BufferedReader bf = new BufferedReader(
+                                        new InputStreamReader(sock.getInputStream()))) {
+                            String response = null;
+                            while ((response = bf.readLine()) == null && sock.isConnected());
+                            if (response.equals("ELRPROGRAM")){
+                                pw.println("ELRQUIT");
+                                pw.flush();
+                            }
+                        }
                         sock.close();
                     }
                 } catch (BindException ex){

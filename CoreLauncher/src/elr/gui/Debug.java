@@ -1,26 +1,37 @@
 package elr.gui;
 
-import Debugger.Parameters;
-import com.sun.mail.smtp.SMTPTransport;
+import com.google.gson.Gson;
+import elr.core.Loader;
 import elr.core.util.Directory;
+import elr.core.util.MessageControl;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import java.util.List;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
  * GUI used to report an error.
  * @author Infernage
  */
 public class Debug extends javax.swing.JDialog{
+    private static final String TICKET_URL = "http://www.minechinchas.bugs3.com/error_ticket";
+    private final String end = "-----------------------------\n\n";
     private StringBuilder builder;
     
     /**
@@ -29,40 +40,77 @@ public class Debug extends javax.swing.JDialog{
     public Debug(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        builder = new StringBuilder();
-        reInit();
-    }
-    
-    public Debug(){
-        //this(((UI) Stack.getModule(UI.class)), true);
-    }
-    
-    /**
-     * Private method to remake the debug class.
-     */
-    private void reInit(){
-        this.setLocationRelativeTo(null);
-        builder.delete(0, builder.length());
-        description.setText("");
-        builder.append("JVM properties and PC info from user ").append(System.getProperty("user.name")).append("\n\n");
-        jButton1.setText("Send");
-        jButton1.setEnabled(true);
+        this.setLocationRelativeTo(parent);
+        builder = new StringBuilder("JVM properties and PC info from user ")
+                .append(System.getProperty("user.name")).append("\n\n");
         for (Object obj : System.getProperties().keySet()){
             builder.append("Key: ").append(obj).append(" Value: ").append(System.getProperty((String) obj)).append("\n");
         }
-        builder.append("-----------------------------").append("\n\n");
-        info.setText(builder.toString());
+        info.setText(builder.toString() + end);
     }
     
-    /**
-     * Method which is assigned to do the reInit() method and setVisible().
-     * @param flag {@code true} if the component is visible, {@code false} otherwise.
-     */
-    @Override
-    public void setVisible(boolean flag){
-        reInit();
-        super.setVisible(flag);
+    private String libraryPost(URL url, Object obj) throws IOException, URISyntaxException{
+        String json = new Gson().toJson(obj);
+        StringBuilder builder = new StringBuilder();
+        HttpClient client = new DefaultHttpClient();
+        try {
+            HttpPost post = new HttpPost(url.toURI());
+            List<BasicNameValuePair> list = new ArrayList<>();
+            list.add(new BasicNameValuePair("json", json));
+            UrlEncodedFormEntity params = new UrlEncodedFormEntity(list, "UTF-8");
+            post.setEntity(params);
+            HttpResponse response = client.execute(post);
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity()
+                    .getContent()))){
+                String lane = reader.readLine();
+                while(lane != null && !lane.equals("ENDTICKET")){
+                    builder.append(lane).append('\r');
+                    lane = reader.readLine();
+                }
+            }
+        } finally{
+            client.getConnectionManager().shutdown();
+        }
+        return builder.toString();
+    }
+    
+    private String no_libraryPost(URL url, Object obj, String content) throws IOException{
+        String json = new Gson().toJson(obj);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", content);
+        con.setRequestProperty("charset", "UTF-8");
+        con.setDoOutput(true);
+        con.setDoInput(true);
+        con.setUseCaches(false);
+        byte[] parameters = json.getBytes("UTF-8");
+        try (DataOutputStream writer = new DataOutputStream(con.getOutputStream())) {
+            writer.write(parameters);
+            writer.flush();
+        }
+        StringBuilder builder = new StringBuilder();
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))){
+            String lane = reader.readLine();
+            while(lane != null && !lane.equals("ENDTICKET")){
+                builder.append(lane).append('\r');
+                lane = reader.readLine();
+            }
+        }
+        return builder.toString();
+    }
+    
+    private class DebugClass{
+        private String nickname;
+        private String information;
+        private String description;
+        private List<elr.modules.console.Error> errors;
+        
+        public DebugClass(String user, String info, String desc, List<elr.modules.console.Error> list){
+            nickname = user;
+            description = desc;
+            information = info;
+            errors = list;
+        }
     }
     
     /**
@@ -81,14 +129,11 @@ public class Debug extends javax.swing.JDialog{
         jScrollPane2 = new javax.swing.JScrollPane();
         info = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        nickname = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-        });
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Error description");
@@ -121,6 +166,10 @@ public class Debug extends javax.swing.JDialog{
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel3.setText("Information to send");
 
+        jLabel1.setText("Input your nickname:");
+
+        nickname.setText("Optional");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -133,18 +182,25 @@ public class Debug extends javax.swing.JDialog{
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane2))
-                    .addComponent(jScrollPane1))
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(nickname))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(229, 229, 229)
+                                .addComponent(jLabel2))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(240, 240, 240)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(229, 229, 229)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(241, 241, 241)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane2))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -156,10 +212,14 @@ public class Debug extends javax.swing.JDialog{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(nickname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -167,70 +227,45 @@ public class Debug extends javax.swing.JDialog{
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        /*Console console = (Console) Stack.getModule(Console.class);
-        String subject = "ELR Ticket from " + System.getProperty("user.name");
-        StringBuilder build = new StringBuilder(info.getText());
-        build.append("\n\nERRORSTREAM\n");
-        if (console != null){
-            if (!console.builder.toString().equals("")){
-                build.append(console.builder.toString());
-            } else build.append("No error stream found");
-        }
-        Parameters par = new Parameters();
-        Session ses = Session.getInstance(par.getPs());
-        ses.setDebug(false);
-        MimeMessage msg = new MimeMessage(ses);
-        SMTPTransport t = null;
-        try{
-            msg.setFrom(new InternetAddress(par.getF()));
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(par.getR()));
-            msg.setSubject(subject);
-            msg.setSentDate(new Date());
-            msg.setText(build.toString());
-            t = (SMTPTransport) ses.getTransport(par.getT());
-            t.connect(par.getF(), par.getP());
-            t.sendMessage(msg, msg.getAllRecipients());
+        List<elr.modules.console.Error> errorList = Loader.getMainGui().getConsoleTab().getErrorList();
+        String name = nickname.getText().equals("Optional") || nickname.getText().equals("") ? 
+                System.getProperty("user.name") : nickname.getText();
+        String information = builder.toString();
+        DebugClass ticket = new DebugClass(name, information, description.getText(), errorList);
+        try {
+            String response;
+            try {
+                response = libraryPost(new URL(TICKET_URL), ticket);
+            } catch (Exception e) {
+                Loader.getMainGui().getConsoleTab().printErr(e, "LibraryPost method failed", 2, 
+                        this.getClass());
+                response = no_libraryPost(new URL(TICKET_URL),
+                        ticket, "application/json");
+            }
+            MessageControl.showInfoMessage(response, "Server response");
             jButton1.setText("Sent");
             jButton1.setEnabled(false);
-        } catch (Exception ex){
-            if (ex.toString().contains("535 No SMTP server defined")){
-                int i = JOptionPane.showConfirmDialog(null, "Please, disable your antivirus/firewall and "
-                        + "try again.\nDo you want to save the error stream into a file?");
-                if (i != 0) return;
-            } else{
-                JOptionPane.showMessageDialog(null, "The message couldn't be sent");
-            }
-            if (console != null) console.setError(ex, 1, this.getClass());
+        } catch (Exception e) {
+            MessageControl.showExceptionMessage(2, e, "The message couldn't be sent."
+                    + "\nDumping error into a file...");
             Calendar C = new GregorianCalendar();
-            File log = new File(Directory.currentPath() + File.separator + "EscorbutoLauncher_Error_" + 
-                    C.get(Calendar.YEAR) + "-" + C.get(Calendar.MONTH) + "-" + 
-                    C.get(Calendar.DAY_OF_MONTH) + "_" + C.get(Calendar.HOUR_OF_DAY) + "-" + 
-                    C.get(Calendar.MINUTE) + "-" + C.get(Calendar.SECOND) + ".log");
-            try{
-                if (!log.exists()){
-                    log.createNewFile();
-                }
-                try (PrintWriter pw = new PrintWriter(log)) {
-                    pw.println(subject);
-                    pw.print(build.toString());
-                }
-            } catch (Exception e){
-                //Well... we attempted
-            }
-            JOptionPane.showMessageDialog(null, "Error file has been saved in the current launcher path");
-        } finally{
+            File dump = new File(Directory.currentPath(), "EscorbutoLauncher_Error_" + C.get(Calendar.YEAR)
+                    + "-" + C.get(Calendar.MONTH) + "-" + C.get(Calendar.DAY_OF_MONTH) + "_" + 
+                    C.get(Calendar.HOUR_OF_DAY) + "-" + C.get(Calendar.MINUTE) + "-" + 
+                    C.get(Calendar.SECOND) + ".elrdump");
             try {
-                if (t != null) t.close();
-            } catch (Exception e) {
-                //Ignore
+                if (!dump.exists()) dump.createNewFile();
+                try (PrintWriter pw = new PrintWriter(dump)) {
+                    pw.print(new Gson().toJson(ticket));
+                }
+                MessageControl.showInfoMessage("Error file has been saved in the current launcher path", 
+                        null);
+            } catch (Exception ex) {
+                //Well... we attempted.
+                MessageControl.showExceptionMessage(2, ex, "Failed to dump it");
             }
-        }*/
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        // TODO add your handling code here:
-        setVisible(false);
-    }//GEN-LAST:event_formWindowClosing
 
     private void descriptionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_descriptionKeyTyped
         // TODO add your handling code here:
@@ -242,7 +277,7 @@ public class Debug extends javax.swing.JDialog{
             if (description.getText().length() != 0){
                 info.setText(info.getText().substring(0, info.getText().length() - 1));
             } else{
-                info.setText(builder.toString());
+                info.setText(builder.toString() + end);
             }
         }
     }//GEN-LAST:event_descriptionKeyTyped
@@ -251,9 +286,11 @@ public class Debug extends javax.swing.JDialog{
     private javax.swing.JTextArea description;
     private javax.swing.JTextArea info;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField nickname;
     // End of variables declaration//GEN-END:variables
 }
