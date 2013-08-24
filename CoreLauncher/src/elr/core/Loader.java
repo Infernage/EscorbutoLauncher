@@ -94,7 +94,7 @@ public class Loader {
      * @param args args[0] = OS, args[1] = workDir, args[2] = mainJar
      * @param mainFrame The frame where will be all JPanels.
      * @param currentJar Core ELR file.
-     * @param prog A progress bar to show the progress of a download.
+     * @param prog Not necessary anymore. This param will be deleted when MainELR be updated.
      * @param stream Custom PrintStream used to inform before remove all containers from the frame.
      */
     public static void load(String[] args, JFrame mainFrame, File currentJar, JProgressBar prog,
@@ -186,7 +186,7 @@ public class Loader {
             }
         }.start();
         secure = new Loader(currentJar);
-        secure.start(args, prog, stream, mainFrame);
+        secure.start(args, stream, mainFrame);
     }
     
     /**
@@ -214,9 +214,12 @@ public class Loader {
     /**
      * Invoked from load method. All parameters are the same.
      */
-    private void start(String[] args, JProgressBar prog, PrintStream stream, JFrame frame){
+    private void start(String[] args, PrintStream stream, JFrame frame){
         ThreadPool.startThreadPool();
-        checkJRE(args, prog, stream);
+        checkJRE();
+        //Creates the root file into the machine.
+        File root = new File(args[1]);
+        if (!root.exists()) root.mkdirs();
         File fileConfig = new File(args[1], "ELR.cfg");
         if (fileConfig.exists()) fileConfig.delete();
         for (File file : new File(args[1]).listFiles()) {
@@ -422,72 +425,13 @@ public class Loader {
     /**
      * Private method used to check system JRE.
      */
-    private void checkJRE(String[] args, JProgressBar prog, PrintStream stream){
+    private void checkJRE(){
         //Read JVM architecture and warn to the user if it's 32 bit type.
         String architecture = System.getProperty("sun.arch.data.model");
         if (architecture.equals("32")){
             MessageControl.showInfoMessage("It seems that you are running a 32-bit JVM architecture. "
                     + "If you want to\nexecute Minecraft with more than 1Gb, please install the 64-bit"
                     + " JVM version.", "32-bit JVM architecture detected!");
-        }
-        //Creates the root file into the machine.
-        File root = new File(args[1]);
-        if (!root.exists()) root.mkdirs();
-        //Checks if is installed the same Java version.
-        int jre = Integer.parseInt(System.getProperty("java.version").split("_")[1]);
-        int version = Integer.parseInt(System.getProperty("java.version").split("_")[0].split("\\.")[1]);
-        if (jre != java_release || version != java_version){
-            System.out.println("Applying jre");
-            stream.println("Applying jre...");
-            File jreOutput = new File(root, "jre_" + java_version + "." + java_release), customJRE = null;
-            try {
-                if (!jreOutput.exists() || jreOutput.listFiles().length < 8){
-                    try {
-                        /**
-                         * Length less than 8 'cause the JRE with less files has 8.
-                         */
-                        if (jreOutput.exists()) IO.deleteDirectory(jreOutput); //Deletes if it's corrupted.
-                        Properties jres = new Properties();
-                        jres.loadFromXML(new URL("https://dl.dropbox.com/s/13ojjgdjra49ihn/Jres.xml?dl=1")
-                                .openStream());
-                        String jreLink;
-                        if (args[0].equals("macosx")) jreLink = jres.getProperty("macosx");
-                        else jreLink = jres.getProperty(args[0] + "_" + architecture);
-                        DownloadJob job = new DownloadJob("JRE job", prog);
-                        Downloader download = new Downloader(new URL(jreLink), job, root, false, true);
-                        job.addJob(download);
-                        List<Future<File>> targets = job.startJob();
-                        File temp = targets.get(0).get();
-                        stream.println("Decoding jre...");
-                        customJRE = Compressor.secureDecompression(temp, null, true);
-                        temp.delete();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        IO.deleteDirectory(jreOutput);
-                        throw new RuntimeException(e);
-                    }
-                }
-                List<String> arg = new ArrayList<>();
-                arg.add(jreOutput.getAbsolutePath() + File.separator + "bin" + File.separator + 
-                        (args[0].equals("windows") ? "javaw" : "java"));
-                arg.add("-jar");
-                arg.add(args[2]);
-                if (customJRE != null) customJRE.renameTo(jreOutput);
-                Process start = new ProcessBuilder(arg).start();
-                Thread.sleep(2000);
-                start.exitValue();
-                System.exit(0);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (e instanceof IllegalThreadStateException){
-                    System.exit(0);
-                }
-                IO.deleteDirectory(jreOutput);
-                int i = MessageControl.showConfirmDialog("If you continue executing the program with"
-                        + " java " + version + " version " + jre + "\nyou can suffer a malfunction."
-                        + "\nDo you want to continue?", "WARNING", 0, 2);
-                if (i != 0) System.exit(-1);
-            }
         }
     }
     
