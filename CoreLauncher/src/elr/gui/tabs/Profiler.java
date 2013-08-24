@@ -1,5 +1,6 @@
 package elr.gui.tabs;
 
+import com.google.gson.Gson;
 import elr.core.Loader;
 import elr.core.interfaces.Listener;
 import elr.core.util.Directory;
@@ -14,8 +15,10 @@ import elr.gui.SaveForm;
 import elr.minecraft.MineFont;
 import elr.minecraft.MinecraftEndAction;
 import elr.minecraft.loader.MinecraftLoader;
+import elr.minecraft.versions.CompleteVersion;
 import elr.minecraft.versions.ExtractRules;
 import elr.minecraft.versions.Library;
+import elr.minecraft.versions.Version;
 import elr.modules.threadsystem.DownloadJob;
 import elr.modules.threadsystem.Downloader;
 import elr.modules.threadsystem.ThreadPool;
@@ -31,6 +34,13 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +48,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.swing.DefaultListModel;
@@ -509,19 +520,54 @@ public class Profiler extends javax.swing.JPanel implements Listener{
         // TODO add your handling code here:
         //Imports saves
         if (isWorking) return;
-        if (selectedInstance == null ){
-            MessageControl.showInfoMessage("Please, select an instance first.", null);
+        isWorking = true;
+        final String mc_version = MessageControl.showInputMessage("Please, input the Minecraft version"
+                + "(Format \"X.X.X\"):", "MC version necessary");
+        boolean isCorrect = false;
+        for (Version version : Loader.getVersionList().getVersionList()) {
+            if (version.getId().equals(mc_version)) isCorrect = true;
+        }
+        if (!isCorrect){
+            MessageControl.showErrorMessage("Please, input a correct version: \"X.X.X\"\nand your"
+                    + " input version is: " + mc_version, "MCVersion not found");
+            isWorking = false;
             return;
         }
-        isWorking = true;
-        Util.importFileOrDirectory(selected.getPath(), JFileChooser.DIRECTORIES_ONLY, null, null, frame);
-        getInstances();
-        try {
-            Util.saveInstances(selected);
-        } catch (Exception e) {
-            //Ignore
+        if (!Util.checkPermission(selected)){
+            isWorking = false;
+            return;
         }
-        isWorking = false;
+        ThreadPool.getInstance().execute(new Runnable() {
+
+            @Override
+            public void run() {
+                Path instancesPath = Paths.get(selected.getPath().getPath());
+                try {
+                    try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
+                        instancesPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
+                        WatchKey key = watcher.take();
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            WatchEvent.Kind kind = event.kind();
+                            if (kind.name().equals("ENTRY_CREATE")){
+                                Path p = (Path) event.context();
+                                File instance = new File(selected.getPath(), p.toString());
+                                CompleteVersion version = new Gson().fromJson(Util.requestGetMethod(Util
+                                        .getCompleteVersionJson(mc_version)), CompleteVersion.class);
+                                selected.addInstance(new Instances(instance.getName(), instance, version));
+                                getInstances();
+                                Util.saveInstances(selected);
+                                break;
+                            }
+                        }
+                        key.cancel();
+                    }
+                } catch (Exception e) {
+                    MessageControl.showExceptionMessage(2, e, "Failed to watch the directory");
+                }
+                isWorking = false;
+            }
+        });
+        Util.importFileOrDirectory(selected.getPath(), JFileChooser.DIRECTORIES_ONLY, null, null, frame);
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void modsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modsButtonActionPerformed
@@ -719,6 +765,10 @@ public class Profiler extends javax.swing.JPanel implements Listener{
     private void titleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleMouseClicked
         // TODO add your handling code here:
         if (evt.getClickCount() == 2 && evt.getButton() == MouseEvent.BUTTON1){
+            if (selected == null || selectedInstance == null){
+                MessageControl.showErrorMessage("Please, select an instance first", null);
+                return;
+            }
             String newName = MessageControl.showInputMessage("Input the new name:", null);
             if (newName == null || newName.equals("")) return;
             selectedInstance.rename(newName);

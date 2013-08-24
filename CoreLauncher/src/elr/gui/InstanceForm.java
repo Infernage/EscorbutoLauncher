@@ -170,7 +170,7 @@ public class InstanceForm extends javax.swing.JDialog {
         if (mc_version == null) return;
         if (mc_version.equals("No versions found")) return;
         if (!Util.checkPermission(profile)) return;
-        String name = Util.checkInstanceName("MC V" + mc_version, profile.getPath());
+        String name = Util.checkFileName("MC V" + mc_version, profile.getPath());
         final File namePath = new File(profile.getPath(), name);
         namePath.mkdirs();
         ThreadPool.getInstance().execute(new Runnable() {
@@ -224,7 +224,7 @@ public class InstanceForm extends javax.swing.JDialog {
         if (modpack == null) return;
         if (modpack.equals("No modpacks found")) return;
         if (!Util.checkPermission(profile)) return;
-        String name = Util.checkInstanceName(modpack, profile.getPath());
+        String name = Util.checkFileName(modpack, profile.getPath());
         final File namePath = new File(profile.getPath(), name);
         namePath.mkdirs();
         ThreadPool.getInstance().execute(new Runnable() {

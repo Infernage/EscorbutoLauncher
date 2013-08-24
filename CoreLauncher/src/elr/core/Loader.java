@@ -149,16 +149,24 @@ public class Loader {
             public void run(){
                 try {
                     Socket sock;
+                    List<Socket> socketList = null;
                     while((sock = unique.accept()) != null){
-                        try (PrintWriter pw = new PrintWriter(sock.getOutputStream());
-                                BufferedReader bf = new BufferedReader(
-                                        new InputStreamReader(sock.getInputStream()))) {
-                            String response = null;
-                            while ((response = bf.readLine()) == null && sock.isConnected());
-                            if (response.equals("ELRPROGRAM")){
+                        PrintWriter pw = new PrintWriter(sock.getOutputStream());
+                        BufferedReader bf = new BufferedReader(new InputStreamReader(sock
+                                .getInputStream()));
+                        String response = null;
+                        while ((response = bf.readLine()) != null && sock.isConnected());
+                        if (response.equals("ELRPROGRAM")){
+                            try {
                                 pw.println("ELRQUIT");
                                 pw.flush();
+                            } catch (Exception e) {
+                                //Ignore
                             }
+                        } else if (response.equals("ELRMAINTAIN")){
+                            if (socketList == null) socketList = new ArrayList<>();
+                            socketList.add(sock);
+                            continue;
                         }
                         sock.close();
                     }
@@ -243,6 +251,7 @@ public class Loader {
                     }
                     kill = new Shutdown(dec, file);
                     Runtime.getRuntime().addShutdownHook(kill);
+                    stream.println("Replacing gui, please wait...");
                     startAllProtocols(frame);
                     return;
                 } catch (Exception e) {
@@ -264,6 +273,7 @@ public class Loader {
             e.printStackTrace(stream);
             return;
         }
+        stream.println("Replacing gui, please wait...");
         startAllProtocols(frame);
     }
     

@@ -222,7 +222,8 @@ public final class Util {
                             String[] split = field.getText().split(";");
                             for (String part : split) {
                                 File save = new File(part);
-                                File targetSave = new File(target, save.getName());
+                                File targetSave = new File(target, checkFileName(save.getName(),
+                                        target));
                                 try {
                                     if (save.getName().endsWith("cxz")){
                                         save = Compressor.codedDecompression(save, true);
@@ -237,7 +238,7 @@ public final class Util {
                             }
                         } else{
                             File save = new File(field.getText());
-                            File targetSave = new File(target, save.getName());
+                            File targetSave = new File(target, checkFileName(save.getName(), target));
                             try {
                                 if (save.getName().endsWith("cxz")){
                                     save = Compressor.codedDecompression(save, true);
@@ -264,26 +265,27 @@ public final class Util {
     };
     
     /**
-     * Checks if an instance name is repeated.
+     * Checks if an file name is repeated.
      * @param name The name to check.
-     * @param path The path of instances.
+     * @param path The parent of the files.
      * @return The name checked.
      */
-    public static String checkInstanceName(String name, File path){
-        if (name == null) return checkInstanceName("Default", path);
+    public static String checkFileName(String name, File path){
+        if (name == null) return checkFileName("Default", path);
         if (name.endsWith("_") && name.substring(0, name.length() - 1).contains("_")){
             for (File child : path.listFiles()) {
                 if (name.substring(0, name.length() - 1).equals(child.getName())){
                     int number = Integer.parseInt(name.substring(name.length() - 2, name.length() - 1));
-                    return checkInstanceName(name.substring(0, name.length() - 3) + "_" + (number + 1) + "_", path);
+                    return checkFileName(name.substring(0, name.length() - 3) + "_" + (number + 1) + "_",
+                            path);
                 }
             }
         } else{
             for (File child : path.listFiles()) {
-                if (name.equals(child.getName())) return checkInstanceName(name + "_1_", path);
+                if (name.equals(child.getName())) return checkFileName(name + "_1_", path);
             }
         }
-        return name;
+        return name.substring(0, name.length() - 1);
     }
     
     /**
