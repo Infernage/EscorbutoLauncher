@@ -64,7 +64,7 @@ public class Debug extends javax.swing.JDialog{
                     .getContent()))){
                 String lane = reader.readLine();
                 while(lane != null && !lane.equals("ENDTICKET")){
-                    builder.append(lane).append('\r');
+                    builder.append(lane).append('\n');
                     lane = reader.readLine();
                 }
             }
@@ -92,7 +92,7 @@ public class Debug extends javax.swing.JDialog{
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))){
             String lane = reader.readLine();
             while(lane != null && !lane.equals("ENDTICKET")){
-                builder.append(lane).append('\r');
+                builder.append(lane).append('\n');
                 lane = reader.readLine();
             }
         }

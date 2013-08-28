@@ -3,6 +3,7 @@ package elr.modules.threadsystem;
 import elr.core.Loader;
 import elr.core.interfaces.Job;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -162,31 +163,31 @@ public class DownloadJob implements Job<Downloader, File>{
         }
         
         private void consoleType(){
-            System.out.println("Total progress   :|");
+            System.out.print("Total progress   :|");
             for (int i = 0; i < 10; i++) {
                 System.out.print("=");
             }
-            System.out.println("|\nFile size: " + (totalSize/MBYTES) + "MB");
+            BigDecimal tot = new BigDecimal(totalSize), mb = new BigDecimal(MBYTES);
+            System.out.println("|\nFile size: " + tot.divide(mb).doubleValue() + "MB");
             System.out.print("Transfer progress:|");
             int bar = 0;
             while(bar < 10){
-                double tmp = ((offset/MBYTES)/(totalSize/MBYTES))*10;
+                double tmp = (offset/totalSize)*10;
                 int temp = (int) (tmp-bar);
                 for (int i = 0; i < temp; i++) {
                     System.out.print("=");
                 }
+                bar = (int) tmp;
             }
             System.out.println("| Finished");
         }
         
         private void guiType(){
-            double total = totalSize/MBYTES;
             progress.setValue(0);
             progress.setMinimum(0);
             progress.setMaximum(100);
             while(progress.getValue() < 100){
-                double current = offset/MBYTES;
-                double tmp = (current/total)*100;
+                double tmp = (offset/totalSize)*100;
                 progress.setValue((int) tmp);
                 progress.setString((int) tmp + "%");
             }

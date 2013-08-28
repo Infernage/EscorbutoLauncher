@@ -19,10 +19,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.LinkOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -329,20 +331,43 @@ public final class Util {
     }
     
     /**
+     * Transforms into an URL with GET query
+     * @param url The url.
+     * @param params (Optional) All pairs "param=value" to use.
+     * @return The URL encoded.
+     * @throws UnsupportedEncodingException 
+     */
+    public static String encodeURLGET(String url, String... params) throws UnsupportedEncodingException{
+        if (params != null && params.length > 0){
+            String[] split = params[0].split("=");
+            url += "?" + URLEncoder.encode(split[0], "utf-8") + "=" + URLEncoder.encode(split[1],
+                    "utf-8");
+            for (int i = 1; i < params.length; i++) {
+                split = params[i].split("=");
+                url += "&" + URLEncoder.encode(split[0], "utf-8") + "=" + URLEncoder.encode(split[1],
+                    "utf-8");
+            }
+        }
+        return url;
+    }
+    
+    /**
      * Makes a GET method to an URL.
      * @param url The URL to request.
+     * @param params (Optional) All pairs "param=value" to use.
      * @return The response.
      * @throws MalformedURLException
      * @throws IOException 
      */
-    public static String requestGetMethod(String url) throws MalformedURLException, IOException{
+    public static String requestGetMethod(String url, String... params) throws MalformedURLException, IOException{
+        url = encodeURLGET(url, params);
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
         StringBuilder builder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String line;
             while((line = reader.readLine()) != null){
-                builder.append(line).append('\r');
+                builder.append(line).append('\n');
             }
         }
         return builder.toString();

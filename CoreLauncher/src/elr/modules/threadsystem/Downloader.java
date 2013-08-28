@@ -24,6 +24,7 @@ public class Downloader implements Callable<File>{
     private File destiny;
     private volatile long size = -1L;
     private String name = null;
+    private String[] getParams;
     private boolean error = false, md5, started = false, directory;
     
     /**
@@ -33,16 +34,19 @@ public class Downloader implements Callable<File>{
      * @param target The local file where will be stored.
      * @param containsMD5 {@code true} if is a MD5 download.
      * @param isDirectory {@code true} if the param target is a directory.
+     * @param params (Optional) All pairs "param=value" to use.
      * @throws MalformedURLException
      * @throws IOException 
      */
-    public Downloader(URL url, DownloadJob j, File target, boolean containsMD5, boolean isDirectory) 
+    public Downloader(URL url, DownloadJob j, File target, boolean containsMD5, boolean isDirectory,
+            String... params) 
             throws MalformedURLException, IOException{
         this.url = url;
         md5 = containsMD5;
         destiny = target;
         job = j;
         directory = isDirectory;
+        getParams = params;
     }
     
     public void setSize(long size){
@@ -55,6 +59,11 @@ public class Downloader implements Callable<File>{
     
     public long getSize(){
         try {
+            if (getParams != null && getParams.length > 0){
+                size = Integer.parseInt(Util.requestGetMethod(url.toString(), "elrfilesize=" 
+                        + getParams[0].split("=")[1]).split("=")[1].replace("<br>", "")
+                        .replace("\r", "").replace("\n", ""));
+            }
             if (size <= 0) size = url.openConnection().getContentLength();
         } catch (Exception e) {
             //Ignore
@@ -160,6 +169,37 @@ public class Downloader implements Callable<File>{
             throw e;
         }
     }
+    
+    private void httpGET_download() throws Exception{
+        url = new URL(Util.encodeURLGET(url.toString(), getParams));
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        FileOutputStream out = new FileOutputStream(destiny);
+        InputStream in = connection.getInputStream();
+        try{
+            byte[] buffer = new byte[(int)size];
+            int read;
+            while ((read = in.read(buffer)) > 0){
+                job.addOffset(read);
+                out.write(buffer, 0, read);
+            }
+        } catch (Exception ex){
+            error = true;
+            ex.printStackTrace();
+            throw ex;
+        } finally{
+            try {
+                out.close();
+            } catch (Exception e) {
+                //Ignore
+            }
+            try {
+                in.close();
+            } catch (Exception e) {
+                //Ignore
+            }
+        }
+    }
 
     @Override
     public File call() throws Exception {
@@ -170,12 +210,17 @@ public class Downloader implements Callable<File>{
             if (directory){
                 destiny.mkdirs();
                 if (name == null){
-                    name = url.getFile().substring(url.getFile().lastIndexOf("/") + 1);
+                    if (getParams != null && getParams.length > 0){
+                        name = getParams[0].split("=")[1];
+                    } else{
+                        name = url.getFile().substring(url.getFile().lastIndexOf("/") + 1);
+                    }
                     checkNameFile();
                 } else checkNameFile();
                 destiny = new File(destiny, name);
             } else destiny.getParentFile().mkdirs();
             if (md5) downloadMD5();
+            else if (getParams != null && getParams.length > 0) httpGET_download();
             else normalDownload();
             job.addDownloadedFile(this);
             Loader.getMainGui().getConsoleTab().println("Download of " + (name == null ? destiny
@@ -186,6 +231,7 @@ public class Downloader implements Callable<File>{
                     destiny.getName() : name), 2, this.getClass());
             destiny.delete();
             job.addFailedDownload(this);
+            e.printStackTrace();
         }
         return null;
     }

@@ -11,6 +11,7 @@ import java.util.Map;
  * @author Infernage
  */
 public class ModPack {
+    private String author;
     private String name;
     private String information;
     private Map<String, String> modPaths;
@@ -18,6 +19,7 @@ public class ModPack {
     private String mc_version;
     private String url;
     
+    public String getAuthor(){ return author; }
     public String getName(){ return name; }
     public String getInformation(){ return information; }
     public String getVersion(){ return version; }

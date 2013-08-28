@@ -610,6 +610,7 @@ public class Profiler extends javax.swing.JPanel implements Listener{
                     MessageControl.showExceptionMessage(3, e, "Failed to import Minecraft assets");
                     IO.deleteDirectory(assets);
                     assets.delete();
+                    return;
                 }
                 MinecraftEndAction runnable = new MinecraftEndAction(selected.getAction());
                 Loader.getMainGui().getConsoleTab().println("Cleaning old natives...");

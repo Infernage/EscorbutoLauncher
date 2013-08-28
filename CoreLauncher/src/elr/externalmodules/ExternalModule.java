@@ -1,13 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package elr.externalmodules;
 
+import java.io.File;
+
 /**
- *
+ * Interface used to initialize each ExternalModule.
  * @author Infernage
  */
 public interface ExternalModule {
-    public ModuleResponse init();
+    public String getVersion();
+    
+    public ModuleResponse init(File rootDir);
+    
+    public void kill();
+    
+    public void createUniqueID();
+    
+    public String getUniqueID();
 }

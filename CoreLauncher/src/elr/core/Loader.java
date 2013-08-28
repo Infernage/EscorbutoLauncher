@@ -3,9 +3,9 @@ package elr.core;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import elr.core.util.Directory;
-import elr.core.util.IO;
 import elr.core.util.MessageControl;
 import elr.core.util.Util;
+import elr.externalmodules.ModuleLoader;
 import elr.gui.MainGui;
 import elr.minecraft.modpacks.ModPackList;
 import elr.minecraft.versions.VersionList;
@@ -41,9 +41,7 @@ import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Future;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -61,8 +59,6 @@ import org.w3c.dom.NodeList;
  */
 public class Loader {
     public static final boolean allowed = getPermission();
-    private final static int java_version = 7;
-    private final static int java_release = 21;
     private static Loader secure = null;
     private static String version_program = "7.0.0";
     private static ServerSocket unique;
@@ -401,6 +397,7 @@ public class Loader {
                 if (!instance.getPath().exists()) profile.removeInstance(instance);
             }
         }
+        ModuleLoader.load();
     }
     
     /**

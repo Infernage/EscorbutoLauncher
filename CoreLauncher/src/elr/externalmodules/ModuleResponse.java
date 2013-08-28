@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package elr.externalmodules;
 
 /**
- *
+ * Class used to control each response and if the module is initialized.
  * @author Infernage
  */
 public class ModuleResponse {

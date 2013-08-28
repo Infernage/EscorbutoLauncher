@@ -204,3 +204,4 @@ ModPackModule/nbbuild.xml
 CoreLauncher/build.xml
 MainLauncher/build.xml
 ModPackModule/build.xml
+libs/
