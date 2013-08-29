@@ -13,7 +13,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Random;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -120,10 +119,12 @@ class AES{
      */
     void encryptFile(File src, File dst){
         try {
-            encrypt(new FileInputStream(src), new FileOutputStream(dst));
+            encrypt(new FileInputStream(src), new FileOutputStream(dst), src.getName()
+                    .substring(src.getName().lastIndexOf(".") + 1, src.getName().length()));
         } catch (Exception ex) {
             ex.printStackTrace();
             MessageControl.showExceptionMessage(3, ex, "Error crypting the file!");
+            dst.delete();
         }
     }
     
@@ -133,19 +134,8 @@ class AES{
      * @return The file crypted.
      */
     File encryptFile(File src){
-        StringBuilder build = new StringBuilder();
-        Random num = new Random();
-        String tmp = null;
-        char[] A = new char[4];
-        for (int i = 0; i < A.length; i++){
-            do{
-                tmp = Integer.toHexString(num.nextInt(109449)+1);
-            } while(tmp.equals("-") || tmp.equals("_"));
-            A[i] = (char) Integer.parseInt(tmp, 16);
-        }
-        build.append(A)
-                .append(";").append(src.getName()).append(";").append(tmp);
-        File dst = new File(src.getParent(), build.toString());
+        File dst = new File(src.getParent(), src.getName().substring(0, src.getName().lastIndexOf("."))
+                + ".cry");
         encryptFile(src, dst);
         return dst;
     }
@@ -157,8 +147,34 @@ class AES{
      */
     File decryptFile(File src){
         String[] tokens = src.getName().split(";");
-        String ext = tokens[1];
-        return decryptFile(src, ext);
+        if (tokens.length == 3) return outdatedDecryptFile(src, tokens[1]);
+        return decryptFile(src, src.getParentFile());
+    }
+    
+    /**
+     * Decrypts a file.
+     * @param src The file to decrypt.
+     * @param parent The folder where will be decrypted.
+     * @return The file decrypted.
+     */
+    File decryptFile(File src, File parent){
+        File target = null;
+        try {
+            CipherInputStream ciph = new CipherInputStream(new FileInputStream(src), decrypt);
+            byte[] info = new byte[ciph.read()];
+            ciph.read(info);
+            String cryptedInfo = new String(info, "utf-8").replace("||", "");
+            target = new File(parent, src.getName().substring(0, src.getName().lastIndexOf("."))
+                    + "." + cryptedInfo.split("=")[1]);
+            FileOutputStream output = new FileOutputStream(target);
+            decrypt(ciph, output);
+            return target;
+        } catch (Exception e) {
+            e.printStackTrace();
+            MessageControl.showExceptionMessage(3, e, "Error decrypting the file!");
+            if (target != null) target.delete();
+        }
+        return null;
     }
     
     /**
@@ -167,9 +183,10 @@ class AES{
      * @param nameDST The name of the file decrypted.
      * @return The file decrypted.
      */
-    File decryptFile(File src, String nameDST){
+    @Deprecated
+    File outdatedDecryptFile(File src, String nameDST){
         File dst = new File(src.getParent(), nameDST);
-        decryptFile(src, dst);
+        outdatedDecryptFile(src, dst);
         return dst;
     }
     
@@ -178,12 +195,14 @@ class AES{
      * @param src The file to decrypt.
      * @param dst The file decrypted.
      */
-    void decryptFile(File src, File dst){
+    @Deprecated
+    void outdatedDecryptFile(File src, File dst){
         try {
-            decrypt(new FileInputStream(src), new FileOutputStream(dst));
+            outdatedDecrypt(new FileInputStream(src), new FileOutputStream(dst));
         } catch (Exception ex) {
             ex.printStackTrace();
             MessageControl.showExceptionMessage(3, ex, "Error decrypting the file!");
+            dst.delete();
         }
     }
     
@@ -191,18 +210,43 @@ class AES{
      * Core method to crypt. The streams will be closed.
      * @param in The inputstream of the source file.
      * @param out The outputstream of the destiny file.
+     * @param extension The extension of the source file.
      */
-    private void encrypt(InputStream in, OutputStream out){
-        try{
-            try (CipherOutputStream cout = new CipherOutputStream(out, encrypt); InputStream input = in) {
-                int read;
-                while ((read = input.read(buffer)) >= 0){
-                    cout.write(buffer, 0, read);
-                }
+    private void encrypt(InputStream in, OutputStream out, String extension) 
+            throws UnsupportedEncodingException, IOException{
+        try (CipherOutputStream cout = new CipherOutputStream(out, encrypt); InputStream input = in) {
+            byte[] info = ("FileExtension=" + extension + "||").getBytes("utf-8");
+            cout.write(info.length);
+            cout.write(info);
+            int read;
+            while ((read = input.read(buffer)) >= 0){
+                cout.write(buffer, 0, read);
             }
-        } catch (IOException ex){
-            ex.printStackTrace();
-           MessageControl.showExceptionMessage(3, ex, "Error: Basic encryptation failed!\nImpossible to continue!");
+        }
+    }
+    /**
+     * Core method to decrypt. The streams will be closed.
+     * @param cin The cipherinputstream of the source file.
+     * @param out The outputstream of the destiny file.
+     */
+    private void decrypt(CipherInputStream cin, OutputStream out) throws IOException{
+        try {
+            int read = cin.read(buffer);
+            while (read > 0){
+                out.write(buffer, 0, read);
+                read = cin.read(buffer);
+            }
+        } finally{
+            try {
+                cin.close();
+            } catch (Exception e) {
+                //Ignore
+            }
+            try {
+                out.close();
+            } catch (Exception e) {
+                //Ignore
+            }
         }
     }
     
@@ -211,18 +255,14 @@ class AES{
      * @param in The inputstream of the source file.
      * @param out The outputstream of the destiny file.
      */
-    private void decrypt(InputStream in, OutputStream out){
-        try{
-            try (CipherInputStream cin = new CipherInputStream(in, decrypt); OutputStream output = out) {
-                int read = cin.read(buffer);
-                while (read >= 0){
-                    output.write(buffer, 0, read);
-                    read = cin.read(buffer);
-                }
+    @Deprecated
+    private void outdatedDecrypt(InputStream in, OutputStream out) throws IOException{
+        try (CipherInputStream cin = new CipherInputStream(in, decrypt); OutputStream output = out) {
+            int read = cin.read(buffer);
+            while (read >= 0){
+                output.write(buffer, 0, read);
+                read = cin.read(buffer);
             }
-        } catch (IOException ex){
-            ex.printStackTrace();
-            MessageControl.showExceptionMessage(3, ex, "Error: Basic decryptation failed!\nImpossible to continue!");
         }
     }
     

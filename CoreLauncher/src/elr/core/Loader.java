@@ -2,6 +2,7 @@ package elr.core;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import elr.core.server.InternalServer;
 import elr.core.util.Directory;
 import elr.core.util.MessageControl;
 import elr.core.util.Util;
@@ -30,17 +31,13 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -98,89 +95,7 @@ public class Loader {
         if (secure != null) throw new RuntimeException("Loader already created");
         if (args[2].equalsIgnoreCase("null")) args[2] = args[1] + File.separator + "MainELR.jar";
         stream.println("Allowed response from server: " + allowed);
-        try {
-            int attempts = 100;
-            int port = 7777;
-            while (attempts > 0){
-                try {
-                    unique = new ServerSocket(port);
-                    attempts = 0;
-                    System.out.println("Internal server successfully created on port " + port);
-                } catch (Exception e) {
-                    Socket sock = new Socket();
-                    sock.connect(new InetSocketAddress("127.0.0.1", port), 10000);
-                    String response = null;
-                    try (BufferedReader bf = new BufferedReader(new InputStreamReader(sock
-                            .getInputStream())); PrintWriter pw = new PrintWriter(sock
-                                    .getOutputStream())){
-                        pw.println("ELRPROGRAM");
-                        pw.flush();
-                        while ((response = bf.readLine()) == null && sock.isConnected());
-                    }
-                    if (response.equals("ELRQUIT")) throw new BindException();
-                    System.err.println("Failed to assign the port " + port + " to the internal server..."
-                            + " Tries left: " + attempts);
-                    attempts--;
-                    port++;
-                    if (attempts == 0){
-                        e.printStackTrace();
-                        throw new IOException("Impossible to assign a port. Tried 100 "
-                            + "times");
-                    }
-                }
-            }
-        } catch (BindException e){
-            e.printStackTrace();
-            MessageControl.showErrorMessage("Program is already running", "ERROR");
-            System.exit(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            MessageControl.showErrorMessage("Something failed with the internal server! Cause: "
-                    + e.toString(), "ERROR");
-            System.err.println("Something failed with the internal server!");
-            System.exit(1);
-        }
-        new Thread("Unique_Instance"){
-            @Override
-            public void run(){
-                try {
-                    Socket sock;
-                    List<Socket> socketList = null;
-                    while((sock = unique.accept()) != null){
-                        PrintWriter pw = new PrintWriter(sock.getOutputStream());
-                        BufferedReader bf = new BufferedReader(new InputStreamReader(sock
-                                .getInputStream()));
-                        String response = null;
-                        while ((response = bf.readLine()) != null && sock.isConnected());
-                        if (response.equals("ELRPROGRAM")){
-                            try {
-                                pw.println("ELRQUIT");
-                                pw.flush();
-                            } catch (Exception e) {
-                                //Ignore
-                            }
-                        } else if (response.equals("ELRMAINTAIN")){
-                            if (socketList == null) socketList = new ArrayList<>();
-                            socketList.add(sock);
-                            continue;
-                        }
-                        sock.close();
-                    }
-                } catch (BindException ex){
-                    ex.printStackTrace();
-                    MessageControl.showErrorMessage("Program is already running", "ERROR");
-                    System.exit(1);
-                } catch (SocketException ex){
-                    System.out.println("Socket closed from outside: " + ex.getMessage());
-                } catch (IOException ex){
-                    ex.printStackTrace();
-                    MessageControl.showErrorMessage("Something failed with the internal server! Cause: "
-                            + ex.toString(), "ERROR");
-                    System.err.println("Something failed with the internal server!");
-                    System.exit(1);
-                }
-            }
-        }.start();
+        InternalServer.load();
         secure = new Loader(currentJar);
         secure.start(args, stream, mainFrame);
     }
@@ -191,7 +106,8 @@ public class Loader {
      */
     private static boolean getPermission(){
         try {
-            return Boolean.parseBoolean(Util.requestGetMethod("https://dl.dropbox.com/s/kkuyfyvyw39h7tc/AllowedPlay.txt?dl=1").replace("\n", "").replace("\r", ""));
+            return Boolean.parseBoolean(Util.requestGetMethod("https://dl.dropbox.com/s/"
+                    + "kkuyfyvyw39h7tc/AllowedPlay.txt?dl=1").replace("\n", "").replace("\r", ""));
         } catch (Exception e) {
             e.printStackTrace();
             //Ignore
@@ -498,6 +414,15 @@ public class Loader {
             }
             channel = out.getChannel();
             lock = channel.lock();
+            try (Socket sock = new Socket()) {
+                sock.connect(new InetSocketAddress("127.0.0.1", InternalServer.getPort()), 10000);
+                PrintWriter pw = new PrintWriter(sock.getOutputStream());
+                pw.println("ELRSC\n" + this.toSecure());
+                pw.flush();
+            } catch (Exception e){
+                e.printStackTrace();
+                //The internal security will be null, so anyone can shutdown the server in any time.
+            }
         }
         
         public void saveConfig(){
@@ -526,12 +451,16 @@ public class Loader {
                 crypt.delete();
                 Compressor.cryptedCompression(decrypt, Compressor.CompressionLevel.NOCOMPRESS, null);
                 if (!pool.isShutdown()) pool.shutdownNow();
-                unique.close();
+                InternalServer.shutdown(this.toSecure());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally{
                 decrypt.delete();
             }
+        }
+        
+        private String toSecure(){
+            return this.toString() + " - Security thread";
         }
     }
 }

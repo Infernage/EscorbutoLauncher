@@ -73,11 +73,11 @@ public class Compressor {
      */
     public static File cryptedCompression(File src, CompressionLevel level, String pass) 
             throws ZipException{
-        File dst = new File(src.getParentFile(), src.getName() + ".zip");
-        basicCompression(src, dst, level);
         AES crypter = new AES();
         if (pass != null) crypter.setPassword(pass);
         if (level == CompressionLevel.NOCOMPRESS) return crypter.encryptFile(src);
+        File dst = new File(src.getParentFile(), src.getName() + ".zip");
+        basicCompression(src, dst, level);
         File crypted = crypter.encryptFile(dst);
         dst.delete();
         return crypted;
@@ -94,9 +94,9 @@ public class Compressor {
      */
     public static File codedCompression(File src, CompressionLevel level) throws
             ZipException, UnsupportedOptionsException, IOException{
+        if (level == CompressionLevel.NOCOMPRESS) return Encoder.encode(src);
         File dst = new File(src.getParentFile(), src.getName() + ".zip");
         basicCompression(src, dst, level);
-        if (level == CompressionLevel.NOCOMPRESS) return Encoder.encode(src);
         File encoded = Encoder.encode(dst);
         dst.delete();
         return encoded;
@@ -115,12 +115,12 @@ public class Compressor {
     
     public static File secureCompression(File src, CompressionLevel level, String pass) 
             throws ZipException, UnsupportedOptionsException, IOException{
-        File dst = new File(src.getParentFile(), src.getName() + ".zip");
-        basicCompression(src, dst, level);
         AES crypter = new AES();
         if (pass != null) crypter.setPassword(pass);
         File crypted;
         if (level != CompressionLevel.NOCOMPRESS){
+            File dst = new File(src.getParentFile(), src.getName() + ".zip");
+            basicCompression(src, dst, level);
             crypted = crypter.encryptFile(dst);
             dst.delete();
         } else crypted = crypter.encryptFile(src);

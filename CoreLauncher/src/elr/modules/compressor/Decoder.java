@@ -36,9 +36,16 @@ class Decoder {
                     output = new File(input.getParent() + File.separator + input.getName()
                             .substring(0, input.getName().lastIndexOf("_" + token))
                             .replace("REPLACE", "_") + "." + token.split("-")[0]);
-                    break;
+                    outStream = new BufferedOutputStream(new FileOutputStream(output));
+                    _decode(inStream, outStream, buffer);
+                    return output;
                 }
             }
+            byte[] info = new byte[inStream.read()];
+            inStream.read(info);
+            String codedInfo = new String(info, "utf-8").replace("||", "");
+            output = new File(input.getParent(), input.getName().substring(0, input.getName()
+                    .lastIndexOf(".")) + "." + codedInfo.split("=")[1]);
             outStream = new BufferedOutputStream(new FileOutputStream(output));
             _decode(inStream, outStream, buffer);
         } finally {

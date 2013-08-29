@@ -25,9 +25,8 @@ class Encoder {
      */
     static File encode(File input) 
             throws UnsupportedOptionsException, IOException{
-        File output = new File(input.getParent() + File.separator + input.getName().substring(0, 
-                        input.getName().lastIndexOf(".")) + "_" + input.getName().substring(input.getName()
-                        .lastIndexOf(".") + 1, input.getName().length()).toLowerCase() + "-File_.cxz");
+        File output = new File(input.getParent(), input.getName().substring(0, input.getName()
+                .lastIndexOf(".")) + ".cxz");
         byte[] buffer = new byte[8192];
         LZMA2Options options = new LZMA2Options();
         options.setPreset(9);
@@ -38,6 +37,10 @@ class Encoder {
         try {
             inStream = new BufferedInputStream(new FileInputStream(input));
             outStream = new XZOutputStream(new FileOutputStream(output), options);
+            byte[] info = ("FileExtension=" + input.getName().substring(input.getName().lastIndexOf(".")
+                    + 1, input.getName().length()) + "||").getBytes("utf-8");
+            outStream.write(info.length);
+            outStream.write(info);
             _encode(inStream, outStream, buffer);
         } finally{
             if (inStream != null) inStream.close();
@@ -50,7 +53,7 @@ class Encoder {
     }
     
     /**
-     * Engine of the encoder.
+     * Encoder engine.
      * @param input The inputstream of the file decoded.
      * @param output The outputstream of the file encoded.
      * @param buffer A buffer used to read and write.
