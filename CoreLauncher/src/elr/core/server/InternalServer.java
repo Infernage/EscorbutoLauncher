@@ -24,6 +24,7 @@ import java.util.List;
 public class InternalServer extends Thread{
     private ServerSocket server;
     private String security = null;
+    private boolean isHalting = false;
     
     private InternalServer(ServerSocket server){
         super("Internal server");
@@ -38,6 +39,12 @@ public class InternalServer extends Thread{
             while ((client = server.accept()) != null){
                 PrintWriter pw = new PrintWriter(client.getOutputStream());
                 BufferedReader bf = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                if (isHalting){
+                    pw.println("ELRHALT");
+                    pw.flush();
+                    client.close();
+                    continue;
+                }
                 String response = "";
                 while ((response += bf.readLine()) != null && client.isConnected());
                 if (response.equals("ELRPROGRAM")){
@@ -100,7 +107,8 @@ public class InternalServer extends Thread{
                             pw.flush();
                             while ((response = bf.readLine()) != null && sock.isConnected());
                         }
-                        if (response.equals("ELRQUIT")) throw new BindException();
+                        if (response.equals("ELRQUIT") || response.equals("ELRHALT")) 
+                            throw new BindException();
                         System.err.println("Failed to assign the port " + port + " to the internal server..."
                                 + " Tries left: " + attempts);
                         attempts--;
@@ -127,7 +135,10 @@ public class InternalServer extends Thread{
         }
     }
     
+    public static boolean isHalting(){ return instance.isHalting; }
+    
     public static void shutdown(String id) throws IOException{
+        if (!isHalting()) return;
         if (instance.security == null){
             instance.server.close();
             instance = null;
@@ -136,6 +147,13 @@ public class InternalServer extends Thread{
                 instance.server.close();
                 instance = null;
             }
+        }
+    }
+    
+    public static void shutdownSignal(String id){
+        if (instance.security == null) instance.isHalting = true;
+        else{
+            if (id.equals(instance.security)) instance.isHalting = true;
         }
     }
 }

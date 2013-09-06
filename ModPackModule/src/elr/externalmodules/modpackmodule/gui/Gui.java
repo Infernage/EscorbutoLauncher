@@ -2,7 +2,7 @@ package elr.externalmodules.modpackmodule.gui;
 
 import elr.core.Loader;
 import elr.core.util.MessageControl;
-import elr.externalmodules.modpackmodule.Initializer;
+import elr.externalmodules.modpackmodule.ModPackModule;
 import elr.externalmodules.modpackmodule.engine.Engine;
 import elr.externalmodules.modpackmodule.engine.ModPackCreator;
 import elr.externalmodules.modpackmodule.interfaces.Listener;
@@ -252,7 +252,7 @@ public class Gui extends javax.swing.JDialog implements Listener{
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        Initializer.exit();
+        ModPackModule.exit();
     }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

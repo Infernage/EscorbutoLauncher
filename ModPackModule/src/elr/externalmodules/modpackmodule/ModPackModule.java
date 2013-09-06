@@ -11,21 +11,21 @@ import java.io.File;
  * Main module class.
  * @author Infernage
  */
-public class Initializer implements ExternalModule{
+public class ModPackModule implements ExternalModule{
     private String UniqueID;
     private final String version = "1";
-    private static Initializer instance;
+    private static ModPackModule instance;
     
     public static void exit(){
         instance.kill();
     }
 
     @Override
-    public ModuleResponse init(File rootDir) {
+    public ModuleResponse init(File configDir) {
         instance = this;
         try {
-            Data.init(new File(rootDir, "elr_modpack.config"));
-            Gui g = new Gui(Loader.getMainGui().getParentFrame(), false);
+            Data.init(new File(configDir, "elr_modpack.config"));
+            new Gui(Loader.getMainGui().getParentFrame(), false);
         } catch (Exception ex) {
             MessageControl.showExceptionMessage(3, ex, "Failed to init module");
             return new ModuleResponse(ex.toString(), false);
@@ -51,5 +51,15 @@ public class Initializer implements ExternalModule{
     @Override
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public boolean isAutoInitialer() {
+        return false;
+    }
+
+    @Override
+    public String getInformationModule() {
+        return "Module used to support a ModPack creation and update it in the server.";
     }
 }

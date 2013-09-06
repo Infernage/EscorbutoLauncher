@@ -7,7 +7,7 @@ import static elr.core.util.Util.OS.linux;
 import static elr.core.util.Util.OS.osx;
 import static elr.core.util.Util.OS.windows;
 import elr.externalmodules.modpackmodule.Data;
-import elr.externalmodules.modpackmodule.Initializer;
+import elr.externalmodules.modpackmodule.ModPackModule;
 import elr.externalmodules.modpackmodule.gui.Loading;
 import elr.externalmodules.modpackmodule.gui.ServerHandler;
 import elr.externalmodules.modpackmodule.gui.ServerSelector;
@@ -52,9 +52,14 @@ public class Engine extends Thread{
     @Override
     public void run(){
         try {
-            Loading.create("Compressing, please wait");
-            File coded = Compressor.codedCompression(basePath, Compressor.CompressionLevel.ULTRA);
-            Loading.close();
+            File coded;
+            if (!basePath.getName().endsWith(".cxz")){
+                Loading.create("Compressing, please wait");
+                coded = Compressor.codedCompression(basePath, Compressor.CompressionLevel.ULTRA);
+                Loading.close();
+            } else{
+                coded = basePath;
+            }
             switch(Loader.getConfiguration().getOS()){
                 case linux: Runtime.getRuntime().exec("xdg-open " + coded.getPath());
                     break;
@@ -88,54 +93,7 @@ public class Engine extends Thread{
         } catch (Exception e) {
             MessageControl.showExceptionMessage(2, e, "Failed to code your files");
         } finally{
-            Initializer.exit();
+            ModPackModule.exit();
         }
-    }
-    
-    private final static String firstHost = "2shared.com", secondHost = "sendspace.com", 
-            thirdHost = "dropbox.com", fouthHost = "mega.co.nz";
-    
-    private String getSignificantURL(String link) throws MalformedURLException, IOException{
-        boolean stop = false;
-        if (link.contains(firstHost)){
-            URL url = new URL(link);
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                String lin;
-                while (((lin = in.readLine()) != null) && !stop){
-                    if (lin.contains(firstHost + "/download") && lin.contains(".cxz")){
-                        StringTokenizer token = new StringTokenizer(lin, "'\"");
-                        while (token.hasMoreTokens()){
-                            String te = token.nextToken();
-                            if (te.contains(".cxz")){
-                                link = te;
-                                stop = true;
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (link.contains(secondHost)){
-            URL url = new URL(link);
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                String lin;
-                while (((lin = in.readLine()) != null) && !stop){
-                    if (lin.contains("download_button") && lin.contains(secondHost) && lin.contains(".cxz")){
-                        StringTokenizer token = new StringTokenizer(lin, "'\"");
-                        while (token.hasMoreTokens()){
-                            String te = token.nextToken();
-                            if (te.contains(".cxz") && te.contains(secondHost)){
-                                link = te;
-                                stop = true;
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (link.contains(thirdHost) || link.contains(fouthHost)){
-            stop = true;
-        } else{
-            return "";
-        }
-        return link;
     }
 }

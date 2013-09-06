@@ -106,6 +106,7 @@ public class Data {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        src.delete();
         object = null;
     }
 }

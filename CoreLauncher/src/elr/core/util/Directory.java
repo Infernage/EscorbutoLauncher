@@ -29,4 +29,11 @@ public class Directory{
     public static String currentPath(){
         return Loader.getConfiguration().getMapValue(Configuration.Keys.mainELRDir);
     }
+    
+    /**
+     * This gets the main temporal directory.
+     */
+    public static String temporal(){
+        return workingDir() + File.separator + "Update";
+    }
 }

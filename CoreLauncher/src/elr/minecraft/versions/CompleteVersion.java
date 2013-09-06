@@ -2,7 +2,9 @@ package elr.minecraft.versions;
 
 import elr.core.Loader;
 import elr.modules.threadsystem.DownloadJob;
+import elr.modules.threadsystem.DefaultEngine;
 import elr.modules.threadsystem.Downloader;
+import elr.modules.threadsystem.MD5Engine;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class CompleteVersion extends Version{
                 File local = new File(target, "libraries" + File.separator + file);
                 try {
                     if (!local.isFile() || !library.hasOwnURL()) downloads.add(
-                            new Downloader(new URL(library.getURL()), job, local, true, false));
+                            new MD5Engine(new URL(library.getURL()), job, local, false));
                 } catch (Exception e) {
                 }
             }

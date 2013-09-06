@@ -11,7 +11,8 @@ import elr.minecraft.modded.LocalMinecraftForge;
 import elr.minecraft.modded.RemoteMinecraftForge;
 import elr.minecraft.versions.Library;
 import elr.modules.threadsystem.DownloadJob;
-import elr.modules.threadsystem.Downloader;
+import elr.modules.threadsystem.DefaultEngine;
+import elr.modules.threadsystem.MD5Engine;
 import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Instances;
 import elr.profiles.Profile;
@@ -654,21 +655,20 @@ public class ModsEditorForm extends javax.swing.JDialog {
                             File core = new File(selected.getPath(), "coremods");
                             if (!jars.exists()) jars.mkdirs();
                             if (!core.exists()) core.mkdirs();
-                            job.addJob(new Downloader(new URL(forge.getDownloadURL()), job, target, 
-                                    false, true));
+                            job.addJob(new DefaultEngine(new URL(forge.getDownloadURL()), job, target, 
+                                    true));
                             List<Future<File>> list = job.startJob();
                             if (!job.isSuccessfull()) throw new Exception();
                             File forgeFile = list.get(0).get();
                             selected.addForge(new LocalMinecraftForge(forgeFile, forge.getForgeVersion(),
                                     forge.getMCVersion(), null));
                         } else{
-                            job.addJob(new Downloader(new URL(forge.getDownloadURL()), job, target, 
-                                    false, true));
+                            job.addJob(new DefaultEngine(new URL(forge.getDownloadURL()), job, target, 
+                                    true));
                             for (Library library : RemoteMinecraftForge.getForgeLibraries()) {
                                 File local = new File(selected.getPath(), "libraries" + File.separator
                                         + library.getPath());
-                                job.addJob(new Downloader(new URL(library.getURL()), job, local, true,
-                                        false));
+                                job.addJob(new MD5Engine(new URL(library.getURL()), job, local, false));
                             }
                             List<Future<File>> list = job.startJob();
                             if (!job.isSuccessfull()) throw new Exception();

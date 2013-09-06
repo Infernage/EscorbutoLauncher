@@ -1,7 +1,7 @@
 package elr.externalmodules.modpackmodule.gui;
 
 import elr.core.util.MessageControl;
-import elr.externalmodules.modpackmodule.Initializer;
+import elr.externalmodules.modpackmodule.ModPackModule;
 import java.awt.Desktop;
 import java.net.URI;
 
@@ -194,7 +194,7 @@ public class ServerSelector extends javax.swing.JDialog {
             }
         } else if (jTextField1.getText().equals("stop")){
             this.dispose();
-            Initializer.exit();
+            ModPackModule.exit();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

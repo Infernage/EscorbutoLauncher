@@ -4,6 +4,7 @@ import elr.core.Loader;
 import elr.core.interfaces.Listener;
 import elr.core.util.MessageControl;
 import elr.core.util.Util;
+import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Profile;
 import elr.profiles.Instances;
 import java.awt.Graphics;
@@ -369,10 +370,21 @@ public class Options extends javax.swing.JPanel implements Listener{
         int i = MessageControl.showConfirmDialog("Are you sure to delete the selected profile? "
                 + "It can not be undone!", "Delete profile", 0, 1);
         if (i != 0) return;
-        Loader.getConfiguration().removeProfile(selected);
-        changeTab();
-        Loader.getMainGui().notifyListeners();
-        optionsPanel.setVisible(false);
+        ThreadPool.getInstance().execute(new Runnable() {
+
+            @Override
+            public void run() {
+                Profile prof = selected;
+                changeTab();
+                optionsPanel.setVisible(false);
+                deleteButton.setEnabled(false);
+                deleteButton.setText("Deleting...");
+                Loader.getConfiguration().removeProfile(prof);
+                Loader.getMainGui().notifyListeners();
+                deleteButton.setEnabled(true);
+                deleteButton.setText("Delete profile");
+            }
+        });
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed

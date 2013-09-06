@@ -25,6 +25,7 @@ public class MainGui extends javax.swing.JPanel implements Notifier{
     private final MinecraftPage pageTab;
     private final Options optionsTab;
     private final Profiler profileTab;
+    private final Modules modulesTab;
     private List<DownloadJob> jobList = Collections.synchronizedList(new ArrayList<DownloadJob>());
     private boolean ready = true;
     private List<Listener> listeners = new ArrayList<>();
@@ -45,6 +46,7 @@ public class MainGui extends javax.swing.JPanel implements Notifier{
         consoleTab = new Console(f);
         optionsTab = new Options(f);
         profileTab = new Profiler(f);
+        modulesTab = new Modules(f);
         listeners.add(optionsTab);
         listeners.add(profileTab);
         tabPanel.removeAll();
@@ -53,9 +55,12 @@ public class MainGui extends javax.swing.JPanel implements Notifier{
         tabPanel.add("Profiler", profileTab);
         tabPanel.add("Console", consoleTab);
         tabPanel.add("Options", optionsTab);
+        tabPanel.add("Modules", modulesTab);
         tabPanel.setSelectedIndex(0);
         setOpaque(false);
     }
+    
+    public Modules getModulesTab(){ return modulesTab; }
     
     public Changelog getChangelogTab(){ return changeTab; }
     

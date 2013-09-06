@@ -9,11 +9,15 @@ import java.io.File;
 public interface ExternalModule {
     public String getVersion();
     
-    public ModuleResponse init(File rootDir);
+    public ModuleResponse init(File configDir);
     
     public void kill();
     
     public void createUniqueID();
     
     public String getUniqueID();
+    
+    public boolean isAutoInitialer();
+    
+    public String getInformationModule();
 }

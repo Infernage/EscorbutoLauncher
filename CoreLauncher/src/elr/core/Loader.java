@@ -11,9 +11,10 @@ import elr.gui.MainGui;
 import elr.minecraft.modpacks.ModPackList;
 import elr.minecraft.versions.VersionList;
 import elr.modules.authentication.Authenticator;
-import elr.modules.threadsystem.Downloader;
 import elr.modules.compressor.Compressor;
 import elr.modules.threadsystem.DownloadJob;
+import elr.modules.threadsystem.Downloader;
+import elr.modules.threadsystem.MD5Engine;
 import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Instances;
 import elr.profiles.Profile;
@@ -32,7 +33,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.channels.FileChannel;
@@ -58,7 +58,6 @@ public class Loader {
     public static final boolean allowed = getPermission();
     private static Loader secure = null;
     private static String version_program = "7.0.0";
-    private static ServerSocket unique;
     private static Shutdown kill;
     
     static Configuration config = null;
@@ -135,7 +134,7 @@ public class Loader {
         File fileConfig = new File(args[1], "ELR.cfg");
         if (fileConfig.exists()) fileConfig.delete();
         for (File file : new File(args[1]).listFiles()) {
-            if (file.getName().contains(";ELR.cfg;")){
+            if (file.getName().contains(";ELR.cfg;") || file.getName().equals("ELR.cry")){
                 try {
                     File dec = Compressor.cryptedDecompression(file, null, false);
                     stream.println("Trying Json read...");
@@ -232,7 +231,7 @@ public class Loader {
                                     }
                                 }
                                 URL url = new URL(Util.MINECRAFT_RESOURCES + key);
-                                Downloader download = new Downloader(url, resources, file, true, false);
+                                Downloader download = new MD5Engine(url, resources, file, false);
                                 download.setName(key.contains("/") ? url.getFile().substring(url
                                         .getFile().lastIndexOf("/") + 1) : key);
                                 download.setSize(size);
@@ -254,6 +253,7 @@ public class Loader {
             versionList = tmp.fromJson(Util.requestGetMethod(Util.MINECRAFT_DOWNLOAD_BASE + 
                     "versions/versions.json"), VersionList.class);
             modpackList = tmp.fromJson(Util.requestGetMethod(Util.MODPACKS), ModPackList.class);
+            modpackList.obtainLatest();
         } catch (Exception e) {
             gui.getConsoleTab().printErr(e, "Failed to obtain Minecraft version list/Modpack "
                     + "version list", 3, this.getClass());
@@ -274,6 +274,7 @@ public class Loader {
                                 Authenticator.refresh(profile);
                                 gui.getConsoleTab().println(profile.getUsername() + " authenticated.");
                             } catch (Exception ex) {
+                                ex.printStackTrace();
                                 //If failed, the user has to select if relog, or not.
                                 gui.getConsoleTab().printErr(ex, "Profile " + profile.getProfilename() 
                                         + " failed to authenticate.", 1, this.getClass());
@@ -313,7 +314,14 @@ public class Loader {
                 if (!instance.getPath().exists()) profile.removeInstance(instance);
             }
         }
-        ModuleLoader.load();
+        try {
+            ModuleLoader.load();
+            gui.getModulesTab().signaled(false);
+        } catch (Exception e) {
+            MessageControl.showExceptionMessage(3, e, "ModuleLoader has failed. "
+                    + "All modules will be disabled.");
+            gui.getModulesTab().signaled(true);
+        }
     }
     
     /**
@@ -443,9 +451,11 @@ public class Loader {
         
         @Override
         public void run(){
+            InternalServer.shutdownSignal(this.toSecure());
             ThreadPool pool = ThreadPool.getInstance();
             pool.shutdown();
             try {
+                ModuleLoader.shutdown();
                 saveConfig();
                 release();
                 crypt.delete();

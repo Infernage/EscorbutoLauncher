@@ -375,7 +375,7 @@ public final class Util {
     
     public final static String MINECRAFT_FORGE = "http://files.minecraftforge.net/minecraftforge/";
     
-    public final static String MODPACKS = "https://dl.dropbox.com/s/4visu6c3td05imn/ModPacks.json";
+    public final static String MODPACKS = "http://www.minechinchas.bugs3.com/modpack_system";
     
     public final static String MINECRAFT_RESOURCES = "https://s3.amazonaws.com/Minecraft.Resources/";
     

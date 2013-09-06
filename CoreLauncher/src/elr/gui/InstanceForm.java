@@ -12,14 +12,20 @@ import elr.minecraft.versions.Version;
 import elr.minecraft.versions.VersionList;
 import elr.modules.compressor.Compressor;
 import elr.modules.threadsystem.DownloadJob;
-import elr.modules.threadsystem.Downloader;
+import elr.modules.threadsystem.DefaultEngine;
+import elr.modules.threadsystem.MD5Engine;
 import elr.modules.threadsystem.ThreadPool;
 import elr.profiles.Profile;
 import elr.profiles.Instances;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import javax.swing.DefaultListModel;
 
@@ -57,12 +63,64 @@ public class InstanceForm extends javax.swing.JDialog {
         if (modpacks == null){
             model.addElement("No modpacks found");
         } else{
-            for (String title : modpacks.getLatestModPacks().keySet()) {
-                model.addElement(title + " V" + modpacks.getLatestModPacks().get(title).getVersion() + 
-                        " MC" + modpacks.getLatestModPacks().get(title).getMinecraftVersion());
+            if (modpacks.getLatestModPacks().isEmpty()) model.addElement("No modpacks found");
+            else{
+                for (String title : modpacks.getLatestModPacks().keySet()) {
+                    model.addElement(title + " V" + modpacks.getLatestModPacks().get(title).getVersion() + 
+                            " MC" + modpacks.getLatestModPacks().get(title).getMinecraftVersion());
+                }
             }
         }
         modpackList.setModel(model);
+    }
+    
+    
+    
+    private final static String firstHost = "2shared.com", secondHost = "sendspace.com", 
+            thirdHost = "dropbox.com", fouthHost = "mega.co.nz";
+    
+    private String getSignificantURL(String link) throws MalformedURLException, IOException{
+        boolean stop = false;
+        if (link.contains(firstHost)){
+            URL url = new URL(link);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                String lin;
+                while (((lin = in.readLine()) != null) && !stop){
+                    if (lin.contains(firstHost + "/download") && lin.contains(".cxz")){
+                        StringTokenizer token = new StringTokenizer(lin, "'\"");
+                        while (token.hasMoreTokens()){
+                            String te = token.nextToken();
+                            if (te.contains(".cxz")){
+                                link = te;
+                                stop = true;
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (link.contains(secondHost)){
+            URL url = new URL(link);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                String lin;
+                while (((lin = in.readLine()) != null) && !stop){
+                    if (lin.contains("download_button") && lin.contains(secondHost) && lin.contains(".cxz")){
+                        StringTokenizer token = new StringTokenizer(lin, "'\"");
+                        while (token.hasMoreTokens()){
+                            String te = token.nextToken();
+                            if (te.contains(".cxz") && te.contains(secondHost)){
+                                link = te;
+                                stop = true;
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (link.contains(thirdHost) || link.contains(fouthHost)){
+            stop = true;
+        } else{
+            return "";
+        }
+        return link;
     }
     
     /**
@@ -195,9 +253,9 @@ public class InstanceForm extends javax.swing.JDialog {
                     CompleteVersion version = new Gson().fromJson(Util.requestGetMethod(Util
                             .getCompleteVersionJson(mc_version)), CompleteVersion.class);
                     job.addListJobs(version.getRequiredDownloads(namePath, job));
-                    job.addJob(new Downloader(new URL(Util.getMinecraftVersionJar(mc_version)), job, 
+                    job.addJob(new MD5Engine(new URL(Util.getMinecraftVersionJar(mc_version)), job, 
                             new File(namePath, "versions" + File.separator + mc_version + 
-                            File.separator + mc_version + ".jar"), true, false));
+                            File.separator + mc_version + ".jar"), false));
                     job.startJob();
                     profile.addInstance(new Instances(namePath.getName(), namePath, version));
                     Loader.getMainGui().notifyListeners();
@@ -235,7 +293,7 @@ public class InstanceForm extends javax.swing.JDialog {
                     Loader.getMainGui().getConsoleTab().println("Downloading ModPack. Please wait...");
                     DownloadJob job = new DownloadJob("Modpack installer", Loader.getMainGui()
                             .getProgressBar());
-                    String title = null;
+                    String title;
                     if (modpack.split(" ").length == 3){
                         title = modpack.split(" ")[0];
                     } else{
@@ -247,7 +305,8 @@ public class InstanceForm extends javax.swing.JDialog {
                         }
                     }
                     ModPack pack = modpacks.getLatestModPacks().get(title);
-                    job.addJob(new Downloader(new URL(pack.getURL()), job, namePath, false, true));
+                    String url = getSignificantURL(pack.getURL());
+                    job.addJob(new DefaultEngine(new URL(url), job, namePath, true));
                     List<Future<File>> file = job.startJob();
                     File decompressed = Compressor.secureDecompression(file.get(0).get(), null, true);
                     decompressed.renameTo(namePath);

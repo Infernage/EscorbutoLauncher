@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -48,18 +49,12 @@ public class Compressor {
             case ULTRA: parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
                 break;
         }
-        File temp = new File(src.getParent(), "Compressed");
-        src.renameTo(temp);
+        if (src.isDirectory()) zip.createZipFileFromFolder(src, parameters, false, MAXSPLITLENGTH);
+        else zip.createZipFile(src, parameters, false, MAXSPLITLENGTH);
         try {
-            if (temp.isDirectory()) zip.createZipFileFromFolder(temp, parameters, false, MAXSPLITLENGTH);
-            else zip.createZipFile(temp, parameters, false, MAXSPLITLENGTH);
-            try {
-                Thread.sleep(250);
-            } catch (Exception e) {
-                //Ignore
-            }
-        } finally{
-            temp.renameTo(src);
+            Thread.sleep(250);
+        } catch (Exception e) {
+            //Ignore
         }
     }
     
@@ -76,7 +71,8 @@ public class Compressor {
         AES crypter = new AES();
         if (pass != null) crypter.setPassword(pass);
         if (level == CompressionLevel.NOCOMPRESS) return crypter.encryptFile(src);
-        File dst = new File(src.getParentFile(), src.getName() + ".zip");
+        File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
+                    .lastIndexOf(".")) + ".zip");
         basicCompression(src, dst, level);
         File crypted = crypter.encryptFile(dst);
         dst.delete();
@@ -95,7 +91,8 @@ public class Compressor {
     public static File codedCompression(File src, CompressionLevel level) throws
             ZipException, UnsupportedOptionsException, IOException{
         if (level == CompressionLevel.NOCOMPRESS) return Encoder.encode(src);
-        File dst = new File(src.getParentFile(), src.getName() + ".zip");
+        File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
+                    .lastIndexOf(".")) + ".zip");
         basicCompression(src, dst, level);
         File encoded = Encoder.encode(dst);
         dst.delete();
@@ -119,7 +116,8 @@ public class Compressor {
         if (pass != null) crypter.setPassword(pass);
         File crypted;
         if (level != CompressionLevel.NOCOMPRESS){
-            File dst = new File(src.getParentFile(), src.getName() + ".zip");
+            File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
+                    .lastIndexOf(".")) + ".zip");
             basicCompression(src, dst, level);
             crypted = crypter.encryptFile(dst);
             dst.delete();
@@ -138,13 +136,14 @@ public class Compressor {
      */
     public static File basicDecompression(File src, File dst) throws ZipException{
         ZipFile zip = new ZipFile(src);
+        FileHeader header = (FileHeader) zip.getFileHeaders().get(0);
         File result;
         if (dst.isDirectory()){
             zip.extractAll(dst.getAbsolutePath());
-            result = new File(dst, "Compressed");
+            result = new File(dst, header.getFileName());
         } else if (dst.isFile()){
             zip.extractAll(dst.getParent());
-            result = new File(dst.getParent(), "Compressed");
+            result = new File(dst.getParent(), header.getFileName());
         }
         else throw new ZipException("Output file can not be recognized");
         return result;
@@ -163,8 +162,7 @@ public class Compressor {
         if (pass != null) decrypter.setPassword(pass);
         File decrypted = decrypter.decryptFile(src);
         if (!isCompress) return decrypted;
-        File dst = new File(src.getParent());
-        File decompressed = basicDecompression(decrypted, dst);
+        File decompressed = basicDecompression(decrypted, src.getParentFile());
         decrypted.delete();
         return decompressed;
     }
@@ -181,8 +179,7 @@ public class Compressor {
             FileNotFoundException, IOException{
         File decoded = Decoder.decode(src);
         if (!isCompress) return decoded;
-        File dst = new File(src.getParent());
-        File decompressed = basicDecompression(src, dst);
+        File decompressed = basicDecompression(src, src.getParentFile());
         decoded.delete();
         return decompressed;
     }
@@ -204,8 +201,7 @@ public class Compressor {
         File decrypted = decrypter.decryptFile(decoded);
         decoded.delete();
         if (!isCompress) return decrypted;
-        File dst = new File(src.getParent());
-        File decompressed = basicDecompression(decrypted, dst);
+        File decompressed = basicDecompression(decrypted, src.getParentFile());
         decrypted.delete();
         return decompressed;
     }
