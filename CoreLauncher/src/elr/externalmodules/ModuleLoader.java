@@ -170,7 +170,9 @@ public class ModuleLoader extends URLClassLoader{
             if (!config.exists()) config.mkdirs();
             List<File> candidateModules = getCandidates();
             tmp = new File(root, "runtime");
-            if (!tmp.exists()) tmp.mkdirs();
+            if (tmp.exists()){
+                IO.deleteDirectory(tmp);
+            } else tmp.mkdirs();
             List<File> toLoadModules = getRawModules(candidateModules);
             List<String> inyected = getInyectedModules(toLoadModules);
             loadModules(inyected);

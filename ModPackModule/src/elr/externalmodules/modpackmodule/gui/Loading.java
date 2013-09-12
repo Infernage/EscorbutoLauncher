@@ -35,7 +35,7 @@ public class Loading extends javax.swing.JDialog {
     /**
      * Creates new form Loading
      */
-    public Loading(java.awt.Frame parent, boolean modal) {
+    private Loading(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }

@@ -19,7 +19,7 @@ public class ModPackModule implements ExternalModule{
     public static void exit(){
         instance.kill();
     }
-
+    
     @Override
     public ModuleResponse init(File configDir) {
         instance = this;
@@ -36,6 +36,7 @@ public class ModPackModule implements ExternalModule{
     @Override
     public void kill() {
         Data.shutdown();
+        instance = null;
     }
 
     @Override

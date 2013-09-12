@@ -282,12 +282,13 @@ public final class Util {
                             path);
                 }
             }
+            return name.substring(0, name.length() - 1);
         } else{
             for (File child : path.listFiles()) {
                 if (name.equals(child.getName())) return checkFileName(name + "_1_", path);
             }
         }
-        return name.substring(0, name.length() - 1);
+        return name;
     }
     
     /**

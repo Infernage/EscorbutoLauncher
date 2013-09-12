@@ -71,8 +71,8 @@ public class Compressor {
         AES crypter = new AES();
         if (pass != null) crypter.setPassword(pass);
         if (level == CompressionLevel.NOCOMPRESS) return crypter.encryptFile(src);
-        File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
-                    .lastIndexOf(".")) + ".zip");
+        File dst = new File(src.getParentFile(), src.isDirectory() ? src.getName() + ".zip" :
+                src.getName().substring(0, src.getName().lastIndexOf(".")) + ".zip");
         basicCompression(src, dst, level);
         File crypted = crypter.encryptFile(dst);
         dst.delete();
@@ -91,8 +91,8 @@ public class Compressor {
     public static File codedCompression(File src, CompressionLevel level) throws
             ZipException, UnsupportedOptionsException, IOException{
         if (level == CompressionLevel.NOCOMPRESS) return Encoder.encode(src);
-        File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
-                    .lastIndexOf(".")) + ".zip");
+        File dst = new File(src.getParentFile(), src.isDirectory() ? src.getName() + ".zip" : 
+                src.getName().substring(0, src.getName().lastIndexOf(".")) + ".zip");
         basicCompression(src, dst, level);
         File encoded = Encoder.encode(dst);
         dst.delete();
@@ -116,8 +116,8 @@ public class Compressor {
         if (pass != null) crypter.setPassword(pass);
         File crypted;
         if (level != CompressionLevel.NOCOMPRESS){
-            File dst = new File(src.getParentFile(), src.getName().substring(0, src.getName()
-                    .lastIndexOf(".")) + ".zip");
+            File dst = new File(src.getParentFile(), src.isDirectory() ? src.getName() + ".zip" :
+                    src.getName().substring(0, src.getName().lastIndexOf(".")) + ".zip");
             basicCompression(src, dst, level);
             crypted = crypter.encryptFile(dst);
             dst.delete();
@@ -204,5 +204,29 @@ public class Compressor {
         File decompressed = basicDecompression(decrypted, src.getParentFile());
         decrypted.delete();
         return decompressed;
+    }
+    
+    /**
+     * Crypts a String. Uses AES algorithm.
+     * @param data The String to crypt.
+     * @param pass The password of the crypted String. (Optional)
+     * @return The String crypted.
+     */
+    public static String dataEncryptation(String data, String pass){
+        AES crypter = new AES();
+        if (pass != null) crypter.setPassword(pass);
+        return crypter.encryptData(data);
+    }
+    
+    /**
+     * Decrypts a String. Uses AES algorithm.
+     * @param data The String to decrypt.
+     * @param pass The password of the crypted String. (Optional)
+     * @return The String decrypted.
+     */
+    public static String dataDecryptation(String data, String pass){
+        AES decrypter = new AES();
+        if (pass != null) decrypter.setPassword(pass);
+        return decrypter.decryptData(data);
     }
 }

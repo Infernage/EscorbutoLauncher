@@ -14,9 +14,8 @@ public class ModPackList {
     private Map<String, Map<String, List<ModPack>>> modpacks = new HashMap<>();
     private SortedMap<String, ModPack> latest;
     
-    public ModPackList(Map modpack, SortedMap last){
+    public ModPackList(Map modpack){
         modpacks = modpack;
-        latest = last;
     }
     
     /**
@@ -24,6 +23,7 @@ public class ModPackList {
      */
     public void obtainLatest(){
         latest = new TreeMap<>();
+        if (modpacks == null || modpacks.isEmpty()) return;
         for (Map.Entry<String, Map<String, List<ModPack>>> entry : modpacks.entrySet()) {
             Map<String, List<ModPack>> map = entry.getValue();
             for (Map.Entry<String, List<ModPack>> en : map.entrySet()) {

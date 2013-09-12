@@ -13,15 +13,9 @@ import elr.externalmodules.modpackmodule.gui.ServerHandler;
 import elr.externalmodules.modpackmodule.gui.ServerSelector;
 import elr.modules.compressor.Compressor;
 import elr.modules.threadsystem.ThreadPool;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  *
@@ -39,6 +33,7 @@ public class Engine extends Thread{
             return;
         }
         ThreadPool.getInstance().execute(instance);
+        instance = null;
     }
     
     private ModPackCreator creator;

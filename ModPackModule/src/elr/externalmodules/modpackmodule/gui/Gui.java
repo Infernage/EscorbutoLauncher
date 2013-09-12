@@ -9,6 +9,7 @@ import elr.externalmodules.modpackmodule.interfaces.Listener;
 import elr.minecraft.versions.Version;
 import java.io.File;
 import java.util.Map;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.iharder.dnd.FileDrop;
@@ -26,6 +27,11 @@ public class Gui extends javax.swing.JDialog implements Listener{
     public Gui(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        for (Version ver : Loader.getVersionList().getVersionList()) {
+            if (ver.getType().equals("release")) model.addElement(ver.getId());
+        }
+        jComboBox1.setModel(model);
         FileDrop drop = new FileDrop(jTextField5, new FileDrop.Listener() {
 
             @Override
@@ -62,7 +68,6 @@ public class Gui extends javax.swing.JDialog implements Listener{
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
@@ -71,6 +76,7 @@ public class Gui extends javax.swing.JDialog implements Listener{
         jLabel7 = new javax.swing.JLabel();
         jTextField5 = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -88,8 +94,6 @@ public class Gui extends javax.swing.JDialog implements Listener{
         jLabel4.setText("ModPack version");
 
         jLabel5.setText("Minecraft version used");
-
-        jTextField4.setText("X.X.X");
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -147,10 +151,10 @@ public class Gui extends javax.swing.JDialog implements Listener{
                                     .addComponent(jTextField1)
                                     .addComponent(jTextField2)
                                     .addComponent(jTextField3)
-                                    .addComponent(jTextField4)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jButton2)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel7)
@@ -182,7 +186,7 @@ public class Gui extends javax.swing.JDialog implements Listener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -232,19 +236,7 @@ public class Gui extends javax.swing.JDialog implements Listener{
             MessageControl.showErrorMessage("The modpack doesn't exist", null);
             return;
         }
-        String mc_version = jTextField4.getText();
-        boolean matches = false;
-        for (Version version : Loader.getVersionList().getVersionList()) {
-            if (mc_version.equals(version.getId())){
-                matches = true;
-                break;
-            }
-        }
-        if (!matches){
-            MessageControl.showErrorMessage("Please, input an existing Minecraft version in format"
-                    + " X.X.X", "Minecraft version not found");
-            return;
-        }
+        String mc_version = (String) jComboBox1.getSelectedItem();
         this.dispose();
         Engine.start(new ModPackCreator(jTextField1.getText(), jTextField2.getText(),
                 jTextArea1.getText(), jTextField3.getText(), mc_version, modMap), path);
@@ -259,6 +251,7 @@ public class Gui extends javax.swing.JDialog implements Listener{
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -271,7 +264,6 @@ public class Gui extends javax.swing.JDialog implements Listener{
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     // End of variables declaration//GEN-END:variables
 

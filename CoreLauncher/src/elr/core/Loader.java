@@ -2,12 +2,14 @@ package elr.core;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import elr.core.server.InternalServer;
 import elr.core.util.Directory;
 import elr.core.util.MessageControl;
 import elr.core.util.Util;
 import elr.externalmodules.ModuleLoader;
 import elr.gui.MainGui;
+import elr.minecraft.modpacks.ModPack;
 import elr.minecraft.modpacks.ModPackList;
 import elr.minecraft.versions.VersionList;
 import elr.modules.authentication.Authenticator;
@@ -32,12 +34,15 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -57,7 +62,7 @@ import org.w3c.dom.NodeList;
 public class Loader {
     public static final boolean allowed = getPermission();
     private static Loader secure = null;
-    private static String version_program = "7.0.0";
+    private static String version_program = "7.0.1 BETA";
     private static Shutdown kill;
     
     static Configuration config = null;
@@ -252,7 +257,9 @@ public class Loader {
             Gson tmp = new Gson();
             versionList = tmp.fromJson(Util.requestGetMethod(Util.MINECRAFT_DOWNLOAD_BASE + 
                     "versions/versions.json"), VersionList.class);
-            modpackList = tmp.fromJson(Util.requestGetMethod(Util.MODPACKS), ModPackList.class);
+            Type map = new TypeToken<Map<String, Map<String, List<ModPack>>>>(){}.getType();
+            Map<String, Map<String, List<ModPack>>> a = tmp.fromJson(Util.requestGetMethod(Util.MODPACKS), map);
+            modpackList = new ModPackList(a);
             modpackList.obtainLatest();
         } catch (Exception e) {
             gui.getConsoleTab().printErr(e, "Failed to obtain Minecraft version list/Modpack "
