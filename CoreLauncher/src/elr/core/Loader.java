@@ -97,6 +97,8 @@ public class Loader {
     public static void load(String[] args, JFrame mainFrame, File currentJar, JProgressBar prog,
             PrintStream stream){
         if (secure != null) throw new RuntimeException("Loader already created");
+        if (args == null || mainFrame == null || currentJar == null || stream == null)
+            throw new RuntimeException("Argument null");
         if (args[2].equalsIgnoreCase("null")) args[2] = args[1] + File.separator + "MainELR.jar";
         stream.println("Allowed response from server: " + allowed);
         InternalServer.load();
