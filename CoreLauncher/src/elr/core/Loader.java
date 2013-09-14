@@ -57,12 +57,12 @@ import org.w3c.dom.NodeList;
 /**
  * Initial class of CoreELR.
  * @author Infernage
- * @version 7.0.0
+ * @version 7.0.1
  */
 public class Loader {
     public static final boolean allowed = getPermission();
     private static Loader secure = null;
-    private static String version_program = "7.0.1 BETA";
+    private static String version_program = "7.0.1";
     private static Shutdown kill;
     
     static Configuration config = null;
